@@ -7,27 +7,13 @@
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/png" href="img/logo.png">
 <style>
-  /* Estilos para la transición suave del carrusel */
+  /* Estilos específicos para la transición suave del carrusel del Hero */
   .hero-photo {
     transition: opacity 0.5s ease-in-out;
     object-fit: cover;
     width: 100%;
     height: 100%;
     border-radius: 24px;
-  }
-  .float-card {
-    transition: transform 0.3s ease, opacity 0.4s ease;
-  }
-  .av-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #fff;
-    margin-left: -8px;
-  }
-  .av-img:first-child {
-    margin-left: 0;
   }
 </style>
 </head>
@@ -62,11 +48,11 @@
       <a href="catalogo.html"><button class="btn-hero-secondary">Ver todas las mascotas</button></a>
     </div>
     <div class="trust-row">
-      <div class="avatar-stack" style="display: flex; align-items: center;">
-        <img class="av-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Usuario 1">
-        <img class="av-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" alt="Usuario 2">
-        <img class="av-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Usuario 3">
-        <span class="av">+</span >
+      <div class="avatar-stack">
+        <span class="av">JL</span>
+        <span class="av">MR</span>
+        <span class="av">AT</span>
+        <span class="av">+</span>
       </div>
       <div class="trust-text">
         <span class="stars">★★★★★</span>
@@ -75,7 +61,7 @@
     </div>
   </div>
 
-  <div class="hero-visual" style="position: relative; overflow: hidden; border-radius: 24px;">
+  <div class="hero-visual">
     <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Mascota en adopción">
     
     <div class="float-card match-alert">
@@ -96,27 +82,51 @@
   </div>
 </section>
 
-<section class="section">
-  <div class="section-head">
-    <span class="eyebrow">Cómo funciona</span>
-    <h2>Un match pensado para los dos</h2>
-    <p>No es solo deslizar fotos bonitas: cruzamos tu rutina real con la personalidad de cada mascota.</p>
+<!-- NUEVA SECCIÓN DE HISTORIA Y PROCESO (MAZO DE CARTAS INTERACTIVO) -->
+<section class="swipe-history-section">
+  <div class="section-head" style="margin-bottom: 26px;">
+    <span class="eyebrow">HISTORIA Y PROCESO</span>
+    <h2>CÓMO FUNCIONA Y MÁS / Una Historia de Match con Propósito</h2>
+    <p>No es solo deslizar fotos bonitas: descubre quiénes somos, qué buscamos y cómo transformamos la adopción.</p>
   </div>
-  <div class="feature-grid">
-    <div class="feature-card">
-      <div class="fc-icon">📋</div>
-      <h3>Cuéntanos tu rutina</h3>
-      <p>Tipo de vivienda, horas fuera de casa, experiencia, niños u otras mascotas. Toma menos de 2 minutos.</p>
+
+  <div class="swipe-history-container" id="swipeHistoryContainer">
+    <div class="swipe-indicator">
+      <span>↑ Desliza para descubrir</span>
     </div>
-    <div class="feature-card">
-      <div class="fc-icon">🧠</div>
-      <h3>Match inteligente</h3>
-      <p>Nuestro motor cruza energía, tamaño, ubicación y compatibilidad de vida para ordenar a los candidatos ideales.</p>
-    </div>
-    <div class="feature-card">
-      <div class="fc-icon">🏠</div>
-      <h3>Refugios verificados</h3>
-      <p>Cada perfil lo sube directamente el refugio o rescatista, con fotos reales y datos actualizados.</p>
+    
+    <div class="swipe-deck" id="swipeDeck">
+      <!-- Carta 1: Misión (visible por defecto) -->
+      <div class="swipe-card active" data-index="0">
+        <div class="fc-icon">🐾</div>
+        <h3>Nuestra Misión: Un Nuevo Comienzo para Ellos</h3>
+        <p>En PatitasMatch, no solo conectamos; transformamos vidas. Buscamos un mundo donde ninguna mascota sea abandonada.</p>
+        <div class="progress-indicator">1 of 4</div>
+      </div>
+      
+      <!-- Carta 2: El Proceso (oculta detrás) -->
+      <div class="swipe-card" data-index="1">
+        <div class="fc-icon">🧠</div>
+        <h3>Tu Historia, Su Compatibilidad</h3>
+        <p>Al contarnos tu rutina, nuestra IA crea un motor de match único, ordenando a los candidatos por energía, tamaño y estilo de vida. No es magia, es ciencia.</p>
+        <div class="progress-indicator">2 of 4</div>
+      </div>
+      
+      <!-- Carta 3: Confianza (oculta detrás) -->
+      <div class="swipe-card" data-index="2">
+        <div class="fc-icon">🏠</div>
+        <h3>Confianza: Transparencia Total</h3>
+        <p>Cada perfil que ves es subido directamente por refugios verificados y rescatistas. Fotos reales, datos actualizados y transparencia total.</p>
+        <div class="progress-indicator">3 of 4</div>
+      </div>
+      
+      <!-- Carta 4: El Impacto (oculta detrás) -->
+      <div class="swipe-card" data-index="3">
+        <div class="fc-icon">♥</div>
+        <h3>El Impacto: Una Adopción Responsable</h3>
+        <p>Cerramos el ciclo con una adopción que cambia vidas. Conecta con el refugio y dale a tu nuevo compañero el hogar que se merece. Juntos, logramos el match.</p>
+        <div class="progress-indicator">4 of 4</div>
+      </div>
     </div>
   </div>
 </section>
@@ -133,9 +143,10 @@
   PatitasMatch · Hecho con 🐾 para conectar refugios con familias · Adopción responsable
 </footer>
 
+<!-- SCRIPTS JAVASCRIPT -->
 <script>
-  // Carrusel dinámico de mascotas en la portada
-  const pets = [
+  // 1. Carrusel dinámico de mascotas en el Hero
+  const heroPets = [
     {
       name: "Luna",
       match: "98% de compatibilidad",
@@ -162,30 +173,78 @@
     }
   ];
 
-  let currentIndex = 0;
-  const photoEl = document.getElementById('heroPetPhoto');
-  const miniPhotoEl = document.getElementById('heroMiniPhoto');
-  const nameEl = document.getElementById('heroPetName');
-  const pctEl = document.getElementById('heroPctText');
-  const alertEl = document.getElementById('heroMatchText');
+  let currentHeroIndex = 0;
+  const heroPhotoEl = document.getElementById('heroPetPhoto');
+  const heroMiniPhotoEl = document.getElementById('heroMiniPhoto');
+  const heroNameEl = document.getElementById('heroPetName');
+  const heroPctEl = document.getElementById('heroPctText');
+  const heroAlertEl = document.getElementById('heroMatchText');
 
+  // Cambiar mascota del hero cada 3.5 segundos
   setInterval(() => {
-    currentIndex = (currentIndex + 1) % pets.length;
-    const pet = pets[currentIndex];
+    currentHeroIndex = (currentHeroIndex + 1) % heroPets.length;
+    const pet = heroPets[currentHeroIndex];
 
-    // Transición de desvanecimiento
-    photoEl.style.opacity = '0';
+    heroPhotoEl.style.opacity = '0'; // Desvanecimiento
 
     setTimeout(() => {
-      photoEl.src = pet.photo;
-      miniPhotoEl.src = pet.photo;
-      nameEl.textContent = pet.name;
-      pctEl.textContent = pet.match;
-      alertEl.textContent = pet.alert;
-      photoEl.style.opacity = '1';
-    }, 400);
+      heroPhotoEl.src = pet.photo;
+      heroMiniPhotoEl.src = pet.photo;
+      heroNameEl.textContent = pet.name;
+      heroPctEl.textContent = pet.match;
+      heroAlertEl.textContent = pet.alert;
+      heroPhotoEl.style.opacity = '1'; // Reaparecer
+    }, 400); // Coincide con la transición CSS
 
   }, 3500);
+
+  // 2. Lógica del Mazo de Cartas de Swipe Interactivo
+  const deck = document.getElementById('swipeDeck');
+  const swipeContainer = document.getElementById('swipeHistoryContainer');
+  const swipeCards = document.querySelectorAll('.swipe-card');
+  let currentSwipeIndex = 0;
+  let startSwipeY = 0;
+  let isSwiping = false;
+
+  // Detección de swipe en el contenedor
+  swipeContainer.addEventListener('touchstart', (e) => {
+    startSwipeY = e.touches[0].clientY;
+    isSwiping = true;
+  });
+
+  swipeContainer.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    const endY = e.changedTouches[0].clientY;
+    const diffY = startSwipeY - endY;
+
+    // Si es un swipe hacia arriba significativo (> 100px)
+    if (diffY > 100) {
+      rotateSwipeCards();
+    }
+    isSwiping = false;
+  });
+
+  // Función para rotar las cartas del mazo
+  function rotateSwipeCards() {
+    const currentCard = swipeCards[currentSwipeIndex];
+    
+    // Añadir la clase de animación de swipe up
+    currentCard.classList.add('swipe-up');
+
+    // Esperar a que termine la animación
+    setTimeout(() => {
+      // Mover la carta actual al final de la pila en el DOM
+      currentCard.classList.remove('active', 'swipe-up');
+      deck.appendChild(currentCard);
+      
+      // Actualizar el índice y activar la siguiente carta
+      currentSwipeIndex = (currentSwipeIndex + 1) % swipeCards.length;
+      swipeCards[currentSwipeIndex].classList.add('active');
+      
+      // Forzar un reflow para asegurar el orden de las capas
+      deck.offsetHeight;
+    }, 400); // Coincide con la duración CSS
+  }
 </script>
 
 </body>
