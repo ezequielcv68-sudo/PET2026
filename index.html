@@ -6,6 +6,30 @@
 <title>PatitasMatch — Encuentra a tu compañero ideal</title>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/png" href="img/logo.png">
+<style>
+  /* Estilos para la transición suave del carrusel */
+  .hero-photo {
+    transition: opacity 0.5s ease-in-out;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+  }
+  .float-card {
+    transition: transform 0.3s ease, opacity 0.4s ease;
+  }
+  .av-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    margin-left: -8px;
+  }
+  .av-img:first-child {
+    margin-left: 0;
+  }
+</style>
 </head>
 <body>
 
@@ -38,11 +62,11 @@
       <a href="catalogo.html"><button class="btn-hero-secondary">Ver todas las mascotas</button></a>
     </div>
     <div class="trust-row">
-      <div class="avatar-stack">
-        <span class="av">JL</span>
-        <span class="av">MR</span>
-        <span class="av">AT</span>
-        <span class="av">+</span>
+      <div class="avatar-stack" style="display: flex; align-items: center;">
+        <img class="av-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" alt="Usuario 1">
+        <img class="av-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" alt="Usuario 2">
+        <img class="av-img" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" alt="Usuario 3">
+        <span class="av">+</span >
       </div>
       <div class="trust-text">
         <span class="stars">★★★★★</span>
@@ -51,20 +75,22 @@
     </div>
   </div>
 
-  <div class="hero-visual">
-    <img class="hero-photo" src="https://images.unsplash.com/photo-1517849845537-4d257902861a?q=80&w=900&auto=format&fit=crop" alt="Perro de refugio esperando ser adoptado">
+  <div class="hero-visual" style="position: relative; overflow: hidden; border-radius: 24px;">
+    <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Mascota en adopción">
+    
     <div class="float-card match-alert">
       <span class="ic-heart">♥</span>
       <div>
         <div class="t1">¡Nuevo match!</div>
-        <div class="t2">Luna quiere conocerte</div>
+        <div id="heroMatchText" class="t2">Luna quiere conocerte</div>
       </div>
     </div>
+    
     <div class="float-card pct-alert">
-      <img class="ic-photo" src="https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?q=80&w=200&auto=format&fit=crop" alt="Gato">
+      <img id="heroMiniPhoto" class="ic-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=200&auto=format&fit=crop" alt="Miniatura">
       <div>
-        <div class="t1">Michi</div>
-        <div class="t2 pct">96% de compatibilidad</div>
+        <div id="heroPetName" class="t1">Luna</div>
+        <div id="heroPctText" class="t2 pct">98% de compatibilidad</div>
       </div>
     </div>
   </div>
@@ -106,6 +132,61 @@
 <footer class="footer">
   PatitasMatch · Hecho con 🐾 para conectar refugios con familias · Adopción responsable
 </footer>
+
+<script>
+  // Carrusel dinámico de mascotas en la portada
+  const pets = [
+    {
+      name: "Luna",
+      match: "98% de compatibilidad",
+      alert: "Luna quiere conocerte",
+      photo: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop"
+    },
+    {
+      name: "Toby",
+      match: "95% de compatibilidad",
+      alert: "Toby busca un hogar activo",
+      photo: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=900&auto=format&fit=crop"
+    },
+    {
+      name: "Michi",
+      match: "96% de compatibilidad",
+      alert: "Michi listo para acurrucarse",
+      photo: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=900&auto=format&fit=crop"
+    },
+    {
+      name: "Max",
+      match: "92% de compatibilidad",
+      alert: "Max es ideal para departamentos",
+      photo: "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=900&auto=format&fit=crop"
+    }
+  ];
+
+  let currentIndex = 0;
+  const photoEl = document.getElementById('heroPetPhoto');
+  const miniPhotoEl = document.getElementById('heroMiniPhoto');
+  const nameEl = document.getElementById('heroPetName');
+  const pctEl = document.getElementById('heroPctText');
+  const alertEl = document.getElementById('heroMatchText');
+
+  setInterval(() => {
+    currentIndex = (currentIndex + 1) % pets.length;
+    const pet = pets[currentIndex];
+
+    // Transición de desvanecimiento
+    photoEl.style.opacity = '0';
+
+    setTimeout(() => {
+      photoEl.src = pet.photo;
+      miniPhotoEl.src = pet.photo;
+      nameEl.textContent = pet.name;
+      pctEl.textContent = pet.match;
+      alertEl.textContent = pet.alert;
+      photoEl.style.opacity = '1';
+    }, 400);
+
+  }, 3500);
+</script>
 
 </body>
 </html>
