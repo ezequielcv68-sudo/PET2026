@@ -1,5 +1,4 @@
-import { db } from './firebase-config.js';
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { db, collection, getDocs } from './firebase-config.js';
 
 const catalogArea = document.getElementById('catalogArea');
 const petModal = document.getElementById('petModal');
@@ -7,7 +6,6 @@ const closeModal = document.getElementById('closeModal');
 
 let allPets = [];
 
-// Cargar mascotas desde Firestore
 async function loadCatalog() {
   try {
     const querySnapshot = await getDocs(collection(db, "pets"));
@@ -25,11 +23,10 @@ async function loadCatalog() {
     renderPets(allPets);
   } catch (error) {
     console.error("Error al cargar el catálogo:", error);
-    catalogArea.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Error al cargar las mascotas.</p>';
+    catalogArea.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">Error al cargar las mascotas: ${error.message}</p>`;
   }
 }
 
-// Renderizar tarjetas
 function renderPets(petsToRender) {
   catalogArea.innerHTML = '';
 
@@ -47,18 +44,16 @@ function renderPets(petsToRender) {
       </div>
     `;
 
-    // Abrir Modal Interactivo al hacer Clic
     card.addEventListener('click', () => openPetModal(pet));
     catalogArea.appendChild(card);
   });
 }
 
-// Abrir detalle de la mascota
 function openPetModal(pet) {
   document.getElementById('modalImg').src = pet.photoUrl || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1';
   document.getElementById('modalName').textContent = pet.name || 'Mascota';
   document.getElementById('modalSub').textContent = `${pet.species === 'cat' ? 'Gato' : 'Perro'} • ${pet.city || 'Ubicación no especificada'}`;
-  document.getElementById('modalDesc').textContent = pet.description || 'Esta mascota busca un hogar responsable y amoroso. ¡Contáctala o inicia sesión para hacer match!';
+  document.getElementById('modalDesc').textContent = pet.description || 'Esta mascota busca un hogar responsable y amoroso.';
 
   const tagsContainer = document.getElementById('modalTags');
   tagsContainer.innerHTML = `
@@ -73,13 +68,16 @@ function openPetModal(pet) {
   petModal.classList.add('active');
 }
 
-// Cerrar Modal
-closeModal.addEventListener('click', () => petModal.classList.remove('active'));
-petModal.addEventListener('click', (e) => {
-  if (e.target === petModal) petModal.classList.remove('active');
-});
+if (closeModal) {
+  closeModal.addEventListener('click', () => petModal.classList.remove('active'));
+}
 
-// Filtros
+if (petModal) {
+  petModal.addEventListener('click', (e) => {
+    if (e.target === petModal) petModal.classList.remove('active');
+  });
+}
+
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
