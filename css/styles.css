@@ -664,3 +664,109 @@ input:focus, select:focus, textarea:focus {
   left: 50%;
   transform: translateX(-50%);
 }
+/* ============================================================
+   ESTILOS PARA EL MAZO DE CARTAS DE SWIPE INTERACTIVO
+   ============================================================ */
+
+.swipe-history-section {
+  padding: 80px 20px;
+  background-color: #f8f5ed; /* Color de fondo crema original */
+}
+
+.swipe-history-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  max-width: 600px; /* Ajusta según el diseño */
+  margin: 0 auto;
+}
+
+.swipe-deck {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Ajusta según el contenido */
+  perspective: 1000px; /* Para efecto 3D opcional */
+}
+
+.swipe-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.4s ease, opacity 0.4s ease, z-index 0s 0.4s;
+  pointer-events: none; /* Desactiva interacción en cartas de atrás */
+  opacity: 0;
+}
+
+.swipe-card.active {
+  pointer-events: auto; /* Activa interacción solo en la carta superior */
+  opacity: 1;
+  transform: translateZ(0);
+}
+
+/* Apilamiento visual de las cartas de atrás */
+.swipe-card:nth-child(2) { transform: translateY(15px) translateZ(-5px); z-index: 3; }
+.swipe-card:nth-child(3) { transform: translateY(30px) translateZ(-10px); z-index: 2; }
+.swipe-card:nth-child(4) { transform: translateY(45px) translateZ(-15px); z-index: 1; }
+
+/* Clases para la animación de swipe up */
+.swipe-card.swipe-up {
+  transform: translateY(-200%) rotateX(20deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.swipe-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #1a1a1a;
+}
+
+.swipe-card p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+.progress-indicator {
+  font-size: 0.8rem;
+  color: #999;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.swipe-indicator {
+  font-size: 1.5rem;
+  color: #ccc;
+  position: absolute;
+  bottom: 15px;
+}
+
+/* Estilos básicos para las flechas de navegación lateral (opcional, como en Turn 6) */
+.nav-arrows {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
+}
+.arrow-prev, .arrow-next {
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.arrow-prev:hover, .arrow-next:hover {
+  color: #999;
+}
