@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="img/logo.png" alt="PetMatch Logo" width="130">
+</p>
+
 # 🐾 PatitasMatch
 
 App tipo "Tinder para mascotas de refugio". Los refugios suben perritos y
