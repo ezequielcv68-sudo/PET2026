@@ -43,13 +43,13 @@
     box-shadow: 0 12px 26px rgba(0,0,0,0.12);
   }
   .pet-card-img {
-  width: 100%;
-  height: 220px;
-  object-fit: contain; /* Muestra la foto completa sin recortar bordes */
-  background-color: #f4f0e6; /* Fondo neutro acorde al diseño */
-  padding: 6px;
-  box-sizing: border-box;
-}
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    background-color: #f4f0e6;
+    padding: 6px;
+    box-sizing: border-box;
+  }
   .pet-card-body {
     padding: 14px;
   }
@@ -107,6 +107,36 @@
     cursor: pointer;
     z-index: 10;
   }
+
+  /* Botones de navegación (Anterior / Siguiente) */
+  .modal-nav-btn {
+    position: absolute;
+    top: 35%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #1a1a1a;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    z-index: 12;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .modal-nav-btn:hover {
+    background: #2ec4b6;
+    color: #fff;
+    transform: translateY(-50%) scale(1.1);
+  }
+  .modal-nav-btn.prev-btn { left: 12px; }
+  .modal-nav-btn.next-btn { right: 12px; }
+
   .modal-img {
     width: 100%;
     height: 260px;
@@ -185,23 +215,23 @@
   </div>
 </div>
 
-<!-- Modal Interactivo de Detalles de Mascota -->
+<!-- Modal Interactivo con Navegación -->
 <div class="modal-overlay" id="petModal">
   <div class="modal-card">
     <button class="modal-close" id="closeModal">✕</button>
+    
+    <!-- Flechas de navegación -->
+    <button class="modal-nav-btn prev-btn" id="prevPetBtn" aria-label="Anterior">❮</button>
+    <button class="modal-nav-btn next-btn" id="nextPetBtn" aria-label="Siguiente">❯</button>
+
     <img class="modal-img" id="modalImg" src="" alt="Mascota">
     <div class="modal-body">
-      <h2 id="modalName" style="margin:0 0 6px 0;">Romina</h2>
-      <div id="modalSub" style="color:#666; font-size:0.9rem;">Perro · Cuernavaca</div>
+      <h2 id="modalName" style="margin:0 0 6px 0;"></h2>
+      <div id="modalSub" style="color:#666; font-size:0.9rem;"></div>
       
-      <div class="modal-tags" id="modalTags">
-        <span class="modal-tag">Energía Media</span>
-        <span class="modal-tag">Apto con niños</span>
-      </div>
+      <div class="modal-tags" id="modalTags"></div>
 
-      <p id="modalDesc" style="color:#444; font-size:0.95rem; line-height:1.5;">
-        Buscando un hogar lleno de amor y paseos diarios.
-      </p>
+      <p id="modalDesc" style="color:#444; font-size:0.95rem; line-height:1.5;"></p>
 
       <div class="modal-actions">
         <button class="btn-match" id="btnMatchAction">¡Hacer Match / Dar Like! 🐾</button>
