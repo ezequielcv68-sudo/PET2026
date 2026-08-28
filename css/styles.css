@@ -565,3 +565,102 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (max-width: 380px) { .role-grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   ESTILOS PARA EL MAZO DE CARTAS DE SWIPE INTERACTIVO (Landing)
+   ============================================================ */
+
+.swipe-history-section {
+  padding: 80px 20px;
+  background-color: var(--color-bg); /* O el color de fondo de tu landing */
+}
+
+.swipe-history-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  max-width: 600px; /* Ajusta según el diseño deseado */
+  margin: 0 auto;
+}
+
+.swipe-indicator {
+  font-size: 0.9rem;
+  color: var(--color-text-sub);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swipe-indicator span::before {
+  content: '↑';
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.swipe-deck {
+  position: relative;
+  width: 100%;
+  height: 420px; /* Ajusta según el contenido de las cartas */
+  perspective: 1000px; /* Para efecto 3D opcional */
+}
+
+.swipe-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.4s ease, opacity 0.4s ease, z-index 0s 0.4s;
+  pointer-events: none; /* Desactiva interacción en cartas de atrás */
+  opacity: 0;
+}
+
+.swipe-card.active {
+  pointer-events: auto; /* Activa interacción solo en la carta superior */
+  opacity: 1;
+  transform: translateZ(0);
+}
+
+/* Apilamiento visual de las cartas de atrás */
+.swipe-card:nth-child(2) { transform: translateY(15px) translateZ(-5px); z-index: 3; }
+.swipe-card:nth-child(3) { transform: translateY(30px) translateZ(-10px); z-index: 2; }
+.swipe-card:nth-child(4) { transform: translateY(45px) translateZ(-15px); z-index: 1; }
+
+/* Clases para la animación de swipe up */
+.swipe-card.swipe-up {
+  transform: translateY(-200%) rotateX(20deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.swipe-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: var(--color-text);
+}
+
+.swipe-card p {
+  font-size: 1rem;
+  color: var(--color-text-sub);
+  line-height: 1.6;
+  margin-bottom: auto; /* Empuja el indicador de progreso hacia abajo */
+}
+
+.progress-indicator {
+  font-size: 0.8rem;
+  color: var(--color-text-sub);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
