@@ -138,10 +138,12 @@
   .modal-nav-btn.next-btn { right: 12px; }
 
   .modal-img {
-    width: 100%;
-    height: 260px;
-    object-fit: cover;
-  }
+  width: 100%;
+  height: 260px;
+  object-fit: contain !important; /* El !important fuerza a la imagen a no recortarse */
+  background-color: #f4f0e6;       /* Color de fondo para rellenar los bordes */
+  display: block;
+}
   .modal-body {
     padding: 20px;
   }
