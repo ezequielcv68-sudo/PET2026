@@ -29,14 +29,14 @@ import {
 
 // 👉 REEMPLAZA estos valores con los de tu proyecto de Firebase
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROYECTO.firebaseapp.com",
-  projectId: "TU_PROYECTO",
-  storageBucket: "TU_PROYECTO.appspot.com",
-  messagingSenderId: "TU_SENDER_ID",
-  appId: "TU_APP_ID",
+  apiKey: "AIzaSyC9wv_vYPZB5oCLkj76D8hmQdZzcubxj_s",
+  authDomain: "pet-2026-e1001.firebaseapp.com",
+  projectId: "pet-2026-e1001",
+  storageBucket: "pet-2026-e1001.firebasestorage.app",
+  messagingSenderId: "224748987381",
+  appId: "1:224748987381:web:905739349170642625b6bc",
+  measurementId: "G-QSSTFV80N2"
 };
-
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
