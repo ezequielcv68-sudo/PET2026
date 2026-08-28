@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel del refugio — PatitasMatch</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell shell-wide">
+  <div class="topbar">
+    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PatitasMatch</a>
+    <div style="display:flex; gap:10px;">
+      <span class="btn-ghost" id="shelterNameTag" style="cursor:default;">Refugio</span>
+      <button class="btn-ghost" id="btnLogout">Salir</button>
+    </div>
+  </div>
+
+  <h2 style="margin-bottom:6px;">Tus mascotas en adopción</h2>
+  <p style="color:var(--ink-soft);font-size:0.9rem;margin:0 0 24px;">Sube fotos y datos para que más familias las encuentren.</p>
+
+  <div id="petsArea"><div class="center-loading">Cargando…</div></div>
+
+  <button class="fab" id="btnAdd" title="Agregar mascota">+</button>
+</div>
+
+<!-- Modal agregar/editar mascota -->
+<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(28,26,22,0.5); z-index:50; align-items:center; justify-content:center; padding:20px;">
+  <div class="panel" style="max-width:440px; width:100%; max-height:88vh; overflow-y:auto;">
+    <h2 id="modalTitle">Nueva mascota</h2>
+    <p class="sub">Completa los datos para publicarla.</p>
+
+    <label>Nombre</label>
+    <input type="text" id="pNombre" placeholder="Ej. Firulais">
+
+    <div class="field-row">
+      <div>
+        <label>Especie</label>
+        <div class="choice-group" data-group="pEspecie">
+          <div class="choice-chip" data-value="perro">Perro</div>
+          <div class="choice-chip" data-value="gato">Gato</div>
+        </div>
+      </div>
+    </div>
+
+    <label>Raza</label>
+    <input type="text" id="pRaza" placeholder="Ej. Mestizo, Labrador...">
+
+    <div class="field-row">
+      <div><label>Edad</label><input type="text" id="pEdad" placeholder="Ej. 2 años"></div>
+    </div>
+
+    <label>Tamaño</label>
+    <div class="choice-group" data-group="pTamano">
+      <div class="choice-chip" data-value="pequeno">Pequeño</div>
+      <div class="choice-chip" data-value="mediano">Mediano</div>
+      <div class="choice-chip" data-value="grande">Grande</div>
+    </div>
+
+    <label>Nivel de energía</label>
+    <div class="choice-group" data-group="pEnergia">
+      <div class="choice-chip" data-value="bajo">Tranquilo</div>
+      <div class="choice-chip" data-value="medio">Activo</div>
+      <div class="choice-chip" data-value="alto">Muy activo</div>
+    </div>
+
+    <label>Nivel de cuidado que requiere</label>
+    <div class="choice-group" data-group="pDificultad">
+      <div class="choice-chip" data-value="facil">Fácil</div>
+      <div class="choice-chip" data-value="moderado">Moderado</div>
+      <div class="choice-chip" data-value="dificil">Necesita experiencia</div>
+    </div>
+
+    <label>¿Bueno con niños?</label>
+    <div class="choice-group" data-group="pNinos">
+      <div class="choice-chip" data-value="true">Sí</div>
+      <div class="choice-chip" data-value="false">No / No probado</div>
+    </div>
+
+    <label>¿Bueno con otras mascotas?</label>
+    <div class="choice-group" data-group="pOtrasMascotas">
+      <div class="choice-chip" data-value="true">Sí</div>
+      <div class="choice-chip" data-value="false">No / No probado</div>
+    </div>
+
+    <label>Descripción</label>
+    <textarea id="pDescripcion" placeholder="Personalidad, historia, cuidados especiales..."></textarea>
+
+    <label>Ciudad</label>
+    <input type="text" id="pCiudad" placeholder="Ej. Cuernavaca, Morelos">
+
+    <label>Foto</label>
+    <div class="photo-drop" id="photoDrop">
+      📷 Toca para elegir una foto
+      <input type="file" id="pFoto" accept="image/*" style="display:none;">
+      <div id="photoPreviewWrap"></div>
+    </div>
+
+    <button class="btn-primary" id="btnGuardarPet">Publicar mascota</button>
+    <button class="btn-secondary" id="btnCancelar">Cancelar</button>
+    <div id="petMsg"></div>
+  </div>
+</div>
+
+<!-- Modal interesados -->
+<div id="interesadosOverlay" style="display:none; position:fixed; inset:0; background:rgba(28,26,22,0.5); z-index:50; align-items:center; justify-content:center; padding:20px;">
+  <div class="panel" style="max-width:420px; width:100%; max-height:80vh; overflow-y:auto;">
+    <h2 id="interesadosTitle">Interesados</h2>
+    <div id="interesadosArea"></div>
+    <button class="btn-secondary" id="btnCerrarInteresados">Cerrar</button>
+  </div>
+</div>
+
+<script type="module" src="js/shelter.js"></script>
+</body>
+</html>

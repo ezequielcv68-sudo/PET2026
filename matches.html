@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis matches — PatitasMatch</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PatitasMatch</a>
+    <button class="btn-ghost" id="btnLogout">Salir</button>
+  </div>
+
+  <h2 style="margin-bottom:6px;">Tus matches 💛</h2>
+  <p style="color:var(--ink-soft);font-size:0.9rem;margin:0 0 20px;">Mascotas que te interesaron. Contacta al refugio para conocerlas.</p>
+
+  <div id="matchesArea"><div class="center-loading">Cargando tus matches…</div></div>
+
+  <div class="tabbar">
+    <a href="swipe.html"><span class="ic">🐾</span>Descubrir</a>
+    <a href="matches.html" class="active"><span class="ic">💛</span>Mis matches</a>
+    <a href="onboarding.html"><span class="ic">📋</span>Mi rutina</a>
+  </div>
+</div>
+
+<script type="module" src="js/matches.js"></script>
+</body>
+</html>

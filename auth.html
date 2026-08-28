@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — PatitasMatch</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PatitasMatch</a>
+    <a href="index.html"><button class="btn-ghost">← Inicio</button></a>
+  </div>
+
+  <div class="panel">
+    <div id="registerView">
+      <h2>Crea tu cuenta</h2>
+      <p class="sub">Elige cómo quieres usar PatitasMatch.</p>
+
+      <div class="role-grid" id="roleGrid">
+        <div class="role-card" data-role="adopter">
+          <span class="icon">🏠</span>
+          <span class="label">Quiero adoptar</span>
+        </div>
+        <div class="role-card" data-role="shelter">
+          <span class="icon">🐕</span>
+          <span class="label">Soy un refugio</span>
+        </div>
+      </div>
+
+      <label id="lblName">Nombre completo</label>
+      <input type="text" id="regName" placeholder="Ej. Ana García">
+
+      <label id="lblShelterName" style="display:none">Nombre del refugio</label>
+      <input type="text" id="regShelterName" style="display:none" placeholder="Ej. Refugio Huellitas A.C.">
+
+      <label>Correo electrónico</label>
+      <input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com">
+
+      <label>Contraseña</label>
+      <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres">
+
+      <label>Ciudad</label>
+      <input type="text" id="regCity" placeholder="Ej. Atlixco, Puebla">
+
+      <button class="btn-primary" id="btnRegister">Crear cuenta</button>
+
+      <div id="registerMsg"></div>
+
+      <div class="link-row">
+        ¿Ya tienes cuenta? <button id="goLogin">Inicia sesión</button>
+      </div>
+    </div>
+
+    <div id="loginView" style="display:none">
+      <h2>Bienvenido de nuevo</h2>
+      <p class="sub">Inicia sesión para seguir buscando match.</p>
+
+      <label>Correo electrónico</label>
+      <input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com">
+
+      <label>Contraseña</label>
+      <input type="password" id="loginPassword" placeholder="Tu contraseña">
+
+      <button class="btn-primary" id="btnLogin">Iniciar sesión</button>
+
+      <div id="loginMsg"></div>
+
+      <div class="link-row">
+        ¿Aún no tienes cuenta? <button id="goRegister">Regístrate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>

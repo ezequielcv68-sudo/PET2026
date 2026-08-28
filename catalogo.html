@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo — PatitasMatch</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html" class="brand"><span class="mark">🐾</span>PatitasMatch</a>
+  <div class="links">
+    <a href="swipe.html">Descubrir</a>
+    <a href="catalogo.html" class="active">Catálogo</a>
+  </div>
+  <div class="right">
+    <a href="auth.html?tab=login"><button class="btn-nav outline">Iniciar sesión</button></a>
+    <a href="auth.html"><button class="btn-nav">Comenzar</button></a>
+  </div>
+</nav>
+
+<div class="section">
+  <div class="section-head" style="margin-bottom:26px;">
+    <span class="eyebrow">Todas las mascotas</span>
+    <h2>Perritos y gatitos esperando un hogar</h2>
+    <p>Crea tu cuenta y contesta la encuesta de estilo de vida para ver el % de compatibilidad con cada uno.</p>
+  </div>
+  <div id="catalogArea" class="match-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+    <div class="center-loading">Cargando mascotas…</div>
+  </div>
+</div>
+
+<footer class="footer">PatitasMatch · Hecho con 🐾 para conectar refugios con familias</footer>
+
+<script type="module" src="js/catalogo.js"></script>
+</body>
+</html>

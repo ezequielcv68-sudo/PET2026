@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu rutina — PatitasMatch</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PatitasMatch</a>
+    <button class="btn-ghost" id="btnLogout">Salir</button>
+  </div>
+
+  <div class="panel">
+    <h2>Cuéntanos tu rutina</h2>
+    <p class="sub">Con esto encontramos qué perritos y gatitos se adaptan mejor a tu vida. Toma 2 minutos.</p>
+
+    <label>¿Dónde vives?</label>
+    <div class="choice-group" data-group="vivienda">
+      <div class="choice-chip" data-value="depto">Departamento</div>
+      <div class="choice-chip" data-value="casa_sin_patio">Casa sin patio</div>
+      <div class="choice-chip" data-value="casa_patio_chico">Casa con patio chico</div>
+      <div class="choice-chip" data-value="casa_patio_grande">Casa con patio grande</div>
+    </div>
+
+    <label>¿Hay niños pequeños en casa?</label>
+    <div class="choice-group" data-group="ninos">
+      <div class="choice-chip" data-value="si">Sí</div>
+      <div class="choice-chip" data-value="no">No</div>
+    </div>
+
+    <label>¿Tienes otras mascotas actualmente?</label>
+    <div class="choice-group" data-group="otras_mascotas">
+      <div class="choice-chip" data-value="si">Sí</div>
+      <div class="choice-chip" data-value="no">No</div>
+    </div>
+
+    <label>¿Cuántas horas al día estaría sola la mascota?</label>
+    <div class="choice-group" data-group="horas_solo">
+      <div class="choice-chip" data-value="menos2">Menos de 2 h</div>
+      <div class="choice-chip" data-value="2a4">2–4 h</div>
+      <div class="choice-chip" data-value="4a8">4–8 h</div>
+      <div class="choice-chip" data-value="mas8">Más de 8 h</div>
+    </div>
+
+    <label>¿Cuánta energía/ejercicio le puedes dedicar?</label>
+    <div class="choice-group" data-group="energia">
+      <div class="choice-chip" data-value="bajo">Tranquilo (paseos cortos)</div>
+      <div class="choice-chip" data-value="medio">Activo (paseos diarios)</div>
+      <div class="choice-chip" data-value="alto">Muy activo (correr, deporte)</div>
+    </div>
+
+    <label>Tu experiencia con mascotas</label>
+    <div class="choice-group" data-group="experiencia">
+      <div class="choice-chip" data-value="primera_vez">Primera vez</div>
+      <div class="choice-chip" data-value="algo">Algo de experiencia</div>
+      <div class="choice-chip" data-value="mucha">Mucha experiencia</div>
+    </div>
+
+    <label>¿Qué te gustaría adoptar?</label>
+    <div class="choice-group" data-group="especie">
+      <div class="choice-chip" data-value="perro">Perro</div>
+      <div class="choice-chip" data-value="gato">Gato</div>
+      <div class="choice-chip" data-value="cualquiera">Cualquiera</div>
+    </div>
+
+    <label>Tamaño de preferencia</label>
+    <div class="choice-group" data-group="tamano">
+      <div class="choice-chip" data-value="pequeno">Pequeño</div>
+      <div class="choice-chip" data-value="mediano">Mediano</div>
+      <div class="choice-chip" data-value="grande">Grande</div>
+      <div class="choice-chip" data-value="cualquiera">Cualquiera</div>
+    </div>
+
+    <label>Ciudad</label>
+    <input type="text" id="obCity" placeholder="Ej. Atlixco, Puebla">
+
+    <button class="btn-secondary" id="btnUbicacion" type="button">📍 Usar mi ubicación para buscar mascotas cercanas</button>
+    <div id="ubicacionMsg" style="font-size:0.8rem;color:var(--ink-soft);margin-top:8px;"></div>
+
+    <button class="btn-primary" id="btnGuardar">Ver mis matches →</button>
+    <div id="obMsg"></div>
+  </div>
+</div>
+
+<script type="module" src="js/onboarding.js"></script>
+</body>
+</html>
