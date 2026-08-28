@@ -65,8 +65,7 @@
   </div>
 
   <div class="hero-visual" style="background-color: #d16343; border-radius: 24px; overflow: hidden; position: relative;">
-    <!-- Contenedor del carrusel dinámico del Hero -->
-    <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Mascota en adopción">
+        <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Mascota en adopción">
     
     <div class="float-card match-alert">
       <span class="ic-heart">♥</span>
@@ -86,7 +85,6 @@
   </div>
 </section>
 
-<!-- NUEVA SECCIÓN DE HISTORIA Y PROCESO (MAZO DE CARTAS INTERACTIVO) -->
 <section class="swipe-history-section">
   <div class="section-head" style="margin-bottom: 26px;">
     <span class="eyebrow">HISTORIA Y PROCESO</span>
@@ -100,43 +98,36 @@
     </div>
     
     <div class="swipe-deck" id="swipeDeck">
-      <!-- Carta 1: Misión (visible por defecto) -->
-      <div class="swipe-card active" data-index="0">
-        <!-- Foto auténtica de perro de refugio -->
-        <img class="card-pet-photo" src="https://images.unsplash.com/photo-1517849845537-4d257902861a?q=80&w=600&auto=format&fit=crop" alt="Mestizo de refugio con expresión conmovedora">
-        <div class="fc-icon">🐾</div> <!-- Icono paw print -->
-        <h3>Nuestra Misión: Un Nuevo Comienzo para Ellos</h3>
+            <div class="swipe-card active" data-index="0">
+                <img class="card-pet-photo" src="https://images.unsplash.com/photo-1517849845537-4d257902861a?q=80&w=600&auto=format&fit=crop" alt="Mestizo de refugio con expresión conmovedora">
+        <div class="fc-icon">🐾</div>         <h3>Nuestra Misión: Un Nuevo Comienzo para Ellos</h3>
         <p>En PatitasMatch, no solo conectamos; transformamos vidas. Buscamos un mundo donde ninguna mascota sea abandonada.</p>
         <div class="progress-indicator">1 of 4</div>
       </div>
       
-      <!-- Carta 2: El Proceso (oculta detrás) -->
-      <div class="swipe-card" data-index="1">
-        <div class="fc-icon">🧠</div> <!-- Icono cerebro/IA -->
-        <h3>Tu Historia, Su Compatibilidad</h3>
+            <div class="swipe-card" data-index="1">
+                <img class="card-pet-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=600&auto=format&fit=crop" alt="Mascota mestiza en adopción - Marcador">
+        <div class="fc-icon">🧠</div>         <h3>Tu Historia, Su Compatibilidad</h3>
         <p>Al contarnos tu rutina, nuestra IA crea un motor de match único, ordenando a los candidatos por energía, tamaño y estilo de vida. No es magia, es ciencia.</p>
         <div class="progress-indicator">2 of 4</div>
       </div>
       
-      <!-- Carta 3: Confianza (oculta detrás) -->
-      <div class="swipe-card" data-index="2">
-        <div class="fc-icon">🏠</div> <!-- Icono casa/refugio -->
-        <h3>Confianza: Transparencia Total</h3>
+            <div class="swipe-card" data-index="2">
+                <img class="card-pet-photo" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=600&auto=format&fit=crop" alt="Perro mestizo en adopción - Marcador">
+        <div class="fc-icon">🏠</div>         <h3>Confianza: Transparencia Total</h3>
         <p>Cada perfil que ves es subido directamente por refugios verificados y rescatistas. Fotos reales, datos actualizados y transparencia total.</p>
         <div class="progress-indicator">3 of 4</div>
       </div>
       
-      <!-- Carta 4: El Impacto (oculta detrás) -->
-      <div class="swipe-card" data-index="3">
-        <div class="fc-icon">♥</div> <!-- Icono corazón/impacto -->
-        <h3>El Impacto: Una Adopción Responsable</h3>
+            <div class="swipe-card" data-index="3">
+                <img class="card-pet-photo" src="https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=600&auto=format&fit=crop" alt="Perro de refugio en adopción - Marcador">
+        <div class="fc-icon">♥</div>         <h3>El Impacto: Una Adopción Responsable</h3>
         <p>Cerramos el ciclo con una adopción que cambia vidas. Conecta con el refugio y dale a tu nuevo compañero el hogar que se merece. Juntos, logramos el match.</p>
         <div class="progress-indicator">4 of 4</div>
       </div>
     </div>
 
-    <!-- Navegación lateral adicional (igual que en Turn 6, con flechas aqua) -->
-    <div class="nav-arrows">
+        <div class="nav-arrows">
       <div class="arrow-prev">‹</div>
       <div class="arrow-next">›</div>
     </div>
@@ -155,7 +146,6 @@
   PatitasMatch · Hecho con 🐾 para conectar refugios con familias · Adopción responsable
 </footer>
 
-<!-- SCRIPTS JAVASCRIPT -->
 <script>
   // 1. Carrusel dinámico de mascotas en el Hero
   const heroPets = [
@@ -227,7 +217,7 @@
   swipeContainer.addEventListener('touchend', (e) => {
     if (!isSwiping) return;
     const endY = e.changedTouches[0].clientY;
-    const diffY = startSwipeY - endY;
+  0const diffY = startSwipeY - endY;
 
     // Si es un swipe hacia arriba y es significativo (> 100px)
     if (diffY > 100) {
@@ -236,23 +226,28 @@
     isSwiping = false;
   });
 
-  // Función para rotar las cartas del mazo (Swipe Up)
+  // MODIFICACIÓN NO DESTRUCTIVA: Función para rotar las cartas del mazo (Swipe Up) CORREGIDA LÓGICA DE DOM
   function rotateSwipeCards() {
-    const currentCard = swipeCards[currentSwipeIndex];
-    
+    // CORRECCIÓN: Consultar el DOM para el elemento activo *actual*, no basarse en un índice inicial estático.
+    const currentActiveCard = deck.querySelector('.swipe-card.active');
+    if (!currentActiveCard) return;
+
     // Añadir la clase de animación de swipe up
-    currentCard.classList.add('swipe-up');
+    currentActiveCard.classList.add('swipe-up');
 
     // Esperar a que termine la animación
     setTimeout(() => {
       // Mover la carta actual al final de la pila en el DOM
-      currentCard.classList.remove('active', 'swipe-up');
-      deck.appendChild(currentCard);
+      currentActiveCard.classList.remove('active', 'swipe-up');
+      deck.appendChild(currentActiveCard);
       
-      // Actualizar el índice y activar la siguiente carta
-      currentSwipeIndex = (currentSwipeIndex + 1) % swipeCards.length;
-      swipeCards[currentSwipeIndex].classList.add('active');
-      
+      // CORRECCIÓN: La carta verdaderamente activa es ahora la *primera* hija del deck en el DOM.
+      const nextActiveCard = deck.firstElementChild;
+      nextActiveCard.classList.add('active');
+
+      // Actualizar currentSwipeIndex basándose en el data-index real para las flechas de navegación
+      currentSwipeIndex = parseInt(nextActiveCard.getAttribute('data-index'));
+
       // Forzar un reflow para asegurar que el orden de las capas se actualice correctamente
       deck.offsetHeight;
     }, 400); // Coincide con la duración CSS
