@@ -6,15 +6,33 @@ const closeModal = document.getElementById('closeModal');
 
 let allPets = [];
 
-// Función auxiliar para obtener propiedades sin importar si están en español o inglés
+// Detector inteligente de imagen y datos
 function getPetData(pet) {
-  const name = pet.nombre || pet.name || 'Sin nombre';
-  const photo = pet.fotoUrl || pet.photoUrl || pet.imageUrl || pet.foto || pet.photo || pet.imagen || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1';
+  const name = pet.nombre || pet.name || pet.titulo || 'Mascota';
   const species = (pet.especie || pet.species || pet.tipo || '').toLowerCase();
   const city = pet.ciudad || pet.city || pet.ubicacion || 'Cuernavaca';
-  const description = pet.descripcion || pet.description || 'Esta mascota busca un hogar responsable y amoroso.';
+  const description = pet.descripcion || pet.description || pet.desc || 'Esta mascota busca un hogar responsable y amoroso.';
   const size = pet.tamano || pet.tamaño || pet.size || 'Mediano';
   const energy = pet.energia || pet.energy || 'Media';
+
+  // 1. Probar nombres de variables comunes
+  let photo = pet.fotoUrl || pet.photoUrl || pet.imageUrl || pet.image || pet.foto || pet.photo || pet.imagen || pet.img || pet.url || pet.picture || pet.foto_url || pet.photo_url || pet.imgUrl;
+
+  // 2. Si no la encuentra por nombre, escanea automáticamente cualquier propiedad que sea una URL de imagen
+  if (!photo) {
+    for (const key in pet) {
+      const value = pet[key];
+      if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
+        photo = value;
+        break;
+      }
+    }
+  }
+
+  // 3. Imagen genérica sólo si la mascota no tiene ningún archivo asignado
+  if (!photo) {
+    photo = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1';
+  }
 
   return { name, photo, species, city, description, size, energy };
 }
@@ -25,7 +43,9 @@ async function loadCatalog() {
     allPets = [];
     
     querySnapshot.forEach((doc) => {
-      allPets.push({ id: doc.id, ...doc.data() });
+      const petData = { id: doc.id, ...doc.data() };
+      console.log("Mascota encontrada en Firestore:", petData); // Imprime los datos exactos en la consola (F12)
+      allPets.push(petData);
     });
 
     if (allPets.length === 0) {
