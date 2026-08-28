@@ -209,7 +209,7 @@ h1, h2, h3, .display {
 .trust-text { font-size: 0.82rem; color: var(--ink-soft); }
 .trust-text .stars { color: var(--amber); letter-spacing: 1px; display: block; }
 
-/* ---------- Hero visual (photo + floating cards) ---------- */
+/* ---------- Hero visual ---------- */
 .hero-visual { position: relative; }
 .hero-photo {
   width: 100%;
@@ -304,9 +304,7 @@ h1, h2, h3, .display {
   font-size: 0.82rem;
 }
 
-/* ============================================================
-   Shells (auth / app screens)
-   ============================================================ */
+/* ---------- Shells & Forms ---------- */
 .shell {
   max-width: 480px;
   margin: 0 auto;
@@ -351,7 +349,6 @@ h1, h2, h3, .display {
 .panel h2 { margin-bottom: 6px; }
 .panel p.sub { color: var(--ink-soft); margin: 0 0 22px; font-size: 0.95rem; }
 
-/* ---------- Forms ---------- */
 label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--ink-soft); margin: 16px 0 6px; }
 label:first-child { margin-top: 0; }
 
@@ -379,7 +376,7 @@ input:focus, select:focus, textarea:focus {
 .choice-chip {
   border: 1.5px solid var(--line);
   background: var(--bg-soft);
-  padding: 9px 14px;
+  padding: 99px 14px;
   border-radius: 999px;
   font-size: 0.85rem;
   cursor: pointer;
@@ -431,7 +428,6 @@ input:focus, select:focus, textarea:focus {
   padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-top: 14px;
 }
 
-/* ---------- Role selector ---------- */
 .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
 .role-card {
   border: 2px solid var(--line);
@@ -445,9 +441,7 @@ input:focus, select:focus, textarea:focus {
 .role-card .icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
 .role-card .label { font-weight: 700; font-size: 0.92rem; }
 
-/* ============================================================
-   SWIPE DECK
-   ============================================================ */
+/* ---------- Swipe Deck & App Views ---------- */
 .deck-wrap { position: relative; height: 62vh; min-height: 420px; margin: 10px 0 20px; }
 
 .pet-card {
@@ -481,13 +475,6 @@ input:focus, select:focus, textarea:focus {
 .pet-card .desc { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.4; overflow: hidden; }
 .pet-card .shelter-line { margin-top: auto; font-size: 0.78rem; color: var(--ink-faint); padding-top: 8px; }
 
-.swipe-indicator {
-  position: absolute; top: 24px; font-family: var(--font-display); font-size: 1.6rem; font-weight: 700;
-  padding: 6px 14px; border-radius: 10px; border: 4px solid; opacity: 0; text-transform: uppercase;
-}
-.swipe-indicator.like { left: 20px; color: var(--mint); border-color: var(--mint); transform: rotate(-12deg); }
-.swipe-indicator.nope { right: 20px; color: var(--coral); border-color: var(--coral); transform: rotate(12deg); }
-
 .deck-actions { display: flex; justify-content: center; gap: 22px; margin-top: 6px; }
 .deck-btn {
   width: 62px; height: 62px; border-radius: 50%; border: none; font-size: 1.5rem; cursor: pointer;
@@ -497,10 +484,6 @@ input:focus, select:focus, textarea:focus {
 .deck-btn.pass { background: var(--paper-card); color: var(--coral); }
 .deck-btn.like { background: var(--mint); color: #fff; }
 
-.empty-state { text-align: center; color: var(--ink-soft); padding: 60px 20px; }
-.empty-state .paw-big { font-size: 2.6rem; display:block; margin-bottom: 10px; }
-
-/* ---------- Bottom nav ---------- */
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--paper-card);
@@ -516,7 +499,6 @@ input:focus, select:focus, textarea:focus {
 .tabbar a.active { color: var(--coral); }
 .tabbar a .ic { font-size: 1.25rem; }
 
-/* ---------- Match grid ---------- */
 .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .match-item { background: var(--paper-card); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-card); }
 .match-item img { width: 100%; height: 110px; object-fit: cover; display: block; }
@@ -524,249 +506,133 @@ input:focus, select:focus, textarea:focus {
 .match-item h3 { font-size: 0.95rem; }
 .match-item .pct { color: var(--mint); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; }
 
-/* ---------- Shelter dashboard ---------- */
-.pet-row {
-  display: flex; gap: 14px;
-  background: var(--paper-card);
-  border-radius: 16px; padding: 12px;
-  box-shadow: var(--shadow-card);
-  margin-bottom: 12px; align-items: center;
-}
-.pet-row img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; background:#E4DEC9; }
-.pet-row .p-body { flex: 1; }
-.pet-row h3 { font-size: 1rem; margin-bottom: 2px; }
-.pet-row .meta { font-size: 0.78rem; color: var(--ink-soft); }
-.pet-row .status-pill {
-  font-family: var(--font-mono); font-size: 0.68rem; padding: 3px 8px; border-radius: 6px;
-  background: var(--mint-bg); color: var(--mint); text-transform: uppercase;
-}
-.pet-row .status-pill.adopted { background: rgba(232,131,107,0.14); color: var(--coral); }
-
-.fab {
-  position: fixed; bottom: 30px; right: max(20px, calc((100vw - 960px)/2 + 20px));
-  width: 58px; height: 58px; border-radius: 50%;
-  background: var(--coral); color: #fff; border: none; font-size: 1.8rem;
-  box-shadow: 0 12px 26px rgba(232,131,107,0.4); cursor: pointer;
-}
-
-.photo-drop {
-  border: 2px dashed var(--line); border-radius: 14px; padding: 18px; text-align: center;
-  cursor: pointer; color: var(--ink-soft); font-size: 0.85rem; background: var(--bg-soft);
-}
-.photo-drop img { max-width: 100%; max-height: 160px; border-radius: 10px; margin-top: 8px; }
-
-.progress-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 22px; }
-.progress-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(28,26,22,0.12); }
-.progress-dots span.on { background: var(--coral); }
-
 .center-loading {
   color: var(--ink-soft); text-align: center; padding: 60px 20px;
   font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: .05em;
 }
 
-@media (max-width: 380px) { .role-grid { grid-template-columns: 1fr; } }
-
 /* ============================================================
-   ESTILOS PARA EL MAZO DE CARTAS DE SWIPE INTERACTIVO (Landing)
+   MODAL INTERACTIVO DE DETALLES Y NAVEGACIÓN (Catálogo)
    ============================================================ */
-
-.swipe-history-section {
-  padding: 80px 20px;
-  background-color: var(--color-bg); /* O el color de fondo de tu landing */
-}
-
-.swipe-history-container {
-  display: flex;
-  flex-direction: column;
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(28, 26, 22, 0.6);
+  display: none;
   align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-card {
+  background: var(--paper-card);
+  border-radius: var(--radius-card);
+  max-width: 440px;
+  width: 100%;
+  overflow: hidden;
   position: relative;
-  max-width: 600px; /* Ajusta según el diseño deseado */
-  margin: 0 auto;
+  box-shadow: var(--shadow-float);
+  animation: popIn 0.3s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.modal-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+  color: var(--ink);
+  transition: background 0.2s;
+}
+.modal-close:hover {
+  background: #ffffff;
 }
 
-.swipe-indicator {
-  font-size: 0.9rem;
-  color: var(--color-text-sub);
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Imagen adaptable sin cortarse */
+.modal-img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain; /* Ajusta la foto respetando la proporción */
+  background-color: var(--bg-soft);
+  display: block;
 }
 
-.swipe-indicator span::before {
-  content: '↑';
+/* Flechas de navegación lateral en la tarjeta */
+.modal-nav-btn {
+  position: absolute;
+  top: 35%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
   font-size: 1.2rem;
   font-weight: bold;
-}
-
-.swipe-deck {
-  position: relative;
-  width: 100%;
-  height: 420px; /* Ajusta según el contenido de las cartas */
-  perspective: 1000px; /* Para efecto 3D opcional */
-}
-
-.swipe-card {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.4s ease, opacity 0.4s ease, z-index 0s 0.4s;
-  pointer-events: none; /* Desactiva interacción en cartas de atrás */
-  opacity: 0;
-}
-
-.swipe-card.active {
-  pointer-events: auto; /* Activa interacción solo en la carta superior */
-  opacity: 1;
-  transform: translateZ(0);
-}
-
-/* Apilamiento visual de las cartas de atrás */
-.swipe-card:nth-child(2) { transform: translateY(15px) translateZ(-5px); z-index: 3; }
-.swipe-card:nth-child(3) { transform: translateY(30px) translateZ(-10px); z-index: 2; }
-.swipe-card:nth-child(4) { transform: translateY(45px) translateZ(-15px); z-index: 1; }
-
-/* Clases para la animación de swipe up */
-.swipe-card.swipe-up {
-  transform: translateY(-200%) rotateX(20deg);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.swipe-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: var(--color-text);
-}
-
-.swipe-card p {
-  font-size: 1rem;
-  color: var(--color-text-sub);
-  line-height: 1.6;
-  margin-bottom: auto; /* Empuja el indicador de progreso hacia abajo */
-}
-
-.progress-indicator {
-  font-size: 0.8rem;
-  color: var(--color-text-sub);
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-/* ============================================================
-   ESTILOS PARA EL MAZO DE CARTAS DE SWIPE INTERACTIVO
-   ============================================================ */
-
-.swipe-history-section {
-  padding: 80px 20px;
-  background-color: #f8f5ed; /* Color de fondo crema original */
-}
-
-.swipe-history-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  max-width: 600px; /* Ajusta según el diseño */
-  margin: 0 auto;
-}
-
-.swipe-deck {
-  position: relative;
-  width: 100%;
-  height: 400px; /* Ajusta según el contenido */
-  perspective: 1000px; /* Para efecto 3D opcional */
-}
-
-.swipe-card {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.4s ease, opacity 0.4s ease, z-index 0s 0.4s;
-  pointer-events: none; /* Desactiva interacción en cartas de atrás */
-  opacity: 0;
-}
-
-.swipe-card.active {
-  pointer-events: auto; /* Activa interacción solo en la carta superior */
-  opacity: 1;
-  transform: translateZ(0);
-}
-
-/* Apilamiento visual de las cartas de atrás */
-.swipe-card:nth-child(2) { transform: translateY(15px) translateZ(-5px); z-index: 3; }
-.swipe-card:nth-child(3) { transform: translateY(30px) translateZ(-10px); z-index: 2; }
-.swipe-card:nth-child(4) { transform: translateY(45px) translateZ(-15px); z-index: 1; }
-
-/* Clases para la animación de swipe up */
-.swipe-card.swipe-up {
-  transform: translateY(-200%) rotateX(20deg);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.swipe-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #1a1a1a;
-}
-
-.swipe-card p {
-  font-size: 1rem;
-  color: #666;
-  line-height: 1.6;
-}
-
-.progress-indicator {
-  font-size: 0.8rem;
-  color: #999;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.swipe-indicator {
-  font-size: 1.5rem;
-  color: #ccc;
-  position: absolute;
-  bottom: 15px;
-}
-
-/* Estilos básicos para las flechas de navegación lateral (opcional, como en Turn 6) */
-.nav-arrows {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 20px;
-}
-.arrow-prev, .arrow-next {
-  font-size: 2rem;
-  color: #ccc;
+  color: var(--ink);
   cursor: pointer;
-  transition: color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
 }
-.arrow-prev:hover, .arrow-next:hover {
-  color: #999;
+.modal-nav-btn:hover {
+  background: var(--mint);
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.1);
 }
+.modal-nav-btn.prev-btn { left: 12px; }
+.modal-nav-btn.next-btn { right: 12px; }
+
+.modal-body {
+  padding: 20px;
+}
+.modal-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0 16px 0;
+}
+.modal-tag {
+  background: var(--mint-bg);
+  color: var(--mint);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.btn-match {
+  flex: 1;
+  background: var(--coral);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 8px 20px rgba(232, 131, 107, 0.3);
+}
+.btn-match:hover { background: var(--coral-dark); }
