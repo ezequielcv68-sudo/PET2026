@@ -3,8 +3,12 @@ import { db, collection, getDocs } from './firebase-config.js';
 const catalogArea = document.getElementById('catalogArea');
 const petModal = document.getElementById('petModal');
 const closeModal = document.getElementById('closeModal');
+const prevPetBtn = document.getElementById('prevPetBtn');
+const nextPetBtn = document.getElementById('nextPetBtn');
 
 let allPets = [];
+let currentPetsList = []; // Mantiene el listado activo (con o sin filtros)
+let currentIndex = 0;
 
 // Detector inteligente de imagen y datos
 function getPetData(pet) {
@@ -44,7 +48,6 @@ async function loadCatalog() {
     
     querySnapshot.forEach((doc) => {
       const petData = { id: doc.id, ...doc.data() };
-      console.log("Mascota encontrada en Firestore:", petData); // Imprime los datos exactos en la consola (F12)
       allPets.push(petData);
     });
 
@@ -54,6 +57,11 @@ async function loadCatalog() {
     }
 
     renderPets(allPets);
+
+    // 🚀 Abre automáticamente la primera mascota al entrar al catálogo
+    if (currentPetsList.length > 0) {
+      showPetAtIndex(0);
+    }
   } catch (error) {
     console.error("Error al cargar el catálogo:", error);
     catalogArea.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">Error al cargar las mascotas: ${error.message}</p>`;
@@ -61,9 +69,10 @@ async function loadCatalog() {
 }
 
 function renderPets(petsToRender) {
+  currentPetsList = petsToRender; // Actualiza el arreglo que se navegará
   catalogArea.innerHTML = '';
 
-  petsToRender.forEach(pet => {
+  petsToRender.forEach((pet, index) => {
     const data = getPetData(pet);
     const isCat = data.species.includes('gato') || data.species.includes('cat');
 
@@ -80,12 +89,19 @@ function renderPets(petsToRender) {
       </div>
     `;
 
-    card.addEventListener('click', () => openPetModal(pet));
+    // Al dar clic en una tarjeta, abre esa mascota en el modal según su posición
+    card.addEventListener('click', () => showPetAtIndex(index));
     catalogArea.appendChild(card);
   });
 }
 
-function openPetModal(pet) {
+// Muestra la mascota actual por su índice en la lista activa
+function showPetAtIndex(index) {
+  if (!currentPetsList.length) return;
+
+  // Manejo circular del índice (si pasa de la última vuelve a la primera)
+  currentIndex = (index + currentPetsList.length) % currentPetsList.length;
+  const pet = currentPetsList[currentIndex];
   const data = getPetData(pet);
   const isCat = data.species.includes('gato') || data.species.includes('cat');
 
@@ -107,6 +123,15 @@ function openPetModal(pet) {
   petModal.classList.add('active');
 }
 
+// Listeners para botones de navegación
+if (prevPetBtn) {
+  prevPetBtn.addEventListener('click', () => showPetAtIndex(currentIndex - 1));
+}
+
+if (nextPetBtn) {
+  nextPetBtn.addEventListener('click', () => showPetAtIndex(currentIndex + 1));
+}
+
 if (closeModal) {
   closeModal.addEventListener('click', () => petModal.classList.remove('active'));
 }
@@ -117,6 +142,16 @@ if (petModal) {
   });
 }
 
+// Eventos de teclado (flechas ← y → para cambiar de perrito)
+document.addEventListener('keydown', (e) => {
+  if (petModal && petModal.classList.contains('active')) {
+    if (e.key === 'ArrowRight') showPetAtIndex(currentIndex + 1);
+    if (e.key === 'ArrowLeft') showPetAtIndex(currentIndex - 1);
+    if (e.key === 'Escape') petModal.classList.remove('active');
+  }
+});
+
+// Filtros
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
