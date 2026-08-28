@@ -6,8 +6,147 @@
 <title>Catálogo — PatitasMatch</title>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/png" href="img/logo.png">
+<style>
+  /* Estilos para tarjetas interactivas y modal */
+  .catalog-filters {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .filter-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: #2ec4b6;
+    color: #fff;
+    border-color: #2ec4b6;
+  }
+
+  .pet-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+  }
+  .pet-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+  }
+  .pet-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  .pet-card-body {
+    padding: 14px;
+  }
+  .pet-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: #1a1a1a;
+  }
+  .pet-card-sub {
+    font-size: 0.85rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Modal de detalles */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+  .modal-card {
+    background: #fff;
+    border-radius: 24px;
+    max-width: 440px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: popIn 0.3s ease;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    width: 34px; height: 34px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .modal-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+  }
+  .modal-body {
+    padding: 20px;
+  }
+  .modal-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 16px 0;
+  }
+  .modal-tag {
+    background: #f0f7f6;
+    color: #2ec4b6;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .btn-match {
+    flex: 1;
+    background: #d16343;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-match:hover { background: #ba5437; }
+</style>
 </head>
 <body>
+
 <nav class="nav">
   <a href="index.html" class="brand">
     <img src="img/logo.png" alt="PetMatch Logo" style="height: 36px; vertical-align: middle; margin-right: 8px;">
@@ -24,13 +163,47 @@
 </nav>
 
 <div class="section">
-  <div class="section-head" style="margin-bottom:26px;">
+  <div class="section-head" style="margin-bottom:20px;">
     <span class="eyebrow">Todas las mascotas</span>
     <h2>Perritos y gatitos esperando un hogar</h2>
-    <p>Crea tu cuenta y contesta la encuesta de estilo de vida para ver el % de compatibilidad con cada uno.</p>
+    <p>Haz clic en cualquier foto para ver su historia completa y conectar con su refugio.</p>
   </div>
-  <div id="catalogArea" class="match-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+
+  <!-- Filtros interactivos -->
+  <div class="catalog-filters">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="dog">🐶 Perros</button>
+    <button class="filter-btn" data-filter="cat">🐱 Gatos</button>
+  </div>
+
+  <!-- Cuadrícula de Mascotas -->
+  <div id="catalogArea" class="match-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
     <div class="center-loading">Cargando mascotas…</div>
+  </div>
+</div>
+
+<!-- Modal Interactivo de Detalles de Mascota -->
+<div class="modal-overlay" id="petModal">
+  <div class="modal-card">
+    <button class="modal-close" id="closeModal">✕</button>
+    <img class="modal-img" id="modalImg" src="" alt="Mascota">
+    <div class="modal-body">
+      <h2 id="modalName" style="margin:0 0 6px 0;">Romina</h2>
+      <div id="modalSub" style="color:#666; font-size:0.9rem;">Perro · Cuernavaca</div>
+      
+      <div class="modal-tags" id="modalTags">
+        <span class="modal-tag">Energía Media</span>
+        <span class="modal-tag">Apto con niños</span>
+      </div>
+
+      <p id="modalDesc" style="color:#444; font-size:0.95rem; line-height:1.5;">
+        Buscando un hogar lleno de amor y paseos diarios.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-match" id="btnMatchAction">¡Hacer Match / Dar Like! 🐾</button>
+      </div>
+    </div>
   </div>
 </div>
 
