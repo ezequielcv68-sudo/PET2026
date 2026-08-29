@@ -48,10 +48,10 @@ async function cargarMascotas() {
     const row = document.createElement("div");
     row.className = "pet-row";
     row.innerHTML = `
-      <img src="${pet.photoURL || ""}" alt="${pet.nombre || ""}">
+      <img src="${pet.photoURL || ""}" alt="${escapeHtml(pet.nombre || "")}">
       <div class="p-body">
         <h3>${escapeHtml(pet.nombre || "Sin nombre")}</h3>
-        <div class="meta">${pet.especie === "gato" ? "🐈 Gato" : "🐕 Perro"} · ${pet.raza || ""} · ${pet.edad || ""}</div>
+        <div class="meta">${pet.especie === "gato" ? "🐈 Gato" : "🐕 Perro"} · ${escapeHtml(pet.raza || "")} · ${escapeHtml(pet.edad || "")}</div>
       </div>
       <span class="status-pill ${pet.status === "adopted" ? "adopted" : ""}">${pet.status === "adopted" ? "Adoptado" : "Disponible"}</span>
     `;
@@ -76,8 +76,23 @@ async function cargarMascotas() {
       cargarMascotas();
     };
 
+    // 🗑️ Botón para eliminar mascota
+    const btnBorrar = document.createElement("button");
+    btnBorrar.className = "btn-ghost";
+    btnBorrar.style.fontSize = "0.72rem";
+    btnBorrar.style.color = "#c0392b";
+    btnBorrar.style.borderColor = "rgba(192, 57, 43, 0.3)";
+    btnBorrar.textContent = "Borrar";
+    btnBorrar.onclick = async () => {
+      if (confirm(`¿Estás seguro de que deseas eliminar a "${pet.nombre || "esta mascota"}"?`)) {
+        await deleteDoc(doc(db, "pets", pet.id));
+        await cargarMascotas();
+      }
+    };
+
     actions.appendChild(btnInteresados);
     actions.appendChild(btnToggle);
+    actions.appendChild(btnBorrar);
     row.appendChild(actions);
     petsArea.appendChild(row);
   }
