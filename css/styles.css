@@ -376,12 +376,16 @@ input:focus, select:focus, textarea:focus {
 .choice-chip {
   border: 1.5px solid var(--line);
   background: var(--bg-soft);
-  padding: 99px 14px;
+  padding: 10px 18px; /* 👈 Corregido de 99px a 10px */
   border-radius: 999px;
   font-size: 0.85rem;
   cursor: pointer;
   user-select: none;
   transition: all .15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 .choice-chip.selected { background: var(--mint); border-color: var(--mint); color: #fff; font-weight: 700; }
 
