@@ -7,11 +7,16 @@
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div class="shell">
-  <div class="topbar">
-    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PatitasMatch</a>
+<div class="topbar">
+  <div class="brand-mini">
+    <div class="mark">🐾</div> PatitasMatch
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <!-- ➕ Botón para regresar al swipe sin reescribir todo -->
+    <a href="swipe.html"><button class="btn-ghost">← Volver</button></a>
     <button class="btn-ghost" id="btnLogout">Salir</button>
   </div>
+</div>
 
   <div class="panel">
     <h2>Cuéntanos tu rutina</h2>
@@ -86,16 +91,7 @@
 </div>
 
 
-  <div class="topbar">
-  <div class="brand-mini">
-    <div class="mark">🐾</div> PatitasMatch
-  </div>
-  <div style="display: flex; gap: 10px;">
-    <!-- ➕ Botón para regresar al swipe sin reescribir todo -->
-    <a href="swipe.html"><button class="btn-ghost">← Volver</button></a>
-    <button class="btn-ghost" id="btnLogout">Salir</button>
-  </div>
-</div>
+ 
 
 <script type="module" src="js/onboarding.js"></script>
 </body>
