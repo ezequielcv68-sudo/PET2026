@@ -1,6 +1,6 @@
 import {
   auth, db, onAuthStateChanged, signOut,
-  doc, setDoc, getDoc, serverTimestamp,
+  doc, setDoc, getDoc, updateDoc, serverTimestamp,
 } from "./firebase-config.js";
 
 let uid = null;
@@ -10,10 +10,14 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "auth.html?tab=login"; return; }
   uid = user.uid;
 
-  // 1. Obtener datos de la colección users
+  // 1. Obtener datos de la colección users (ciudad y teléfono)
   const userDoc = await getDoc(doc(db, "users", uid));
-  if (userDoc.exists() && userDoc.data().city) {
-    document.getElementById("obCity").value = userDoc.data().city;
+  if (userDoc.exists()) {
+    const uData = userDoc.data();
+    if (uData.city) document.getElementById("obCity").value = uData.city;
+    if (uData.phone && document.getElementById("obPhone")) {
+      document.getElementById("obPhone").value = uData.phone;
+    }
   }
 
   // 2. Cargar perfil de rutina previamente guardado en adopterProfiles
@@ -22,8 +26,12 @@ onAuthStateChanged(auth, async (user) => {
     if (profileDoc.exists()) {
       const data = profileDoc.data();
 
-      // Rellenar ciudad y coordenadas guardadas previamente
+      // Rellenar datos de texto
       if (data.city) document.getElementById("obCity").value = data.city;
+      if (data.phone && document.getElementById("obPhone")) {
+        document.getElementById("obPhone").value = data.phone;
+      }
+
       if (data.lat && data.lng) {
         coords = { lat: data.lat, lng: data.lng };
         const msg = document.getElementById("ubicacionMsg");
@@ -33,6 +41,9 @@ onAuthStateChanged(auth, async (user) => {
       // Mapear y preseleccionar los botones (chips) que correspondan a cada grupo
       const savedFields = [
         { group: "vivienda", val: data.vivienda },
+        { group: "tipo_vivienda", val: data.tipoVivienda },
+        { group: "acuerdo_familiar", val: data.acuerdoFamiliar },
+        { group: "plan_viajes", val: data.planViajes },
         { group: "ninos", val: data.ninos },
         { group: "otras_mascotas", val: data.otrasMascotas },
         { group: "horas_solo", val: data.horasSolo },
@@ -95,8 +106,16 @@ document.getElementById("btnUbicacion").addEventListener("click", () => {
 // ---------- Guardar perfil ----------
 document.getElementById("btnGuardar").addEventListener("click", async () => {
   const btn = document.getElementById("btnGuardar");
+  const phoneInput = document.getElementById("obPhone");
+  const phone = phoneInput ? phoneInput.value.trim() : "";
+  const city = document.getElementById("obCity").value.trim();
+
   const perfil = {
+    phone,
     vivienda: getSelected("vivienda"),
+    tipoVivienda: getSelected("tipo_vivienda"),
+    acuerdoFamiliar: getSelected("acuerdo_familiar"),
+    planViajes: getSelected("plan_viajes"),
     ninos: getSelected("ninos"),
     otrasMascotas: getSelected("otras_mascotas"),
     horasSolo: getSelected("horas_solo"),
@@ -104,17 +123,33 @@ document.getElementById("btnGuardar").addEventListener("click", async () => {
     experiencia: getSelected("experiencia"),
     especiePreferida: getSelected("especie"),
     tamanoPreferido: getSelected("tamano"),
-    city: document.getElementById("obCity").value.trim(),
+    city,
     lat: coords ? coords.lat : null,
     lng: coords ? coords.lng : null,
     updatedAt: serverTimestamp(),
   };
 
-  const faltantes = Object.entries(perfil).filter(([k, v]) => v === null && k !== "lat" && k !== "lng");
-  if (faltantes.length) {
-    document.getElementById("obMsg").innerHTML = `<div class="error-msg">Contesta todas las preguntas antes de continuar.</div>`;
+  // Validar teléfono si el campo existe en la vista
+  if (phoneInput && (!phone || phone.length < 10)) {
+    document.getElementById("obMsg").innerHTML = `<div class="error-msg">Ingresa un número de teléfono/WhatsApp válido (10 dígitos).</div>`;
     return;
   }
+
+  // Filtrar campos faltantes en los datos esenciales
+  const faltantes = Object.entries(perfil).filter(([k, v]) => 
+    v === null && 
+    k !== "lat" && 
+    k !== "lng" && 
+    k !== "tipoVivienda" && 
+    k !== "acuerdoFamiliar" && 
+    k !== "planViajes"
+  );
+
+  if (faltantes.length) {
+    document.getElementById("obMsg").innerHTML = `<div class="error-msg">Contesta todas las preguntas principales antes de continuar.</div>`;
+    return;
+  }
+
   if (!perfil.city) {
     document.getElementById("obMsg").innerHTML = `<div class="error-msg">Escribe tu ciudad.</div>`;
     return;
@@ -122,8 +157,14 @@ document.getElementById("btnGuardar").addEventListener("click", async () => {
 
   btn.disabled = true;
   btn.textContent = "Guardando...";
+
   try {
-    await setDoc(doc(db, "adopterProfiles", uid), perfil);
+    // 1. Guardar el perfil detallado
+    await setDoc(doc(db, "adopterProfiles", uid), perfil, { merge: true });
+
+    // 2. Sincronizar teléfono y ciudad con el usuario para que el refugio lo pueda leer directamente
+    await setDoc(doc(db, "users", uid), { phone, city }, { merge: true });
+
     window.location.href = "swipe.html";
   } catch (err) {
     btn.disabled = false;
