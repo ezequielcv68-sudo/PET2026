@@ -9,7 +9,7 @@ let uid = null;
 let shelterName = "";
 let shelterCity = "";
 let selectedFile = null;
-let editingPetId = null; // Variable para saber si estamos editando o creando
+let editingPetId = null;
 
 const petsArea = document.getElementById("petsArea");
 document.getElementById("btnLogout").onclick = () => signOut(auth).then(() => window.location.href = "index.html");
@@ -77,14 +77,12 @@ async function cargarMascotas() {
       cargarMascotas();
     };
 
-    // ✏️ Botón para editar
     const btnEditar = document.createElement("button");
     btnEditar.className = "btn-ghost";
     btnEditar.style.fontSize = "0.72rem";
     btnEditar.textContent = "Editar";
     btnEditar.onclick = () => abrirModalEditar(pet);
 
-    // 🗑️ Botón para eliminar
     const btnBorrar = document.createElement("button");
     btnBorrar.className = "btn-ghost";
     btnBorrar.style.fontSize = "0.72rem";
@@ -112,7 +110,6 @@ const modalOverlay = document.getElementById("modalOverlay");
 document.getElementById("btnAdd").onclick = () => { resetForm(); modalOverlay.style.display = "flex"; };
 document.getElementById("btnCancelar").onclick = () => { modalOverlay.style.display = "none"; };
 
-// Cargar datos existentes en el formulario al presionar Editar
 function abrirModalEditar(pet) {
   resetForm();
   editingPetId = pet.id;
@@ -191,7 +188,6 @@ function resetForm() {
   document.getElementById("petMsg").innerHTML = "";
 }
 
-// ---------- Guardar / Actualizar Registro ----------
 document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   const btn = document.getElementById("btnGuardarPet");
   const nombre = document.getElementById("pNombre").value.trim();
@@ -233,15 +229,11 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
       updatedAt: serverTimestamp(),
     };
 
-    if (photoURL) {
-      petData.photoURL = photoURL;
-    }
+    if (photoURL) petData.photoURL = photoURL;
 
     if (editingPetId) {
-      // Editar existente
       await updateDoc(doc(db, "pets", editingPetId), petData);
     } else {
-      // Crear nuevo
       petData.photoURL = photoURL || "";
       petData.status = "available";
       petData.createdAt = serverTimestamp();
@@ -260,7 +252,7 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   }
 });
 
-// ---------- Interesados ----------
+// ---------- Interesados con contacto directo ----------
 const interesadosOverlay = document.getElementById("interesadosOverlay");
 document.getElementById("btnCerrarInteresados").onclick = () => { interesadosOverlay.style.display = "none"; };
 
@@ -286,15 +278,83 @@ async function verInteresados(pet) {
     const adopterId = d.data().adopterId;
     const adopterSnap = await getDoc(doc(db, "users", adopterId));
     const adopter = adopterSnap.exists() ? adopterSnap.data() : {};
+    
+    const phone = adopter.phone || adopter.telefono || adopter.celular || "";
+    const cleanPhone = phone.replace(/\D/g, "");
+    
+    // Mensaje predefinido para WhatsApp
+    const waText = encodeURIComponent(`¡Hola ${adopter.name || ''}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PatitasMatch 🐾`);
+    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : null;
+
     const row = document.createElement("div");
-    row.style.padding = "10px 0";
+    row.style.padding = "12px 0";
     row.style.borderBottom = "1px solid var(--line)";
     row.innerHTML = `
-      <strong>${escapeHtml(adopter.name || "Adoptante")}</strong> · ${d.data().matchScore}% match<br>
-      <span style="font-size:0.85rem; color:var(--ink-soft);">${escapeHtml(adopter.city || "")} · <a href="mailto:${adopter.email || ""}" style="color:var(--mint); font-weight:600;">${escapeHtml(adopter.email || "")}</a></span>
+      <strong>${escapeHtml(adopter.name || "Adoptante")}</strong> · <span style="color:var(--mint); font-weight:700;">${d.data().matchScore || 90}% match</span><br>
+      <div style="font-size:0.85rem; color:var(--ink-soft); margin-top:4px;">
+        📍 ${escapeHtml(adopter.city || "Sin ciudad")}<br>
+        ✉️ <a href="mailto:${adopter.email || ""}" style="color:var(--ink); font-weight:600;">${escapeHtml(adopter.email || "Sin correo")}</a><br>
+        📞 ${phone ? escapeHtml(phone) : "Teléfono no registrado"}
+      </div>
+      ${waUrl ? `<a href="${waUrl}" target="_blank" class="btn-whatsapp">💬 Contactar por WhatsApp</a>` : ""}
     `;
     area.appendChild(row);
   }
 }
+
+// ---------- Exportar datos a CSV (Compatible con Excel) ----------
+document.getElementById("btnExportarCSV").onclick = async () => {
+  const btn = document.getElementById("btnExportarCSV");
+  btn.textContent = "Generando...";
+  btn.disabled = true;
+
+  try {
+    // 1. Obtener mascotas del refugio
+    const petsSnap = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
+    const pets = petsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Encabezados del CSV
+    let csvContent = "\uFEFFMascota,Especie,Estado,Nombre Adoptante,Correo Adoptante,Telefono Adoptante,Ciudad Adoptante,Match Score (%)\n";
+
+    for (const pet of pets) {
+      const swipesSnap = await getDocs(query(
+        collection(db, "swipes"),
+        where("petId", "==", pet.id),
+        where("liked", "==", true)
+      ));
+
+      if (swipesSnap.empty) {
+        csvContent += `"${pet.nombre}","${pet.especie}","${pet.status === "adopted" ? "Adoptado" : "Disponible"}","Sin interesados","N/A","N/A","N/A","N/A"\n`;
+      } else {
+        for (const swipeDoc of swipesSnap.docs) {
+          const adopterId = swipeDoc.data().adopterId;
+          const adopterSnap = await getDoc(doc(db, "users", adopterId));
+          const adopter = adopterSnap.exists() ? adopterSnap.data() : {};
+
+          const phone = adopter.phone || adopter.telefono || "N/A";
+          
+          csvContent += `"${pet.nombre}","${pet.especie}","${pet.status === "adopted" ? "Adoptado" : "Disponible"}","${adopter.name || "N/A"}","${adopter.email || "N/A"}","${phone}","${adopter.city || "N/A"}","${swipeDoc.data().matchScore || 90}"\n`;
+        }
+      }
+    }
+
+    // Descargar archivo binario .csv
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Reporte_PatitasMatch_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error al descargar el reporte.");
+  } finally {
+    btn.textContent = "📊 Descargar Datos (CSV)";
+    btn.disabled = false;
+  }
+};
 
 function escapeHtml(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
