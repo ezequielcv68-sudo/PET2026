@@ -6,7 +6,6 @@
 <title>Panel del refugio — PatitasMatch</title>
 <link rel="stylesheet" href="css/styles.css">
 <style>
-  /* Control estricto del tamaño de imágenes en la lista */
   .pet-row {
     display: flex;
     align-items: center;
@@ -29,7 +28,6 @@
     flex-shrink: 0;
   }
 
-  /* Control del tamaño para la previsualización al subir foto */
   #photoPreviewWrap img {
     max-width: 100%;
     max-height: 140px;
@@ -39,23 +37,33 @@
     display: block;
   }
 
-  .pet-info {
-    flex: 1;
-  }
+  .pet-info { flex: 1; }
+  .pet-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 
-  .pet-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 8px;
+  /* Estilos del botón de WhatsApp en la lista de interesados */
+  .btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    cursor: pointer;
   }
+  .btn-whatsapp:hover { background: #1ebd59; }
 </style>
 </head>
 <body>
 <div class="shell shell-wide">
   <div class="topbar">
     <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PatitasMatch</a>
-    <div style="display:flex; gap:10px;">
+    <div style="display:flex; gap:10px; align-items:center;">
+      <button class="btn-ghost" id="btnExportarCSV" title="Descargar base de datos">📊 Descargar Datos (CSV)</button>
       <span class="btn-ghost" id="shelterNameTag" style="cursor:default;">Refugio</span>
       <button class="btn-ghost" id="btnLogout">Salir</button>
     </div>
@@ -149,7 +157,7 @@
 
 <!-- Modal interesados -->
 <div id="interesadosOverlay" style="display:none; position:fixed; inset:0; background:rgba(28,26,22,0.5); z-index:50; align-items:center; justify-content:center; padding:20px;">
-  <div class="panel" style="max-width:420px; width:100%; max-height:80vh; overflow-y:auto;">
+  <div class="panel" style="max-width:440px; width:100%; max-height:80vh; overflow-y:auto;">
     <h2 id="interesadosTitle">Interesados</h2>
     <div id="interesadosArea"></div>
     <button class="btn-secondary" id="btnCerrarInteresados">Cerrar</button>
