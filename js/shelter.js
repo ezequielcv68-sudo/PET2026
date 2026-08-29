@@ -252,7 +252,7 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   }
 });
 
-// ---------- Interesados con contacto directo ----------
+// ---------- Interesados con consulta dual en Firestore ----------
 const interesadosOverlay = document.getElementById("interesadosOverlay");
 document.getElementById("btnCerrarInteresados").onclick = () => { interesadosOverlay.style.display = "none"; };
 
@@ -276,44 +276,52 @@ async function verInteresados(pet) {
   area.innerHTML = "";
   for (const d of snap.docs) {
     const adopterId = d.data().adopterId;
-    const adopterSnap = await getDoc(doc(db, "users", adopterId));
-    const adopter = adopterSnap.exists() ? adopterSnap.data() : {};
     
-    const phone = adopter.phone || adopter.telefono || adopter.celular || "";
+    // Consulta simultánea en users y adopterProfiles
+    const [adopterSnap, profileSnap] = await Promise.all([
+      getDoc(doc(db, "users", adopterId)),
+      getDoc(doc(db, "adopterProfiles", adopterId))
+    ]);
+
+    const uData = adopterSnap.exists() ? adopterSnap.data() : {};
+    const pData = profileSnap.exists() ? profileSnap.data() : {};
+
+    // Combinación inteligente de campos
+    const name = uData.name || uData.nombre || pData.name || pData.nombre || "Adoptante";
+    const email = uData.email || pData.email || "";
+    const city = uData.city || pData.city || "Sin ciudad";
+    const phone = uData.phone || uData.telefono || uData.celular || pData.phone || pData.telefono || pData.celular || "";
+
     const cleanPhone = phone.replace(/\D/g, "");
-    
-    // Mensaje predefinido para WhatsApp
-    const waText = encodeURIComponent(`¡Hola ${adopter.name || ''}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PatitasMatch 🐾`);
+    const waText = encodeURIComponent(`¡Hola ${name}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PatitasMatch 🐾`);
     const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : null;
 
     const row = document.createElement("div");
     row.style.padding = "12px 0";
     row.style.borderBottom = "1px solid var(--line)";
     row.innerHTML = `
-      <strong>${escapeHtml(adopter.name || "Adoptante")}</strong> · <span style="color:var(--mint); font-weight:700;">${d.data().matchScore || 90}% match</span><br>
+      <strong>${escapeHtml(name)}</strong> · <span style="color:var(--mint); font-weight:700;">${d.data().matchScore || 90}% match</span><br>
       <div style="font-size:0.85rem; color:var(--ink-soft); margin-top:4px;">
-        📍 ${escapeHtml(adopter.city || "Sin ciudad")}<br>
-        ✉️ <a href="mailto:${adopter.email || ""}" style="color:var(--ink); font-weight:600;">${escapeHtml(adopter.email || "Sin correo")}</a><br>
+        📍 ${escapeHtml(city)}<br>
+        ✉️ <a href="mailto:${email}" style="color:var(--ink); font-weight:600;">${escapeHtml(email || "Sin correo")}</a><br>
         📞 ${phone ? escapeHtml(phone) : "Teléfono no registrado"}
       </div>
-      ${waUrl ? `<a href="${waUrl}" target="_blank" class="btn-whatsapp">💬 Contactar por WhatsApp</a>` : ""}
+      ${waUrl ? `<a href="${waUrl}" target="_blank" class="btn-whatsapp" style="margin-top:6px; display:inline-block;">💬 Contactar por WhatsApp</a>` : ""}
     `;
     area.appendChild(row);
   }
 }
 
-// ---------- Exportar datos a CSV (Compatible con Excel) ----------
+// ---------- Exportar datos a CSV con consulta dual ----------
 document.getElementById("btnExportarCSV").onclick = async () => {
   const btn = document.getElementById("btnExportarCSV");
   btn.textContent = "Generando...";
   btn.disabled = true;
 
   try {
-    // 1. Obtener mascotas del refugio
     const petsSnap = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
     const pets = petsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Encabezados del CSV
     let csvContent = "\uFEFFMascota,Especie,Estado,Nombre Adoptante,Correo Adoptante,Telefono Adoptante,Ciudad Adoptante,Match Score (%)\n";
 
     for (const pet of pets) {
@@ -328,17 +336,25 @@ document.getElementById("btnExportarCSV").onclick = async () => {
       } else {
         for (const swipeDoc of swipesSnap.docs) {
           const adopterId = swipeDoc.data().adopterId;
-          const adopterSnap = await getDoc(doc(db, "users", adopterId));
-          const adopter = adopterSnap.exists() ? adopterSnap.data() : {};
-
-          const phone = adopter.phone || adopter.telefono || "N/A";
           
-          csvContent += `"${pet.nombre}","${pet.especie}","${pet.status === "adopted" ? "Adoptado" : "Disponible"}","${adopter.name || "N/A"}","${adopter.email || "N/A"}","${phone}","${adopter.city || "N/A"}","${swipeDoc.data().matchScore || 90}"\n`;
+          const [adopterSnap, profileSnap] = await Promise.all([
+            getDoc(doc(db, "users", adopterId)),
+            getDoc(doc(db, "adopterProfiles", adopterId))
+          ]);
+
+          const uData = adopterSnap.exists() ? adopterSnap.data() : {};
+          const pData = profileSnap.exists() ? profileSnap.data() : {};
+
+          const name = uData.name || uData.nombre || pData.name || pData.nombre || "N/A";
+          const email = uData.email || pData.email || "N/A";
+          const city = uData.city || pData.city || "N/A";
+          const phone = uData.phone || uData.telefono || uData.celular || pData.phone || pData.telefono || pData.celular || "N/A";
+
+          csvContent += `"${pet.nombre}","${pet.especie}","${pet.status === "adopted" ? "Adoptado" : "Disponible"}","${name}","${email}","${phone}","${city}","${swipeDoc.data().matchScore || 90}"\n`;
         }
       }
     }
 
-    // Descargar archivo binario .csv
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
