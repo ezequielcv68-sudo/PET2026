@@ -19,6 +19,154 @@
     transition: transform 0.3s ease, opacity 0.4s ease;
   }
 
+  /* --- ESTILOS DE SECCIONES INFORMATIVAS --- */
+  .info-section {
+    padding: 70px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .grid-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 36px;
+  }
+
+  @media (max-width: 850px) {
+    .grid-two-col { grid-template-columns: 1fr; }
+  }
+
+  .info-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 10px 30px rgba(28, 26, 22, 0.06);
+    border: 1px solid var(--line, rgba(28, 26, 22, 0.08));
+  }
+
+  .info-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--ink, #1C1A16);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .info-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0 0;
+  }
+
+  .info-card ul li {
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft, #6E6759);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .info-card ul li span.bullet-icon {
+    color: var(--mint, #4F9D8D);
+    font-weight: bold;
+  }
+
+  /* --- ESTILOS DEL FOOTER AMPLIADO --- */
+  .footer-enhanced {
+    background: #1C1A16;
+    color: #FBF8F0;
+    padding: 60px 20px 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(251, 248, 240, 0.12);
+  }
+
+  @media (max-width: 900px) {
+    .footer-container { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 550px) {
+    .footer-container { grid-template-columns: 1fr; }
+  }
+
+  .footer-col h4 {
+    color: #FFFFFF;
+    font-family: var(--font-display, 'Baloo 2', sans-serif);
+    font-size: 1.15rem;
+    margin-bottom: 18px;
+  }
+
+  .footer-col p {
+    color: rgba(251, 248, 240, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-links li {
+    margin-bottom: 10px;
+  }
+
+  .footer-links a {
+    color: rgba(251, 248, 240, 0.75);
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--coral, #E8836B);
+  }
+
+  .social-icons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .social-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(251, 248, 240, 0.08);
+    color: #FBF8F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .social-btn:hover {
+    background: var(--coral, #E8836B);
+    transform: translateY(-3px);
+  }
+
+  .footer-bottom {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    text-align: center;
+    font-size: 0.82rem;
+    color: rgba(251, 248, 240, 0.5);
+  }
+
   /* --- ESTILOS DEL CARRUSEL 3D (COVERFLOW) --- */
   .swipe-history-section {
     padding: 60px 20px;
@@ -59,7 +207,6 @@
     pointer-events: none;
   }
 
-  /* Posiciones Tridimensionales */
   .swipe-card.card-center {
     transform: translateX(-50%) scale(1);
     z-index: 10;
@@ -91,7 +238,6 @@
     opacity: 0.5;
   }
 
-  /* Elementos internos de la carta */
   .card-pet-photo {
     width: 100%;
     height: 200px;
@@ -125,7 +271,6 @@
     font-weight: 600;
   }
 
-  /* --- BOTONES DE NAVEGACIÓN FLOTANTES LATERALES --- */
   .side-btn {
     position: absolute;
     top: 50%;
@@ -150,7 +295,6 @@
   .side-btn.left { left: 10px; }
   .side-btn.right { right: 10px; }
 
-  /* Indicadores de puntos inferiores */
   .dots-indicator {
     display: flex;
     justify-content: center;
@@ -186,7 +330,8 @@
     PetMatch
   </div>
   <div class="links">
-    <a href="swipe.html" class="active">Descubrir</a>
+    <a href="#conocenos">Conócenos</a>
+    <a href="#como-ayudamos">¿Cómo funciona?</a>
     <a href="catalogo.html">Catálogo</a>
   </div>
   <div class="right">
@@ -243,7 +388,62 @@
   </div>
 </section>
 
-<!-- SECCIÓN CARRUSEL COVERFLOW 3D -->
+<section id="conocenos" class="info-section">
+  <div class="section-head">
+    <span class="eyebrow">CONÓCENOS</span>
+    <h2>Un puente directo entre refugios y familias</h2>
+    <p>Somos una plataforma tecnológica comprometida con la adopción responsable y el bienestar animal en México.</p>
+  </div>
+
+  <div class="feature-grid" style="margin-top: 36px;">
+    <div class="feature-card">
+      <div class="fc-icon">🎯</div>
+      <h3>Algoritmo de Compatibilidad</h3>
+      <p>Analizamos tu espacio, tiempo disponible y estilo de vida para conectarte únicamente con mascotas con las que tendrás una convivencia armónica.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">🛡️</div>
+      <h3>Refugios Verificados</h3>
+      <p>Colaboramos de la mano con albergues y rescatistas independientes reales, garantizando que cada animalito cuente con esquema de salud e historia transparente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon">💬</div>
+      <h3>Contacto Directo y Ágil</h3>
+      <p>Eliminamos las trabas y burocracia excesiva. Te ponemos en comunicación inmediata vía WhatsApp con el refugio a cargo tras hacer match.</p>
+    </div>
+  </div>
+</section>
+
+<section id="como-ayudamos" class="info-section" style="background-color: var(--bg-soft, #FBF8F0); border-radius: 28px; padding: 50px 30px;">
+  <div class="section-head">
+    <span class="eyebrow">¿CÓMO TE AYUDAMOS?</span>
+    <h2>Diseñado para Adoptantes y Albergues</h2>
+    <p>Nuestra misión es simplificar el proceso para ambas partes y asegurar adopciones exitosas para toda la vida.</p>
+  </div>
+
+  <div class="grid-two-col">
+    <div class="info-card">
+      <h3><span>🐶</span> Si buscas adoptar un compañero:</h3>
+      <ul>
+        <li><span class="bullet-icon">✓</span> <strong>Test rápido de 2 minutos:</strong> Define tu entorno, tiempo libre y experiencia sin rodeos.</li>
+        <li><span class="bullet-icon">✓</span> <strong>Recomendaciones inteligentes:</strong> La IA evalúa qué perritos o gatitos se acoplan mejor a ti.</li>
+        <li><span class="bullet-icon">✓</span> <strong>Cero búsquedas a ciegas:</strong> Conoce la personalidad real, nivel de energía e historial de cada rescate.</li>
+        <li><span class="bullet-icon">✓</span> <strong>Enlace sin intermediarios:</strong> Conversa directamente con el albergue cuando surja el interés mutuo.</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <h3><span>🏠</span> Si eres un refugio o rescatista:</h3>
+      <ul>
+        <li><span class="bullet-icon">✓</span> <strong>Gestión centralizada:</strong> Publica, edita y administra tu catálogo de animales en adopción fácilmente.</li>
+        <li><span class="bullet-icon">✓</span> <strong>Perfil detallado del adoptante:</strong> Revisa el tipo de hogar y motivación del interesado antes de responder.</li>
+        <li><span class="bullet-icon">✓</span> <strong>WhatsApp a un clic:</strong> Inicia la entrevista de adopción al instante desde tu panel de control.</li>
+        <li><span class="bullet-icon">✓</span> <strong>Exportación de reportes:</strong> Descarga bases de datos en Excel/CSV para mantener tu inventario al día.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <section class="swipe-history-section">
   <div class="section-head" style="margin-bottom: 20px;">
     <span class="eyebrow">HISTORIA Y PROCESO</span>
@@ -256,7 +456,6 @@
     <button class="side-btn right" id="btnNext">›</button>
 
     <div class="swipe-deck" id="swipeDeck">
-      <!-- Carta 1 -->
       <div class="swipe-card">
         <img class="card-pet-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1" alt="Perrito de refugio">
         <div class="fc-icon">🐾</div>
@@ -265,7 +464,6 @@
         <div class="progress-indicator">1 of 4</div>
       </div>
       
-      <!-- Carta 2 -->
       <div class="swipe-card">
         <img class="card-pet-photo" src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=600&auto=format&fit=crop" alt="Perritos jugando">
         <div class="fc-icon">🧠</div>
@@ -274,7 +472,6 @@
         <div class="progress-indicator">2 of 4</div>
       </div>
       
-      <!-- Carta 3 -->
       <div class="swipe-card">
         <img class="card-pet-photo" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=600&auto=format&fit=crop" alt="Voluntaria con perro">
         <div class="fc-icon">🏠</div>
@@ -283,7 +480,6 @@
         <div class="progress-indicator">3 of 4</div>
       </div>
       
-      <!-- Carta 4 -->
       <div class="swipe-card">
         <img class="card-pet-photo" src="https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=600&auto=format&fit=crop" alt="Familia feliz con perro">
         <div class="fc-icon">♥</div>
@@ -310,8 +506,54 @@
   <a href="auth.html?role=shelter"><button class="btn-hero-primary">Registrar mi refugio →</button></a>
 </div>
 
-<footer class="footer">
-  PatitasMatch · Hecho con 🐾 para conectar refugios con familias · Adopción responsable
+<footer class="footer-enhanced">
+  <div class="footer-container">
+    <div class="footer-col">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+        <img src="img/logo.png" alt="PetMatch Logo" style="height: 32px;">
+        <span style="font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: #FFF;">PetMatch</span>
+      </div>
+      <p>
+        Plataforma inteligente dedicada a unir huellitas con hogares responsables. Promovemos el bienestar animal, la transparencia y el apoyo a refugios independientes.
+      </p>
+      <div class="social-icons">
+        <a href="https://facebook.com" target="_blank" class="social-btn" title="Facebook">f</a>
+        <a href="https://instagram.com" target="_blank" class="social-btn" title="Instagram">📷</a>
+        <a href="https://tiktok.com" target="_blank" class="social-btn" title="TikTok">🎵</a>
+        <a href="https://wa.me/" target="_blank" class="social-btn" title="WhatsApp">💬</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Navegación</h4>
+      <ul class="footer-links">
+        <li><a href="#conocenos">Conócenos</a></li>
+        <li><a href="#como-ayudamos">¿Cómo funciona?</a></li>
+        <li><a href="catalogo.html">Catálogo de Mascotas</a></li>
+        <li><a href="auth.html">Iniciar Sesión / Registro</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Para Refugios</h4>
+      <ul class="footer-links">
+        <li><a href="auth.html?role=shelter">Registrar un Albergue</a></li>
+        <li><a href="shelter.html">Panel de Administración</a></li>
+        <li><a href="#como-ayudamos">Guía para Rescatistas</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <p style="margin-bottom: 10px;">📍 Cuernavaca, Morelos, México</p>
+      <p style="margin-bottom: 10px;">✉️ contacto@patitasmatch.com</p>
+      <p>🤝 Alianza con más de 300 albergues verficados.</p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    PatitasMatch © 2026 · Hecho con 🐾 para conectar refugios con familias · Adopción responsable
+  </div>
 </footer>
 
 <script>
@@ -352,7 +594,7 @@
   function update3DCarousel() {
     const total = cards.length;
     cards.forEach((card, index) => {
-      card.className = 'swipe-card'; // Limpiar clases previas
+      card.className = 'swipe-card';
 
       let offset = index - activeIndex;
       if (offset > total / 2) offset -= total;
@@ -386,7 +628,6 @@
     update3DCarousel();
   });
 
-  // Swipe táctil horizontal
   let startX = 0;
   const container = document.getElementById('swipeHistoryContainer');
 
@@ -407,7 +648,6 @@
     }
   });
 
-  // Inicializar posiciones al cargar
   update3DCarousel();
 </script>
 
