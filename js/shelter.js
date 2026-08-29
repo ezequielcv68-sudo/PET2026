@@ -277,7 +277,7 @@ async function verInteresados(pet) {
   for (const d of snap.docs) {
     const adopterId = d.data().adopterId;
     
-    // Consulta simultánea en users y adopterProfiles
+    // Consulta simultánea a users y adopterProfiles
     const [adopterSnap, profileSnap] = await Promise.all([
       getDoc(doc(db, "users", adopterId)),
       getDoc(doc(db, "adopterProfiles", adopterId))
@@ -286,27 +286,54 @@ async function verInteresados(pet) {
     const uData = adopterSnap.exists() ? adopterSnap.data() : {};
     const pData = profileSnap.exists() ? profileSnap.data() : {};
 
-    // Combinación inteligente de campos
+    // Extraer datos esenciales
     const name = uData.name || uData.nombre || pData.name || pData.nombre || "Adoptante";
     const email = uData.email || pData.email || "";
     const city = uData.city || pData.city || "Sin ciudad";
     const phone = uData.phone || uData.telefono || uData.celular || pData.phone || pData.telefono || pData.celular || "";
+    const bio = pData.biografia || uData.biografia || "Sin carta de presentación.";
+
+    // Mapeo de etiquetas rápidas para el refugio
+    const vivienda = pData.vivienda ? pData.vivienda.replace('_', ' ') : 'Vivienda no descrita';
+    const horasSolo = pData.horasSolo ? `${pData.horasSolo} solo/día` : 'Horas n/d';
+    const ninosTag = pData.ninos === 'si' ? '👶 Con niños' : 'Sin niños';
+    const mascotasTag = pData.otrasMascotas === 'si' ? '🐾 Tiene mascotas' : 'Sin mascotas';
+    const expTag = pData.experiencia ? `⭐ Exp: ${pData.experiencia}` : 'Sin exp. registrada';
 
     const cleanPhone = phone.replace(/\D/g, "");
     const waText = encodeURIComponent(`¡Hola ${name}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PatitasMatch 🐾`);
     const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : null;
 
     const row = document.createElement("div");
-    row.style.padding = "12px 0";
+    row.style.padding = "14px 0";
     row.style.borderBottom = "1px solid var(--line)";
     row.innerHTML = `
-      <strong>${escapeHtml(name)}</strong> · <span style="color:var(--mint); font-weight:700;">${d.data().matchScore || 90}% match</span><br>
-      <div style="font-size:0.85rem; color:var(--ink-soft); margin-top:4px;">
-        📍 ${escapeHtml(city)}<br>
-        ✉️ <a href="mailto:${email}" style="color:var(--ink); font-weight:600;">${escapeHtml(email || "Sin correo")}</a><br>
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <strong style="font-size:1rem;">${escapeHtml(name)}</strong>
+        <span style="color:var(--mint); font-weight:700; font-size:0.9rem;">${d.data().matchScore || 90}% match</span>
+      </div>
+
+      <!-- Datos de contacto básico -->
+      <div style="font-size:0.82rem; color:var(--ink-soft); margin:4px 0 8px;">
+        📍 ${escapeHtml(city)} · ✉️ <a href="mailto:${email}" style="color:var(--ink); font-weight:600;">${escapeHtml(email || "Sin correo")}</a><br>
         📞 ${phone ? escapeHtml(phone) : "Teléfono no registrado"}
       </div>
-      ${waUrl ? `<a href="${waUrl}" target="_blank" class="btn-whatsapp" style="margin-top:6px; display:inline-block;">💬 Contactar por WhatsApp</a>` : ""}
+
+      <!-- Badges de compatibilidad visual rápida -->
+      <div class="tag-row" style="margin: 6px 0;">
+        <span class="tag">🏠 ${escapeHtml(vivienda)}</span>
+        <span class="tag">⏱️ ${escapeHtml(horasSolo)}</span>
+        <span class="tag">${ninosTag}</span>
+        <span class="tag">${mascotasTag}</span>
+        <span class="tag">${escapeHtml(expTag)}</span>
+      </div>
+
+      <!-- Carta de motivación -->
+      <div style="font-size:0.83rem; background:var(--bg-soft); padding:10px 12px; border-radius:10px; margin:8px 0; color:var(--ink); line-height:1.4;">
+        <strong>Motivación:</strong> <em>"${escapeHtml(bio)}"</em>
+      </div>
+
+      ${waUrl ? `<a href="${waUrl}" target="_blank" class="btn-whatsapp" style="margin-top:4px; display:inline-block;">💬 Contactar por WhatsApp</a>` : ""}
     `;
     area.appendChild(row);
   }
