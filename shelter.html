@@ -23,10 +23,20 @@
     height: 90px !important;
     min-width: 90px !important;
     max-height: 90px !important;
-    object-fit: cover;
+    object-fit: cover !important;
     border-radius: 12px;
     background-color: #E4DEC9;
     flex-shrink: 0;
+  }
+
+  /* Control del tamaño para la previsualización al subir foto */
+  #photoPreviewWrap img {
+    max-width: 100%;
+    max-height: 140px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-top: 10px;
+    display: block;
   }
 
   .pet-info {
@@ -38,22 +48,6 @@
     gap: 8px;
     flex-wrap: wrap;
     margin-top: 8px;
-  }
-
-  .btn-delete {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: background 0.2s;
-  }
-
-  .btn-delete:hover {
-    background: #c0392b;
   }
 </style>
 </head>
