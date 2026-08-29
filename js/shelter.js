@@ -9,6 +9,7 @@ let uid = null;
 let shelterName = "";
 let shelterCity = "";
 let selectedFile = null;
+let editingPetId = null; // Variable para saber si estamos editando o creando
 
 const petsArea = document.getElementById("petsArea");
 document.getElementById("btnLogout").onclick = () => signOut(auth).then(() => window.location.href = "index.html");
@@ -76,7 +77,14 @@ async function cargarMascotas() {
       cargarMascotas();
     };
 
-    // 🗑️ Botón para eliminar mascota
+    // ✏️ Botón para editar
+    const btnEditar = document.createElement("button");
+    btnEditar.className = "btn-ghost";
+    btnEditar.style.fontSize = "0.72rem";
+    btnEditar.textContent = "Editar";
+    btnEditar.onclick = () => abrirModalEditar(pet);
+
+    // 🗑️ Botón para eliminar
     const btnBorrar = document.createElement("button");
     btnBorrar.className = "btn-ghost";
     btnBorrar.style.fontSize = "0.72rem";
@@ -92,16 +100,54 @@ async function cargarMascotas() {
 
     actions.appendChild(btnInteresados);
     actions.appendChild(btnToggle);
+    actions.appendChild(btnEditar);
     actions.appendChild(btnBorrar);
     row.appendChild(actions);
     petsArea.appendChild(row);
   }
 }
 
-// ---------- Modal agregar mascota ----------
+// ---------- Modal y Formulario ----------
 const modalOverlay = document.getElementById("modalOverlay");
 document.getElementById("btnAdd").onclick = () => { resetForm(); modalOverlay.style.display = "flex"; };
 document.getElementById("btnCancelar").onclick = () => { modalOverlay.style.display = "none"; };
+
+// Cargar datos existentes en el formulario al presionar Editar
+function abrirModalEditar(pet) {
+  resetForm();
+  editingPetId = pet.id;
+  document.getElementById("modalTitle").textContent = "Editar mascota";
+  document.getElementById("btnGuardarPet").textContent = "Guardar cambios";
+
+  document.getElementById("pNombre").value = pet.nombre || "";
+  document.getElementById("pRaza").value = pet.raza || "";
+  document.getElementById("pEdad").value = pet.edad || "";
+  document.getElementById("pDescripcion").value = pet.descripcion || "";
+  document.getElementById("pCiudad").value = pet.city || shelterCity;
+
+  setChipSelected("pEspecie", pet.especie);
+  setChipSelected("pTamano", pet.tamano);
+  setChipSelected("pEnergia", pet.energia);
+  setChipSelected("pDificultad", pet.nivelDificultad);
+  setChipSelected("pNinos", String(pet.buenoConNinos));
+  setChipSelected("pOtrasMascotas", String(pet.buenoConOtrasMascotas));
+
+  if (pet.photoURL) {
+    const wrap = document.getElementById("photoPreviewWrap");
+    const img = document.createElement("img");
+    img.src = pet.photoURL;
+    wrap.appendChild(img);
+  }
+
+  modalOverlay.style.display = "flex";
+}
+
+function setChipSelected(groupName, value) {
+  if (value === undefined || value === null) return;
+  const group = document.querySelector(`[data-group="${groupName}"]`);
+  const chip = group?.querySelector(`.choice-chip[data-value="${value}"]`);
+  if (chip) chip.classList.add("selected");
+}
 
 document.querySelectorAll("[data-group]").forEach(group => {
   group.querySelectorAll(".choice-chip").forEach(chip => {
@@ -111,6 +157,7 @@ document.querySelectorAll("[data-group]").forEach(group => {
     });
   });
 });
+
 function getSelected(groupName) {
   const group = document.querySelector(`[data-group="${groupName}"]`);
   const sel = group?.querySelector(".choice-chip.selected");
@@ -130,6 +177,9 @@ document.getElementById("pFoto").addEventListener("change", (e) => {
 });
 
 function resetForm() {
+  editingPetId = null;
+  document.getElementById("modalTitle").textContent = "Nueva mascota";
+  document.getElementById("btnGuardarPet").textContent = "Publicar mascota";
   document.getElementById("pNombre").value = "";
   document.getElementById("pRaza").value = "";
   document.getElementById("pEdad").value = "";
@@ -141,6 +191,7 @@ function resetForm() {
   document.getElementById("petMsg").innerHTML = "";
 }
 
+// ---------- Guardar / Actualizar Registro ----------
 document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   const btn = document.getElementById("btnGuardarPet");
   const nombre = document.getElementById("pNombre").value.trim();
@@ -161,16 +212,17 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   }
 
   btn.disabled = true;
-  btn.textContent = "Publicando...";
+  btn.textContent = editingPetId ? "Guardando..." : "Publicando...";
+
   try {
-    let photoURL = "";
+    let photoURL = null;
     if (selectedFile) {
       const fileRef = ref(storage, `pets/${uid}/${Date.now()}_${selectedFile.name}`);
       await uploadBytes(fileRef, selectedFile);
       photoURL = await getDownloadURL(fileRef);
     }
 
-    await addDoc(collection(db, "pets"), {
+    const petData = {
       shelterId: uid,
       shelterName,
       nombre, especie, raza, edad, tamano, energia,
@@ -178,19 +230,33 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
       buenoConNinos: buenoConNinos === "true",
       buenoConOtrasMascotas: buenoConOtrasMascotas === "true",
       descripcion, city,
-      photoURL,
-      status: "available",
-      createdAt: serverTimestamp(),
-    });
+      updatedAt: serverTimestamp(),
+    };
+
+    if (photoURL) {
+      petData.photoURL = photoURL;
+    }
+
+    if (editingPetId) {
+      // Editar existente
+      await updateDoc(doc(db, "pets", editingPetId), petData);
+    } else {
+      // Crear nuevo
+      petData.photoURL = photoURL || "";
+      petData.status = "available";
+      petData.createdAt = serverTimestamp();
+      await addDoc(collection(db, "pets"), petData);
+    }
 
     modalOverlay.style.display = "none";
+    resetForm();
     await cargarMascotas();
   } catch (err) {
     console.error(err);
-    document.getElementById("petMsg").innerHTML = `<div class="error-msg">Error al publicar. Intenta de nuevo.</div>`;
+    document.getElementById("petMsg").innerHTML = `<div class="error-msg">Error al guardar. Intenta de nuevo.</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = "Publicar mascota";
+    btn.textContent = editingPetId ? "Guardar cambios" : "Publicar mascota";
   }
 });
 
