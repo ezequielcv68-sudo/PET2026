@@ -10,7 +10,7 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "auth.html?tab=login"; return; }
   uid = user.uid;
 
-  // 1. Obtener datos de la colección users (ciudad y teléfono)
+  // 1. Cargar teléfono y ciudad desde la colección users
   const userDoc = await getDoc(doc(db, "users", uid));
   if (userDoc.exists()) {
     const uData = userDoc.data();
@@ -20,13 +20,12 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 
-  // 2. Cargar perfil de rutina previamente guardado en adopterProfiles
+  // 2. Cargar perfil de rutina previo en adopterProfiles
   try {
     const profileDoc = await getDoc(doc(db, "adopterProfiles", uid));
     if (profileDoc.exists()) {
       const data = profileDoc.data();
 
-      // Rellenar datos de texto
       if (data.city) document.getElementById("obCity").value = data.city;
       if (data.phone && document.getElementById("obPhone")) {
         document.getElementById("obPhone").value = data.phone;
@@ -38,7 +37,6 @@ onAuthStateChanged(auth, async (user) => {
         if (msg) msg.textContent = "✓ Ubicación guardada previamente.";
       }
 
-      // Mapear y preseleccionar los botones (chips) que correspondan a cada grupo
       const savedFields = [
         { group: "vivienda", val: data.vivienda },
         { group: "tipo_vivienda", val: data.tipoVivienda },
@@ -70,7 +68,7 @@ onAuthStateChanged(auth, async (user) => {
 
 document.getElementById("btnLogout").onclick = () => signOut(auth).then(() => window.location.href = "index.html");
 
-// ---------- Chips de selección única por grupo ----------
+// ---------- Chips de selección única ----------
 document.querySelectorAll("[data-group]").forEach(group => {
   group.querySelectorAll(".choice-chip").forEach(chip => {
     chip.addEventListener("click", () => {
@@ -90,7 +88,7 @@ function getSelected(groupName) {
 document.getElementById("btnUbicacion").addEventListener("click", () => {
   const msg = document.getElementById("ubicacionMsg");
   if (!navigator.geolocation) {
-    msg.textContent = "Tu navegador no soporta ubicación. No hay problema, usaremos tu ciudad.";
+    msg.textContent = "Tu navegador no soporta ubicación. Usaremos tu ciudad.";
     return;
   }
   msg.textContent = "Obteniendo ubicación...";
@@ -103,9 +101,8 @@ document.getElementById("btnUbicacion").addEventListener("click", () => {
   );
 });
 
-// ---------- Guardar perfil ----------
-document.getElementById("btnGuardar").addEventListener("click", async () => {
-  const btn = document.getElementById("btnGuardar");
+// ---------- Función genérica para recopilar y guardar datos ----------
+async function procesarGuardado() {
   const phoneInput = document.getElementById("obPhone");
   const phone = phoneInput ? phoneInput.value.trim() : "";
   const city = document.getElementById("obCity").value.trim();
@@ -129,13 +126,11 @@ document.getElementById("btnGuardar").addEventListener("click", async () => {
     updatedAt: serverTimestamp(),
   };
 
-  // Validar teléfono si el campo existe en la vista
   if (phoneInput && (!phone || phone.length < 10)) {
-    document.getElementById("obMsg").innerHTML = `<div class="error-msg">Ingresa un número de teléfono/WhatsApp válido (10 dígitos).</div>`;
-    return;
+    document.getElementById("obMsg").innerHTML = `<div class="error-msg">Ingresa un número de teléfono/WhatsApp válido de 10 dígitos.</div>`;
+    return null;
   }
 
-  // Filtrar campos faltantes en los datos esenciales
   const faltantes = Object.entries(perfil).filter(([k, v]) => 
     v === null && 
     k !== "lat" && 
@@ -147,28 +142,65 @@ document.getElementById("btnGuardar").addEventListener("click", async () => {
 
   if (faltantes.length) {
     document.getElementById("obMsg").innerHTML = `<div class="error-msg">Contesta todas las preguntas principales antes de continuar.</div>`;
-    return;
+    return null;
   }
 
   if (!perfil.city) {
     document.getElementById("obMsg").innerHTML = `<div class="error-msg">Escribe tu ciudad.</div>`;
-    return;
+    return null;
   }
 
-  btn.disabled = true;
-  btn.textContent = "Guardando...";
+  // Guardar en ambas colecciones
+  await setDoc(doc(db, "adopterProfiles", uid), perfil, { merge: true });
+  await setDoc(doc(db, "users", uid), { phone, city }, { merge: true });
 
-  try {
-    // 1. Guardar el perfil detallado
-    await setDoc(doc(db, "adopterProfiles", uid), perfil, { merge: true });
+  return perfil;
+}
 
-    // 2. Sincronizar teléfono y ciudad con el usuario para que el refugio lo pueda leer directamente
-    await setDoc(doc(db, "users", uid), { phone, city }, { merge: true });
+// Acción 1: Guardar cambios únicamente (Permanecer en la vista)
+const btnSoloGuardar = document.getElementById("btnSoloGuardar");
+if (btnSoloGuardar) {
+  btnSoloGuardar.addEventListener("click", async () => {
+    btnSoloGuardar.disabled = true;
+    btnSoloGuardar.textContent = "Guardando...";
+    document.getElementById("obMsg").innerHTML = "";
 
-    window.location.href = "swipe.html";
-  } catch (err) {
-    btn.disabled = false;
-    btn.textContent = "Ver mis matches →";
-    document.getElementById("obMsg").innerHTML = `<div class="error-msg">Error al guardar. Intenta de nuevo.</div>`;
-  }
-});
+    try {
+      const res = await procesarGuardado();
+      if (res) {
+        document.getElementById("obMsg").innerHTML = `<div class="ok-msg">✓ Tus datos se actualizaron correctamente.</div>`;
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById("obMsg").innerHTML = `<div class="error-msg">Error al guardar los datos. Intenta de nuevo.</div>`;
+    } finally {
+      btnSoloGuardar.disabled = false;
+      btnSoloGuardar.textContent = "Guardar cambios";
+    }
+  });
+}
+
+// Acción 2: Guardar e ir directamente a los matches (Redirección)
+const btnGuardar = document.getElementById("btnGuardar");
+if (btnGuardar) {
+  btnGuardar.addEventListener("click", async () => {
+    btnGuardar.disabled = true;
+    btnGuardar.textContent = "Guardando...";
+    document.getElementById("obMsg").innerHTML = "";
+
+    try {
+      const res = await procesarGuardado();
+      if (res) {
+        window.location.href = "swipe.html";
+      } else {
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = "Ver mis matches →";
+      }
+    } catch (err) {
+      console.error(err);
+      btnGuardar.disabled = false;
+      btnGuardar.textContent = "Ver mis matches →";
+      document.getElementById("obMsg").innerHTML = `<div class="error-msg">Error al guardar los datos. Intenta de nuevo.</div>`;
+    }
+  });
+}
