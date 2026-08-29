@@ -104,7 +104,7 @@
 
     <!-- Agrega esto justo arriba de <label>Ciudad</label> -->
 <label>Teléfono / WhatsApp de contacto</label>
-<input type="tel" id="obPhone" placeholder="Ej. 7771234567">
+    <input type="tel" id="obPhone" placeholder="Ej. 7771234567">
 
     <label>Ciudad</label>
     <input type="text" id="obCity" placeholder="Ej. Atlixco, Puebla">
@@ -112,13 +112,14 @@
     <button class="btn-secondary" id="btnUbicacion" type="button">📍 Usar mi ubicación para buscar mascotas cercanas</button>
     <div id="ubicacionMsg" style="font-size:0.8rem;color:var(--ink-soft);margin-top:8px;"></div>
 
-    <button class="btn-primary" id="btnGuardar">Ver mis matches →</button>
-    <div id="obMsg"></div>
+    <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+      <button class="btn-secondary" id="btnSoloGuardar" type="button" style="flex: 1; margin-top: 0;">Guardar cambios</button>
+      <button class="btn-primary" id="btnGuardar" type="button" style="flex: 1; margin-top: 0;">Ver mis matches →</button>
+    </div>
+
+    <div id="obMsg" style="margin-top: 12px;"></div>
   </div>
 </div>
-
-
- 
 
 <script type="module" src="js/onboarding.js"></script>
 </body>
