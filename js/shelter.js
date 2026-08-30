@@ -401,3 +401,56 @@ document.getElementById("btnExportarCSV").onclick = async () => {
 };
 
 function escapeHtml(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
+// ---------- CONFIGURACIÓN DE REDES SOCIALES ----------
+const configOverlay = document.getElementById("configOverlay");
+const btnConfigRefugio = document.getElementById("btnConfigRefugio");
+
+if (btnConfigRefugio) {
+  btnConfigRefugio.onclick = async () => {
+    configOverlay.style.display = "flex";
+    document.getElementById("cfgMsg").innerHTML = "Cargando...";
+    
+    try {
+      const snap = await getDoc(doc(db, "users", uid));
+      if(snap.exists()) {
+        const d = snap.data();
+        document.getElementById("cfgFb").value = d.facebook || "";
+        document.getElementById("cfgIg").value = d.instagram || "";
+      }
+      document.getElementById("cfgMsg").innerHTML = "";
+    } catch(err) {
+      document.getElementById("cfgMsg").innerHTML = "Error al cargar datos.";
+    }
+  };
+}
+
+document.getElementById("btnCerrarConfig").onclick = () => {
+  configOverlay.style.display = "none";
+};
+
+document.getElementById("btnGuardarConfig").onclick = async () => {
+  const btn = document.getElementById("btnGuardarConfig");
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
+  
+  try {
+    await updateDoc(doc(db, "users", uid), {
+      facebook: document.getElementById("cfgFb").value.trim(),
+      instagram: document.getElementById("cfgIg").value.trim()
+    });
+    document.getElementById("cfgMsg").innerHTML = `<div class="ok-msg" style="color:var(--mint); margin-top:8px; font-weight:bold;">✓ Guardado con éxito</div>`;
+    
+    // Cerrar el modal automáticamente después de un segundo
+    setTimeout(() => { 
+      configOverlay.style.display = "none"; 
+      document.getElementById("cfgMsg").innerHTML = ""; 
+    }, 1500);
+    
+  } catch (err) {
+    console.error("Error al guardar redes:", err);
+    document.getElementById("cfgMsg").innerHTML = `<div class="error-msg" style="margin-top:8px;">Error al guardar.</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Guardar Configuración";
+  }
+};
