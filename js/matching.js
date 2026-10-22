@@ -125,3 +125,30 @@ export function ordenarPorMatch(perfil, mascotas) {
     .map(pet => ({ ...pet, matchScore: calcularMatch(perfil, pet).score }))
     .sort((a, b) => b.matchScore - a.matchScore);
 }
+
+/**
+ * Explica en lenguaje simple por qué una mascota encaja (o no) con el perfil.
+ * Devuelve { razones: [...máx 3], avisos: [...máx 2] }.
+ * Usa el mismo desglose que calcularMatch, así no hay lógica duplicada.
+ */
+export function explicarMatch(perfil, pet) {
+  const { breakdown } = calcularMatch(perfil, pet);
+  const razones = [];
+  const avisos = [];
+  const pide = (v) => v && v !== "cualquiera";
+
+  if (pide(perfil.tamanoPreferido) && breakdown.tamano >= 1) razones.push("Del tamaño que buscas");
+  if (perfil.energia && breakdown.energia >= 1) razones.push("Su energía va con tu ritmo");
+  if (breakdown.vivienda >= 0.9) razones.push("Se adapta bien a tu vivienda");
+  if (perfil.ninos === "si" && pet.buenoConNinos === true) razones.push("Bueno con niños");
+  if (perfil.otrasMascotas === "si" && pet.buenoConOtrasMascotas === true) razones.push("Se lleva bien con otras mascotas");
+  if (breakdown.experiencia >= 1) razones.push("Su cuidado va con tu experiencia");
+  if (perfil.lat && perfil.lng && pet.lat && pet.lng && breakdown.distancia >= 0.85) razones.push("Vive cerca de ti");
+
+  if (perfil.ninos === "si" && pet.buenoConNinos === false) avisos.push("No probado con niños");
+  if (perfil.otrasMascotas === "si" && pet.buenoConOtrasMascotas === false) avisos.push("No probado con otras mascotas");
+  if (breakdown.vivienda < 0.5) avisos.push("Puede necesitar más espacio del que tienes");
+  if (breakdown.horasSolo < 1) avisos.push("Necesita compañía: ojo con las horas que estaría solo");
+
+  return { razones: razones.slice(0, 3), avisos: avisos.slice(0, 2) };
+}

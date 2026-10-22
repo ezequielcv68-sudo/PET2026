@@ -8,6 +8,7 @@ import {
 let uid = null;
 let shelterName = "";
 let shelterCity = "";
+let shelterVerified = false;
 let selectedFile = null;
 let editingPetId = null;
 
@@ -25,7 +26,8 @@ onAuthStateChanged(auth, async (user) => {
   }
   shelterName = userSnap.data().shelterName || userSnap.data().name || "Refugio";
   shelterCity = userSnap.data().city || "";
-  document.getElementById("shelterNameTag").textContent = shelterName;
+  shelterVerified = userSnap.data().verified === true;
+  document.getElementById("shelterNameTag").textContent = shelterName + (shelterVerified ? " ✓" : "");
 
   await cargarMascotas();
 });
@@ -221,6 +223,7 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
     const petData = {
       shelterId: uid,
       shelterName,
+      shelterVerified,
       nombre, especie, raza, edad, tamano, energia,
       nivelDificultad,
       buenoConNinos: buenoConNinos === "true",
@@ -264,6 +267,7 @@ async function verInteresados(pet) {
 
   const snap = await getDocs(query(
     collection(db, "swipes"),
+    where("shelterId", "==", uid),
     where("petId", "==", pet.id),
     where("liked", "==", true),
   ));
@@ -275,30 +279,31 @@ async function verInteresados(pet) {
 
   area.innerHTML = "";
   for (const d of snap.docs) {
-    const adopterId = d.data().adopterId;
-    
-    // Consulta simultánea a users y adopterProfiles
-    const [adopterSnap, profileSnap] = await Promise.all([
-      getDoc(doc(db, "users", adopterId)),
-      getDoc(doc(db, "adopterProfiles", adopterId))
-    ]);
+    // El adoptante comparte estos datos al dar like (ver swipe.js → snapshotAdoptante)
+    const a = d.data().adopter || {};
 
-    const uData = adopterSnap.exists() ? adopterSnap.data() : {};
-    const pData = profileSnap.exists() ? profileSnap.data() : {};
+    const name = a.name || "Adoptante";
+    const email = a.email || "";
+    const city = a.city || "Sin ciudad";
+    const phone = a.phone || "";
+    const bio = a.biografia || "Sin carta de presentación.";
 
-    // Extraer datos esenciales
-    const name = uData.name || uData.nombre || pData.name || pData.nombre || "Adoptante";
-    const email = uData.email || pData.email || "";
-    const city = uData.city || pData.city || "Sin ciudad";
-    const phone = uData.phone || uData.telefono || uData.celular || pData.phone || pData.telefono || pData.celular || "";
-    const bio = pData.biografia || uData.biografia || "Sin carta de presentación.";
+    const L = {
+      vivienda: { depto: "Departamento", casa_sin_patio: "Casa sin patio", casa_patio_chico: "Casa patio chico", casa_patio_grande: "Casa patio grande" },
+      horas: { menos2: "<2 h", "2a4": "2–4 h", "4a8": "4–8 h", mas8: ">8 h" },
+      exp: { primera_vez: "Primera vez", algo: "Algo de exp.", mucha: "Mucha exp." },
+      tipo: { propia: "Vivienda propia", renta_permitida: "Renta (con permiso)" },
+      acuerdo: { si: "Familia de acuerdo", en_proceso: "Familia aún lo platica" },
+      viajes: { familiares: "Viajes: familiares/amigos", pension: "Viajes: pensión", viaja: "Viaja con la mascota" },
+    };
 
-    // Mapeo de etiquetas rápidas para el refugio
-    const vivienda = pData.vivienda ? pData.vivienda.replace('_', ' ') : 'Vivienda no descrita';
-    const horasSolo = pData.horasSolo ? `${pData.horasSolo} solo/día` : 'Horas n/d';
-    const ninosTag = pData.ninos === 'si' ? '👶 Con niños' : 'Sin niños';
-    const mascotasTag = pData.otrasMascotas === 'si' ? '🐾 Tiene mascotas' : 'Sin mascotas';
-    const expTag = pData.experiencia ? `⭐ Exp: ${pData.experiencia}` : 'Sin exp. registrada';
+    // Etiquetas rápidas para el refugio
+    const vivienda = L.vivienda[a.vivienda] || "Vivienda no descrita";
+    const horasSolo = a.horasSolo ? `${L.horas[a.horasSolo] || a.horasSolo} solo/día` : "Horas n/d";
+    const ninosTag = a.ninos === "si" ? "👶 Con niños" : "Sin niños";
+    const mascotasTag = a.otrasMascotas === "si" ? "🐾 Tiene mascotas" : "Sin mascotas";
+    const expTag = a.experiencia ? `⭐ ${L.exp[a.experiencia] || a.experiencia}` : "Sin exp. registrada";
+    const extras = [L.tipo[a.tipoVivienda], L.acuerdo[a.acuerdoFamiliar], L.viajes[a.planViajes]].filter(Boolean);
 
     const cleanPhone = phone.replace(/\D/g, "");
     const waText = encodeURIComponent(`¡Hola ${name}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PatitasMatch 🐾`);
@@ -315,7 +320,7 @@ async function verInteresados(pet) {
 
       <!-- Datos de contacto básico -->
       <div style="font-size:0.82rem; color:var(--ink-soft); margin:4px 0 8px;">
-        📍 ${escapeHtml(city)} · ✉️ <a href="mailto:${email}" style="color:var(--ink); font-weight:600;">${escapeHtml(email || "Sin correo")}</a><br>
+        📍 ${escapeHtml(city)} · ✉️ <a href="mailto:${escapeHtml(email)}" style="color:var(--ink); font-weight:600;">${escapeHtml(email || "Sin correo")}</a><br>
         📞 ${phone ? escapeHtml(phone) : "Teléfono no registrado"}
       </div>
 
@@ -326,6 +331,7 @@ async function verInteresados(pet) {
         <span class="tag">${ninosTag}</span>
         <span class="tag">${mascotasTag}</span>
         <span class="tag">${escapeHtml(expTag)}</span>
+        ${extras.map(x => `<span class="tag">${escapeHtml(x)}</span>`).join("")}
       </div>
 
       <!-- Carta de motivación -->
@@ -354,30 +360,23 @@ document.getElementById("btnExportarCSV").onclick = async () => {
     for (const pet of pets) {
       const swipesSnap = await getDocs(query(
         collection(db, "swipes"),
+        where("shelterId", "==", uid),
         where("petId", "==", pet.id),
         where("liked", "==", true)
       ));
 
+      const estado = pet.status === "adopted" ? "Adoptado" : "Disponible";
       if (swipesSnap.empty) {
-        csvContent += `"${pet.nombre}","${pet.especie}","${pet.status === "adopted" ? "Adoptado" : "Disponible"}","Sin interesados","N/A","N/A","N/A","N/A"\n`;
+        csvContent += [pet.nombre, pet.especie, estado, "Sin interesados", "N/A", "N/A", "N/A", "N/A"].map(csvCell).join(",") + "\n";
       } else {
         for (const swipeDoc of swipesSnap.docs) {
-          const adopterId = swipeDoc.data().adopterId;
-          
-          const [adopterSnap, profileSnap] = await Promise.all([
-            getDoc(doc(db, "users", adopterId)),
-            getDoc(doc(db, "adopterProfiles", adopterId))
-          ]);
-
-          const uData = adopterSnap.exists() ? adopterSnap.data() : {};
-          const pData = profileSnap.exists() ? profileSnap.data() : {};
-
-          const name = uData.name || uData.nombre || pData.name || pData.nombre || "N/A";
-          const email = uData.email || pData.email || "N/A";
-          const city = uData.city || pData.city || "N/A";
-          const phone = uData.phone || uData.telefono || uData.celular || pData.phone || pData.telefono || pData.celular || "N/A";
-
-          csvContent += `"${pet.nombre}","${pet.especie}","${pet.status === "adopted" ? "Adoptado" : "Disponible"}","${name}","${email}","${phone}","${city}","${swipeDoc.data().matchScore || 90}"\n`;
+          const sw = swipeDoc.data();
+          const a = sw.adopter || {};
+          csvContent += [
+            pet.nombre, pet.especie, estado,
+            a.name || "N/A", a.email || "N/A", a.phone || "N/A", a.city || "N/A",
+            sw.matchScore ?? "N/A",
+          ].map(csvCell).join(",") + "\n";
         }
       }
     }
@@ -399,6 +398,12 @@ document.getElementById("btnExportarCSV").onclick = async () => {
     btn.disabled = false;
   }
 };
+
+function csvCell(v) {
+  let t = String(v ?? "");
+  if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;   // evita inyección de fórmulas en Excel
+  return `"${t.replace(/"/g, '""')}"`;
+}
 
 function escapeHtml(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
 // ---------- CONFIGURACIÓN DE REDES SOCIALES ----------

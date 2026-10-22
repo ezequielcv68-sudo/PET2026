@@ -1,10 +1,12 @@
 import {
   auth, db, onAuthStateChanged, signOut,
   doc, setDoc, getDoc, collection, getDocs, query, where, serverTimestamp,
+  track, esc, safeUrl, PENDING_KEY,
 } from "./firebase-config.js";
-import { ordenarPorMatch } from "./matching.js";
+import { ordenarPorMatch, calcularMatch, explicarMatch } from "./matching.js";
 
 let uid = null;
+let userData = {};
 let perfil = null;
 let deck = [];
 let index = 0;
@@ -16,12 +18,47 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = "auth.html?tab=login"; return; }
   uid = user.uid;
 
+  const userSnap = await getDoc(doc(db, "users", uid));
+  userData = userSnap.exists() ? userSnap.data() : {};
+  if (userData.role === "shelter") { window.location.href = "shelter.html"; return; }
+
   const perfilSnap = await getDoc(doc(db, "adopterProfiles", uid));
   if (!perfilSnap.exists()) { window.location.href = "onboarding.html"; return; }
   perfil = perfilSnap.data();
 
+  await procesarLikePendiente();
   await cargarDeck();
 });
+
+// Si la persona dio "Me interesa" en el catálogo o en el test antes de registrarse,
+// aquí se guarda ese like una vez que ya tiene perfil.
+async function procesarLikePendiente() {
+  let petId = null;
+  try { petId = sessionStorage.getItem(PENDING_KEY); } catch (e) {}
+  if (!petId) return;
+  try { sessionStorage.removeItem(PENDING_KEY); } catch (e) {}
+
+  try {
+    const snap = await getDoc(doc(db, "pets", petId));
+    if (!snap.exists()) return;
+    const pet = { id: snap.id, ...snap.data() };
+    if (pet.status === "adopted" || pet.shelterId === uid) return;
+
+    const { score } = calcularMatch(perfil, pet);
+    await guardarSwipe(pet, true, score);
+    mostrarToast(`Guardamos tu interés en ${pet.nombre || "la mascota"} 💛`);
+  } catch (err) {
+    console.error("No se pudo guardar el like pendiente:", err);
+  }
+}
+
+function mostrarToast(texto) {
+  const t = document.createElement("div");
+  t.textContent = texto;
+  t.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1C1A16;color:#FBF8F0;padding:12px 18px;border-radius:999px;font-size:0.88rem;box-shadow:0 10px 24px rgba(0,0,0,.25);z-index:200;max-width:90vw;text-align:center;";
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
 
 async function cargarDeck() {
   // Mascotas disponibles
@@ -62,22 +99,26 @@ function render() {
     card.style.zIndex = i + 1;
     if (!isTop) card.style.transform = "scale(0.96) translateY(10px)";
 
+    const { razones, avisos } = explicarMatch(perfil, pet);
+    const fotoSegura = safeUrl(pet.photoURL, fotoDefault(pet.especie));
+    const porque = [...razones.slice(0, 2).map(r => "✓ " + r), ...avisos.slice(0, 1).map(a => "⚠ " + a)].join(" · ");
     card.innerHTML = `
-      <div class="photo" style="background-image:url('${pet.photoURL || fotoDefault(pet.especie)}')">
+      <div class="photo" style="background-image:url('${esc(fotoSegura)}')">
         <div class="stamp">${pet.matchScore}% match</div>
         <div class="swipe-indicator like">ME GUSTA</div>
         <div class="swipe-indicator nope">PASO</div>
       </div>
       <div class="info">
-        <div class="name-row"><h2>${escapeHtml(pet.nombre || "Sin nombre")}</h2><span class="age">${pet.edad || "?"}</span></div>
+        <div class="name-row"><h2>${escapeHtml(pet.nombre || "Sin nombre")}</h2><span class="age">${esc(pet.edad || "?")}</span></div>
         <div class="tag-row">
           <span class="tag">${etiquetaEspecie(pet.especie)}</span>
-          <span class="tag">${pet.raza || "Raza mixta"}</span>
+          <span class="tag">${esc(pet.raza || "Raza mixta")}</span>
           <span class="tag">${etiquetaTamano(pet.tamano)}</span>
           <span class="tag">${etiquetaEnergia(pet.energia)}</span>
         </div>
+        ${porque ? `<div style="font-size:0.78rem;color:#2E6B5D;margin-bottom:4px;">${esc(porque)}</div>` : ""}
         <p class="desc">${escapeHtml(pet.descripcion || "")}</p>
-        <div class="shelter-line">📍 ${escapeHtml(pet.shelterName || "Refugio")} · ${escapeHtml(pet.city || "")}</div>
+        <div class="shelter-line">📍 ${escapeHtml(pet.shelterName || "Refugio")}${pet.shelterVerified === true ? " ✓" : ""} · ${escapeHtml(pet.city || "")}</div>
       </div>
     `;
     wrap.appendChild(card);
@@ -151,22 +192,49 @@ function animarSalida(card, dir, cb) {
   setTimeout(cb, 260);
 }
 
+// Datos del adoptante que ve el refugio SOLO cuando hay like.
+// Se copian dentro del swipe para que el refugio no necesite leer el perfil completo.
+function snapshotAdoptante() {
+  return {
+    name: userData.name || "",
+    email: userData.email || "",
+    city: perfil.city || userData.city || "",
+    phone: perfil.phone || userData.phone || "",
+    biografia: perfil.biografia || "",
+    vivienda: perfil.vivienda || "",
+    tipoVivienda: perfil.tipoVivienda || "",
+    acuerdoFamiliar: perfil.acuerdoFamiliar || "",
+    planViajes: perfil.planViajes || "",
+    horasSolo: perfil.horasSolo || "",
+    ninos: perfil.ninos || "",
+    otrasMascotas: perfil.otrasMascotas || "",
+    experiencia: perfil.experiencia || "",
+  };
+}
+
+async function guardarSwipe(pet, liked, score) {
+  const data = {
+    adopterId: uid,
+    petId: pet.id,
+    shelterId: pet.shelterId || null,
+    liked,
+    matchScore: score,
+    petName: pet.nombre || "",
+    petPhoto: pet.photoURL || "",
+    petSpecies: pet.especie || "",
+    timestamp: serverTimestamp(),
+  };
+  if (liked) data.adopter = snapshotAdoptante();
+  await setDoc(doc(db, "swipes", `${uid}_${pet.id}`), data);
+  if (liked) track("like", { pet_id: pet.id, score });
+}
+
 async function commitSwipe(liked) {
   const pet = deck[index];
   index++;
   render();
   try {
-    await setDoc(doc(db, "swipes", `${uid}_${pet.id}`), {
-      adopterId: uid,
-      petId: pet.id,
-      shelterId: pet.shelterId || null,
-      liked,
-      matchScore: pet.matchScore,
-      petName: pet.nombre || "",
-      petPhoto: pet.photoURL || "",
-      petSpecies: pet.especie || "",
-      timestamp: serverTimestamp(),
-    });
+    await guardarSwipe(pet, liked, pet.matchScore);
   } catch (err) {
     console.error("No se pudo guardar el swipe:", err);
   }
