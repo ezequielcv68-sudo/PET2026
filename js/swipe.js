@@ -4,6 +4,7 @@ import {
   track, esc, safeUrl, PENDING_KEY,
 } from "./firebase-config.js";
 import { ordenarPorMatch, calcularMatch, explicarMatch } from "./matching.js";
+import { avisarRefugio } from "./avisos.js";
 
 let uid = null;
 let userData = {};
@@ -226,7 +227,10 @@ async function guardarSwipe(pet, liked, score) {
   };
   if (liked) data.adopter = snapshotAdoptante();
   await setDoc(doc(db, "swipes", `${uid}_${pet.id}`), data);
-  if (liked) track("like", { pet_id: pet.id, score });
+  if (liked) {
+    track("like", { pet_id: pet.id, score });
+    avisarRefugio(`${uid}_${pet.id}`); // correo al refugio (no bloquea)
+  }
 }
 
 async function commitSwipe(liked) {

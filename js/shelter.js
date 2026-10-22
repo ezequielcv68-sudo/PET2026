@@ -4,6 +4,7 @@ import {
   collection, addDoc, getDocs, query, where, serverTimestamp,
   ref, uploadBytes, getDownloadURL,
 } from "./firebase-config.js";
+import { abrirTarjeta } from "./sharecard.js";
 
 let uid = null;
 let shelterName = "";
@@ -32,9 +33,51 @@ onAuthStateChanged(auth, async (user) => {
   await cargarMascotas();
 });
 
+// ---------- Interesados nuevos (desde la última vez que abriste cada mascota) ----------
+function claveVistos() { return `pm_vistos_${uid}`; }
+function leerVistos() {
+  try { return JSON.parse(localStorage.getItem(claveVistos()) || "{}"); } catch (e) { return {}; }
+}
+function marcarVistos(petId) {
+  try {
+    const v = leerVistos(); v[petId] = Date.now();
+    localStorage.setItem(claveVistos(), JSON.stringify(v));
+  } catch (e) {}
+}
+async function contarNuevos() {
+  try {
+    const snap = await getDocs(query(collection(db, "swipes"), where("shelterId", "==", uid), where("liked", "==", true)));
+    const vistos = leerVistos();
+    const out = {};
+    snap.forEach((d) => {
+      const s = d.data();
+      const t = s.timestamp && s.timestamp.toMillis ? s.timestamp.toMillis() : 0;
+      if (t > (vistos[s.petId] || 0)) out[s.petId] = (out[s.petId] || 0) + 1;
+    });
+    return out;
+  } catch (e) {
+    console.warn("No se pudo contar interesados nuevos:", e);
+    return {};
+  }
+}
+function mostrarBanner(total) {
+  let el = document.getElementById("avisoNuevos");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "avisoNuevos";
+    petsArea.parentNode.insertBefore(el, petsArea);
+  }
+  el.innerHTML = "";
+  if (!total) return;
+  el.style.cssText = "background:#FDEBE5;border:1.5px solid #E8836B;color:#8a3a26;padding:12px 16px;border-radius:14px;margin:0 0 18px;font-weight:600;font-size:0.92rem;";
+  el.textContent = `🔔 Tienes ${total} ${total === 1 ? "interesado nuevo" : "interesados nuevos"}. ¡Respóndeles pronto!`;
+}
+
 async function cargarMascotas() {
   const snap = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
   const pets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const nuevos = pets.length ? await contarNuevos() : {};
+  mostrarBanner(Object.values(nuevos).reduce((x, y) => x + y, 0));
 
   if (!pets.length) {
     petsArea.innerHTML = `
@@ -67,8 +110,21 @@ async function cargarMascotas() {
     const btnInteresados = document.createElement("button");
     btnInteresados.className = "btn-ghost";
     btnInteresados.style.fontSize = "0.72rem";
-    btnInteresados.textContent = "Interesados";
-    btnInteresados.onclick = () => verInteresados(pet);
+    const nNuevos = nuevos[pet.id] || 0;
+    btnInteresados.textContent = nNuevos ? `Interesados 🔔${nNuevos}` : "Interesados";
+    if (nNuevos) btnInteresados.style.cssText += "color:#D96B50;border-color:#E8836B;font-weight:700;";
+    btnInteresados.onclick = () => {
+      marcarVistos(pet.id);
+      btnInteresados.textContent = "Interesados";
+      btnInteresados.style.color = ""; btnInteresados.style.borderColor = ""; btnInteresados.style.fontWeight = "";
+      verInteresados(pet);
+    };
+
+    const btnTarjeta = document.createElement("button");
+    btnTarjeta.className = "btn-ghost";
+    btnTarjeta.style.fontSize = "0.72rem";
+    btnTarjeta.textContent = "🖼️ Tarjeta";
+    btnTarjeta.onclick = () => abrirTarjeta(pet);
 
     const btnToggle = document.createElement("button");
     btnToggle.className = "btn-ghost";
@@ -99,6 +155,7 @@ async function cargarMascotas() {
     };
 
     actions.appendChild(btnInteresados);
+    actions.appendChild(btnTarjeta);
     actions.appendChild(btnToggle);
     actions.appendChild(btnEditar);
     actions.appendChild(btnBorrar);

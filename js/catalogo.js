@@ -2,6 +2,7 @@ import {
   db, auth, collection, getDocs, onAuthStateChanged,
   track, esc, safeUrl, PENDING_KEY,
 } from './firebase-config.js';
+import { abrirTarjeta } from './sharecard.js';
 
 const catalogArea = document.getElementById('catalogArea');
 const petModal = document.getElementById('petModal');
@@ -146,6 +147,11 @@ function showPetAtIndex(index) {
   const btnShare = document.getElementById('btnShare');
   if (btnShare) {
     btnShare.onclick = () => compartirMascota(pet, data);
+  }
+
+  const btnCard = document.getElementById('btnCard');
+  if (btnCard) {
+    btnCard.onclick = () => abrirTarjeta({ ...pet, photoURL: data.photo, nombre: data.name, city: data.city });
   }
 
   petModal.classList.add('active');
