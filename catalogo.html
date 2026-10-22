@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo — PatitasMatch</title>
+<title>Catálogo de mascotas en adopción — PatitasMatch</title>
+<meta name="description" content="Perritos y gatitos de refugios y rescatistas de México esperando un hogar. Conoce su historia y contacta al refugio.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mascotas en adopción — PatitasMatch">
+<meta property="og:description" content="Perritos y gatitos esperando un hogar. Haz el test y descubre cuál encaja contigo.">
+<meta property="og:image" content="https://pet-2026.vercel.app/img/logo.png">
+<meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/png" href="img/logo.png">
 <style>
@@ -184,10 +190,11 @@
 
 <nav class="nav">
   <a href="index.html" class="brand">
-    <img src="img/logo.png" alt="PetMatch Logo" style="height: 36px; vertical-align: middle; margin-right: 8px;">
-    PetMatch
+    <img src="img/logo.png" alt="PatitasMatch" style="height: 36px; vertical-align: middle; margin-right: 8px;">
+    PatitasMatch
   </a>
   <div class="links">
+    <a href="test.html">Hacer el test</a>
     <a href="swipe.html">Descubrir</a>
     <a href="catalogo.html" class="active">Catálogo</a>
   </div>
@@ -236,7 +243,8 @@
       <p id="modalDesc" style="color:#444; font-size:0.95rem; line-height:1.5;"></p>
 
       <div class="modal-actions">
-        <button class="btn-match" id="btnMatchAction">¡Hacer Match / Dar Like! 🐾</button>
+        <button class="btn-match" id="btnMatchAction">Me interesa 🐾</button>
+        <button class="btn-match" id="btnShare" type="button" style="background:#4F9D8D; flex:0 0 auto; padding:14px 18px;" aria-label="Compartir">Compartir</button>
       </div>
     </div>
   </div>

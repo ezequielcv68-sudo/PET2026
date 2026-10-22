@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function miUsuario() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // ---------- users ----------
+    // Cada quien lee su propio documento. Los documentos de REFUGIOS son legibles
+    // para cualquier usuario con sesión (matches.js usa el correo del refugio).
+    // Los de adoptantes son privados. Nadie puede auto-verificarse ni cambiar su rol.
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || resource.data.role == 'shelter');
+      allow create: if signedIn() && request.auth.uid == userId
+        && request.resource.data.role in ['adopter', 'shelter']
+        && request.resource.data.get('verified', false) == false;
+      allow update: if signedIn() && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.get('verified', false) == resource.data.get('verified', false);
+      allow delete: if false;
+    }
+
+    // ---------- adopterProfiles ----------
+    // Solo el dueño. El refugio ve lo necesario dentro del swipe (campo "adopter").
+    match /adopterProfiles/{userId} {
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
+    // ---------- pets ----------
+    // Lectura pública (catálogo). Solo usuarios con rol "shelter" publican, y la marca
+    // shelterVerified debe coincidir con users/{uid}.verified (no se puede falsificar).
+    match /pets/{petId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.shelterId == request.auth.uid
+        && miUsuario().role == 'shelter'
+        && request.resource.data.get('shelterVerified', false) == miUsuario().get('verified', false);
+      allow update: if signedIn()
+        && resource.data.shelterId == request.auth.uid
+        && request.resource.data.shelterId == request.auth.uid
+        && (
+          request.resource.data.get('shelterVerified', false) == resource.data.get('shelterVerified', false)
+          || request.resource.data.get('shelterVerified', false) == miUsuario().get('verified', false)
+        );
+      allow delete: if signedIn() && resource.data.shelterId == request.auth.uid;
+    }
+
+    // ---------- swipes ----------
+    // Los lee el adoptante que los creó o el refugio dueño de la mascota.
+    // Por eso las consultas del panel del refugio llevan where("shelterId", "==", uid).
+    match /swipes/{swipeId} {
+      allow read: if signedIn()
+        && (resource.data.adopterId == request.auth.uid || resource.data.shelterId == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.adopterId == request.auth.uid
+        && swipeId == request.auth.uid + '_' + request.resource.data.petId;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

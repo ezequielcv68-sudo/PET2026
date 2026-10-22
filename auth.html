@@ -4,15 +4,44 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Entrar — PatitasMatch</title>
+<meta name="robots" content="noindex">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/png" href="img/logo.png">
+<style>
+  .btn-google {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: #fff; color: var(--ink);
+    border: 1.5px solid var(--line);
+    padding: 12px 18px; border-radius: 999px;
+    font-weight: 700; font-size: 0.95rem; cursor: pointer;
+    margin-top: 14px;
+  }
+  .btn-google:hover { border-color: var(--mint); }
+  .btn-google:disabled { opacity: .5; cursor: not-allowed; }
+  .or-sep {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--ink-faint); font-size: 0.8rem; margin: 18px 0 4px;
+  }
+  .or-sep::before, .or-sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .forgot-row { text-align: right; margin-top: 8px; }
+  .forgot-row button {
+    background: none; border: none; color: var(--mint);
+    font-size: 0.82rem; font-weight: 700; cursor: pointer; padding: 0;
+  }
+  .guest-note {
+    background: var(--mint-bg); color: #2E6B5D;
+    border-radius: var(--radius-sm); padding: 10px 14px;
+    font-size: 0.85rem; margin-bottom: 16px; display: none;
+  }
+</style>
 </head>
 <body>
 <div class="shell">
   <div class="topbar">
     <a href="index.html" class="brand-mini">
-      <img src="img/logo.png" alt="PetMatch Logo" style="height: 32px; vertical-align: middle; margin-right: 8px;">
-      PetMatch
+      <img src="img/logo.png" alt="PatitasMatch" style="height: 32px; vertical-align: middle; margin-right: 8px;">
+      PatitasMatch
     </a>
     <a href="index.html"><button class="btn-ghost">← Inicio</button></a>
   </div>
@@ -21,6 +50,10 @@
     <div id="registerView">
       <h2>Crea tu cuenta</h2>
       <p class="sub">Elige cómo quieres usar PatitasMatch.</p>
+
+      <div class="guest-note" id="guestNote">
+        ✓ Guardamos las respuestas de tu test. Crea tu cuenta para ver tus matches y contactar a los refugios.
+      </div>
 
       <div class="role-grid" id="roleGrid">
         <div class="role-card" data-role="adopter">
@@ -34,21 +67,26 @@
       </div>
 
       <label id="lblName">Nombre completo</label>
-      <input type="text" id="regName" placeholder="Ej. Ana García">
+      <input type="text" id="regName" placeholder="Ej. Ana García" autocomplete="name">
 
       <label id="lblShelterName" style="display:none">Nombre del refugio</label>
       <input type="text" id="regShelterName" style="display:none" placeholder="Ej. Refugio Huellitas A.C.">
 
       <label>Correo electrónico</label>
-      <input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com">
+      <input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com" autocomplete="email">
 
       <label>Contraseña</label>
-      <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres">
+      <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
 
       <label>Ciudad</label>
-      <input type="text" id="regCity" placeholder="Ej. Atlixco, Puebla">
+      <input type="text" id="regCity" placeholder="Ej. Cuernavaca, Morelos" autocomplete="address-level2">
 
       <button class="btn-primary" id="btnRegister">Crear cuenta</button>
+
+      <div class="or-sep">o</div>
+      <button class="btn-google" id="btnGoogleReg" type="button">
+        <span style="font-weight:800;color:#4285F4;">G</span> Continuar con Google
+      </button>
 
       <div id="registerMsg"></div>
 
@@ -62,12 +100,19 @@
       <p class="sub">Inicia sesión para seguir buscando match.</p>
 
       <label>Correo electrónico</label>
-      <input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com">
+      <input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" autocomplete="email">
 
       <label>Contraseña</label>
-      <input type="password" id="loginPassword" placeholder="Tu contraseña">
+      <input type="password" id="loginPassword" placeholder="Tu contraseña" autocomplete="current-password">
+
+      <div class="forgot-row"><button id="btnForgot" type="button">¿Olvidaste tu contraseña?</button></div>
 
       <button class="btn-primary" id="btnLogin">Iniciar sesión</button>
+
+      <div class="or-sep">o</div>
+      <button class="btn-google" id="btnGoogleLogin" type="button">
+        <span style="font-weight:800;color:#4285F4;">G</span> Continuar con Google
+      </button>
 
       <div id="loginMsg"></div>
 

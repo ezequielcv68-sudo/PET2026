@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de compatibilidad — PatitasMatch</title>
+<meta name="description" content="Contesta 8 preguntas en 2 minutos y descubre qué perros y gatos de refugio se adaptan a tu estilo de vida. Sin registro.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="¿Qué mascota de refugio va contigo? — PatitasMatch">
+<meta property="og:description" content="Test de 2 minutos, sin registro. Descubre tu match.">
+<meta property="og:image" content="https://pet-2026.vercel.app/img/logo.png">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" type="image/png" href="img/logo.png">
+<style>
+  .test-wrap { max-width: 640px; margin: 0 auto; padding: 8px clamp(16px, 4vw, 24px) 80px; }
+  .res-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .res-card {
+    background: var(--paper-card);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    display: flex; flex-direction: column;
+  }
+  .res-photo { position: relative; height: 190px; background: #E4DEC9 center/cover no-repeat; }
+  .res-pct {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--mint); color: #fff;
+    font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem;
+    padding: 6px 10px; border-radius: 10px;
+  }
+  .res-body { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .res-body h3 { font-size: 1.1rem; }
+  .res-sub { font-size: 0.8rem; color: var(--ink-soft); }
+  .res-why { list-style: none; padding: 0; margin: 4px 0 0; font-size: 0.82rem; color: #2E6B5D; }
+  .res-why li::before { content: "✓ "; font-weight: 700; }
+  .res-warn { list-style: none; padding: 0; margin: 2px 0 0; font-size: 0.78rem; color: #8a5a00; }
+  .res-warn li::before { content: "⚠ "; }
+  .res-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; }
+  .res-actions button, .res-actions a { flex: 1; text-align: center; }
+  .btn-sm {
+    background: var(--coral); color: #fff; border: none; border-radius: 999px;
+    padding: 10px 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: var(--font-display);
+  }
+  .btn-sm:hover { background: var(--coral-dark); }
+  .btn-sm.outline { background: transparent; color: var(--ink); border: 1.5px solid var(--line); display: inline-block; }
+  .cta-save {
+    background: var(--ink); color: var(--bg-soft); border-radius: 20px;
+    padding: 22px 24px; margin-top: 28px; text-align: center;
+  }
+  .cta-save h3 { color: var(--bg-soft); margin-bottom: 6px; }
+  .cta-save p { color: rgba(251,248,240,0.7); margin: 0 0 14px; font-size: 0.92rem; }
+  .progress { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 14px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="brand">
+    <img src="img/logo.png" alt="PatitasMatch" style="height: 36px; vertical-align: middle; margin-right: 8px;">
+    PatitasMatch
+  </a>
+  <div class="links">
+    <a href="test.html" class="active">Hacer el test</a>
+    <a href="catalogo.html">Catálogo</a>
+  </div>
+  <div class="right">
+    <a href="auth.html?tab=login"><button class="btn-nav outline">Iniciar sesión</button></a>
+  </div>
+</nav>
+
+<div class="section" style="padding-top: 32px;">
+  <div class="test-wrap">
+
+    <!-- ============ FORMULARIO ============ -->
+    <div id="vistaTest">
+      <div class="section-head" style="margin-bottom: 20px;">
+        <span class="eyebrow">Sin registro · 2 minutos</span>
+        <h2>¿Qué mascota va con tu vida?</h2>
+        <p>Contesta 8 preguntas y te mostramos a los perritos y gatitos de refugio que mejor encajan contigo.</p>
+      </div>
+
+      <div class="panel">
+        <label>¿Qué te gustaría adoptar?</label>
+        <div class="choice-group" data-group="especie">
+          <div class="choice-chip" data-value="perro">Perro</div>
+          <div class="choice-chip" data-value="gato">Gato</div>
+          <div class="choice-chip" data-value="cualquiera">Cualquiera</div>
+        </div>
+
+        <label>¿Dónde vives?</label>
+        <div class="choice-group" data-group="vivienda">
+          <div class="choice-chip" data-value="depto">Departamento</div>
+          <div class="choice-chip" data-value="casa_sin_patio">Casa sin patio</div>
+          <div class="choice-chip" data-value="casa_patio_chico">Casa con patio chico</div>
+          <div class="choice-chip" data-value="casa_patio_grande">Casa con patio grande</div>
+        </div>
+
+        <label>¿Hay niños pequeños en casa?</label>
+        <div class="choice-group" data-group="ninos">
+          <div class="choice-chip" data-value="si">Sí</div>
+          <div class="choice-chip" data-value="no">No</div>
+        </div>
+
+        <label>¿Tienes otras mascotas?</label>
+        <div class="choice-group" data-group="otrasMascotas">
+          <div class="choice-chip" data-value="si">Sí</div>
+          <div class="choice-chip" data-value="no">No</div>
+        </div>
+
+        <label>¿Cuántas horas al día estaría sola la mascota?</label>
+        <div class="choice-group" data-group="horasSolo">
+          <div class="choice-chip" data-value="menos2">Menos de 2 h</div>
+          <div class="choice-chip" data-value="2a4">2–4 h</div>
+          <div class="choice-chip" data-value="4a8">4–8 h</div>
+          <div class="choice-chip" data-value="mas8">Más de 8 h</div>
+        </div>
+
+        <label>¿Cuánta energía/ejercicio le puedes dedicar?</label>
+        <div class="choice-group" data-group="energia">
+          <div class="choice-chip" data-value="bajo">Tranquilo (paseos cortos)</div>
+          <div class="choice-chip" data-value="medio">Activo (paseos diarios)</div>
+          <div class="choice-chip" data-value="alto">Muy activo (correr, deporte)</div>
+        </div>
+
+        <label>Tu experiencia con mascotas</label>
+        <div class="choice-group" data-group="experiencia">
+          <div class="choice-chip" data-value="primera_vez">Primera vez</div>
+          <div class="choice-chip" data-value="algo">Algo de experiencia</div>
+          <div class="choice-chip" data-value="mucha">Mucha experiencia</div>
+        </div>
+
+        <label>Tamaño de preferencia</label>
+        <div class="choice-group" data-group="tamanoPreferido">
+          <div class="choice-chip" data-value="pequeno">Pequeño</div>
+          <div class="choice-chip" data-value="mediano">Mediano</div>
+          <div class="choice-chip" data-value="grande">Grande</div>
+          <div class="choice-chip" data-value="cualquiera">Cualquiera</div>
+        </div>
+
+        <button class="btn-primary" id="btnVerMatches" type="button">Ver mis matches →</button>
+        <div id="testMsg"></div>
+      </div>
+    </div>
+
+    <!-- ============ RESULTADOS ============ -->
+    <div id="vistaResultados" class="hidden">
+      <div class="section-head" style="margin-bottom: 0;">
+        <span class="eyebrow">Tus resultados</span>
+        <h2 id="resTitulo">Estas mascotas van contigo</h2>
+        <p id="resSub"></p>
+      </div>
+
+      <div id="resArea" class="res-grid"></div>
+
+      <div class="cta-save" id="ctaGuardar">
+        <h3>Guarda tus matches y contacta al refugio</h3>
+        <p>Crea tu cuenta gratis: conservamos tus respuestas y avisas al refugio cuando te interese una mascota.</p>
+        <a href="auth.html"><button class="btn-hero-primary" type="button">Crear mi cuenta →</button></a>
+      </div>
+
+      <div style="text-align:center; margin-top: 16px;">
+        <button class="btn-ghost" id="btnRehacer" type="button">← Cambiar mis respuestas</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">PatitasMatch · Hecho con 🐾 en Cuernavaca, Morelos para conectar refugios con familias</footer>
+
+<script type="module" src="js/test.js"></script>
+</body>
+</html>
