@@ -1,5 +1,5 @@
 // ============================================================
-// MOTOR DE MATCH — PatitasMatch
+// MOTOR DE MATCH — PetMatch
 // ------------------------------------------------------------
 // Calcula un puntaje de compatibilidad (0–100) entre el perfil
 // de estilo de vida del adoptante y cada mascota del refugio,

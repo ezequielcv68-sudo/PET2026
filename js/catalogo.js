@@ -153,11 +153,11 @@ function showPetAtIndex(index) {
 
 async function compartirMascota(pet, data) {
   const url = `${window.location.origin}${window.location.pathname}?m=${encodeURIComponent(pet.id)}`;
-  const texto = `Conoce a ${data.name}, busca hogar en PatitasMatch 🐾`;
+  const texto = `Conoce a ${data.name}, busca hogar en PetMatch 🐾`;
   track('compartir_mascota', { pet_id: pet.id });
   try {
     if (navigator.share) {
-      await navigator.share({ title: `${data.name} — PatitasMatch`, text: texto, url });
+      await navigator.share({ title: `${data.name} — PetMatch`, text: texto, url });
       return;
     }
   } catch (e) {

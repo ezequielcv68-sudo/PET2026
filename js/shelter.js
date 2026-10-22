@@ -306,7 +306,7 @@ async function verInteresados(pet) {
     const extras = [L.tipo[a.tipoVivienda], L.acuerdo[a.acuerdoFamiliar], L.viajes[a.planViajes]].filter(Boolean);
 
     const cleanPhone = phone.replace(/\D/g, "");
-    const waText = encodeURIComponent(`¡Hola ${name}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PatitasMatch 🐾`);
+    const waText = encodeURIComponent(`¡Hola ${name}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PetMatch 🐾`);
     const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : null;
 
     const row = document.createElement("div");
@@ -385,7 +385,7 @@ document.getElementById("btnExportarCSV").onclick = async () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `Reporte_PatitasMatch_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `Reporte_PetMatch_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
