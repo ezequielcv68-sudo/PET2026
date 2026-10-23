@@ -61,28 +61,40 @@
 <meta name="theme-color" content="#E8836B">
 <link rel="apple-touch-icon" href="img/icon-192.png">
 <link rel="stylesheet" href="css/ux.css">
+<link rel="stylesheet" href="css/shelter-panel.css">
 </head>
 <body>
 <div class="shell shell-wide">
   <div class="topbar">
     <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PetMatch</a>
-    <div style="display:flex; gap:10px; align-items:center;">
-      <button class="btn-ghost" id="btnExportarCSV" title="Descargar base de datos">📊 Descargar Datos (CSV)</button>
-      <span class="btn-ghost" id="shelterNameTag" style="cursor:default;">Refugio</span>
-      
-      <!-- Botón de configuración de Redes -->
-      <button class="btn-ghost" id="btnConfigRefugio" style="font-size:1.2rem;" title="Configurar Redes Sociales">⚙️</button>
-      
-      <button class="btn-ghost" id="btnLogout">Salir</button>
+    <div class="sp-top">
+      <button class="sp-publish sp-publish-top" id="btnAddTop">＋ Publicar animal</button>
+      <span class="sp-chip" id="shelterNameTag">Refugio</span>
+      <div class="sp-menu-wrap">
+        <button class="sp-more" id="btnMore" title="Más opciones" aria-label="Más opciones">⋯</button>
+        <div class="sp-menu" id="spMenu">
+          <button id="btnConfigRefugio">⚙️ Redes sociales del refugio</button>
+          <button id="btnExportarCSV">📊 Descargar datos (CSV)</button>
+          <button id="btnLogout" class="danger">Salir</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <h2 style="margin-bottom:6px;">Tus animales en adopción</h2>
-  <p style="color:var(--ink-soft);font-size:0.9rem;margin:0 0 24px;">Sube fotos y datos para que más familias las encuentren.</p>
+  <h2 class="sp-hello" id="spHello">Tus animales en adopción</h2>
+  <p style="color:var(--ink-soft);font-size:0.9rem;margin:0 0 6px;">Sube fotos y datos para que más familias los encuentren.</p>
+  <div id="spCheck"></div>
+  <div class="sp-kpis" id="spKpis"></div>
+  <div id="spTodo"></div>
+  <div class="sp-tabs" id="spTabs">
+    <button class="sp-tab on" data-f="all">Todos</button>
+    <button class="sp-tab" data-f="available">Disponibles</button>
+    <button class="sp-tab" data-f="adopted">Adoptados</button>
+  </div>
 
   <div id="petsArea"><div class="center-loading">Cargando…</div></div>
 
-  <button class="fab" id="btnAdd" title="Agregar animal">+</button>
+  <button class="fab" id="btnAdd" title="Publicar animal">＋ Publicar</button>
 </div>
 
 <!-- Modal agregar/editar mascota -->
