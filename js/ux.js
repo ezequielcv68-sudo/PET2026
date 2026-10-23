@@ -56,6 +56,38 @@ function initAuthNav(fb) {
   });
 }
 
+// ---------- Fotos con su proporción real (Descubrir y resultados del test) ----------
+// La portada NO se toca. Aquí la caja de la foto se adapta a la imagen para que
+// el animal se vea completo, sin recortes y sin espacios vacíos.
+function urlDeFondo(el) {
+  const m = /url\(["']?(.*?)["']?\)/.exec(el.style.backgroundImage || "");
+  return m ? m[1] : null;
+}
+function adaptarFoto(el) {
+  if (el.dataset.fit) return;
+  const u = urlDeFondo(el);
+  if (!u) return;
+  el.dataset.fit = "1";
+  const im = new Image();
+  im.onload = () => {
+    if (!im.naturalWidth || !im.naturalHeight) return;
+    const r = im.naturalWidth / im.naturalHeight;
+    const enSwipe = el.closest(".pet-card");
+    const ratio = enSwipe ? Math.min(Math.max(r, 0.6), 2.1) : Math.min(Math.max(r, 0.75), 1.9);
+    el.style.aspectRatio = String(ratio);
+  };
+  im.onerror = () => { delete el.dataset.fit; };
+  im.src = u;
+}
+function initFotosAdaptables() {
+  const sel = ".pet-card .photo, .res-photo";
+  const pasar = () => document.querySelectorAll(sel).forEach(adaptarFoto);
+  pasar();
+  if ("MutationObserver" in window) {
+    new MutationObserver(pasar).observe(document.body, { childList: true, subtree: true });
+  }
+}
+
 // ---------- 2. Preguntas ----------
 const ICONOS = {
   especie: { perro: "🐕", gato: "🐈", cualquiera: "✨" },
@@ -241,6 +273,7 @@ function initPWA() {
 function arrancar() {
   try { initNav(); } catch (e) { console.warn(e); }
   try { initQuestions(); } catch (e) { console.warn(e); }
+  try { initFotosAdaptables(); } catch (e) { console.warn(e); }
   try { initReveal(); } catch (e) { console.warn(e); }
   try { initFeedback(); } catch (e) { console.warn(e); }
   try { initPWA(); } catch (e) { console.warn(e); }

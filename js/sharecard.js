@@ -152,8 +152,18 @@ export async function crearTarjeta(pet) {
   rrect(ctx, fx, fy, fw, fh, 56);
   ctx.clip();
   if (img) {
-    const escala = Math.max(fw / img.width, fh / img.height);
-    const dw = img.width * escala, dh = img.height * escala;
+    // Fondo: la misma foto ampliada y difuminada (sin barras vacías)
+    const relleno = Math.max(fw / img.width, fh / img.height) * 1.2;
+    const rw = img.width * relleno, rh = img.height * relleno;
+    const hayFiltro = "filter" in ctx;
+    ctx.save();
+    if (hayFiltro) ctx.filter = "blur(34px)";
+    ctx.drawImage(img, fx + (fw - rw) / 2, fy + (fh - rh) / 2, rw, rh);
+    ctx.restore();
+    if (!hayFiltro) { ctx.fillStyle = "rgba(245,239,221,0.72)"; ctx.fillRect(fx, fy, fw, fh); }
+    // Foto completa, sin recortar
+    const ajuste = Math.min(fw / img.width, fh / img.height);
+    const dw = img.width * ajuste, dh = img.height * ajuste;
     ctx.drawImage(img, fx + (fw - dw) / 2, fy + (fh - dh) / 2, dw, dh);
   } else {
     const g = ctx.createLinearGradient(fx, fy, fx + fw, fy + fh);
