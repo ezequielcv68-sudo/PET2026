@@ -53,6 +53,12 @@ function usarAnimalesReales(lista) {
   if (t1) t1.textContent = "Busca hogar";
   visual.dataset.petId = p0.id;
 
+  // Muestra el hero hasta que la foto real ya cargó (sin parpadeo del ejemplo)
+  const revelar = () => visual.classList.remove("hv-wait");
+  const ph = $("#heroPetPhoto");
+  if (ph.complete && ph.naturalWidth) revelar();
+  else { ph.addEventListener("load", revelar, { once: true }); ph.addEventListener("error", revelar, { once: true }); }
+
   visual.addEventListener("click", () => {
     const id = visual.dataset.petId;
     if (id) window.location.href = "catalogo.html?m=" + encodeURIComponent(id);
@@ -73,7 +79,9 @@ function usarAnimalesReales(lista) {
       .map((p) => ({ ...p, foto: safeUrl(p.photoURL, "") }))
       .filter((p) => p.foto);
     usarAnimalesReales(mezclar(conFoto).slice(0, 6));
+    if (!conFoto.length) { const v = $(".hero-visual"); if (v) v.classList.remove("hv-wait"); }
   } catch (e) {
     console.warn("Portada: se queda con los datos de ejemplo", e);
+    const v = $(".hero-visual"); if (v) v.classList.remove("hv-wait");
   }
 })();
