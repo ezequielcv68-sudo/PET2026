@@ -1,0 +1,237 @@
+/* ============================================================
+   PetMatch — Capa de pulido (UX)
+   NO cambia colores, tipografías ni el estilo base: solo mejora botones,
+   preguntas y animaciones. Se carga DESPUÉS de styles.css.
+   Si algún día quieres quitarla, borra el <link> y todo vuelve a como estaba.
+   ============================================================ */
+
+:root { --ease: cubic-bezier(.2, .8, .2, 1); }
+
+/* ---------- Botones: respuesta táctil y foco accesible ---------- */
+.btn-nav, .btn-ghost, .btn-primary, .btn-secondary,
+.btn-hero-primary, .btn-hero-secondary, .btn-sm, .btn-match, .filter-btn {
+  transition: transform .16s var(--ease), box-shadow .22s var(--ease),
+              background-color .2s, border-color .2s, color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-nav:hover, .btn-primary:not(:disabled):hover,
+.btn-hero-primary:hover, .btn-hero-secondary:hover, .btn-sm:hover, .btn-match:hover {
+  transform: translateY(-2px);
+}
+.btn-nav:active, .btn-ghost:active, .btn-primary:active, .btn-secondary:active,
+.btn-hero-primary:active, .btn-hero-secondary:active, .btn-sm:active, .btn-match:active {
+  transform: translateY(0) scale(.97);
+}
+.btn-nav:focus-visible, .btn-ghost:focus-visible, .btn-primary:focus-visible,
+.btn-secondary:focus-visible, .btn-hero-primary:focus-visible, .btn-hero-secondary:focus-visible,
+.btn-sm:focus-visible, .btn-match:focus-visible, .choice-chip:focus-visible, .filter-btn:focus-visible {
+  outline: 3px solid rgba(79, 157, 141, .45);
+  outline-offset: 2px;
+}
+
+/* Brillo suave al pasar por los botones principales */
+.btn-primary, .btn-hero-primary, .btn-nav:not(.outline), .btn-match { position: relative; overflow: hidden; }
+.btn-primary::after, .btn-hero-primary::after, .btn-nav:not(.outline)::after, .btn-match::after {
+  content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .35), transparent);
+  transform: skewX(-18deg); transition: left .55s var(--ease); pointer-events: none;
+}
+.btn-primary:hover::after, .btn-hero-primary:hover::after,
+.btn-nav:not(.outline):hover::after, .btn-match:hover::after { left: 130%; }
+
+/* Botones de la barra superior: más cómodos de tocar */
+.btn-nav { min-height: 42px; padding: 11px 22px; box-shadow: 0 8px 18px rgba(232, 131, 107, .28); }
+.btn-nav.outline { box-shadow: none; }
+.btn-nav.outline:hover { border-color: var(--coral); color: var(--coral); }
+.btn-ghost { min-height: 38px; padding: 8px 16px; }
+.btn-ghost:hover { transform: translateY(-1px); }
+.btn-hero-secondary:hover { border-color: var(--mint); color: var(--mint); }
+
+/* «Salir» con icono de puerta (hereda el color del texto) */
+#btnLogout, .btn-logout { display: inline-flex; align-items: center; gap: 7px; }
+#btnLogout::before, .btn-logout::before {
+  content: ""; width: 15px; height: 15px; flex: 0 0 auto; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5'/%3E%3Cpath d='M21 12H9'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5'/%3E%3Cpath d='M21 12H9'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+#btnLogout:hover, .btn-logout:hover { border-color: #c0392b; color: #c0392b; }
+
+/* ---------- Barra superior fija con efecto cristal (mismo color) ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(251, 248, 240, .9);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+          backdrop-filter: saturate(1.4) blur(10px);
+  transition: box-shadow .25s;
+}
+.nav.scrolled { box-shadow: 0 8px 24px rgba(28, 26, 22, .07); }
+.nav .right { transition: opacity .2s; }
+.ux-pending .nav .right { opacity: 0; }
+.nav .links a { position: relative; }
+.nav .links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+  background: var(--coral); transform: scaleX(0); transform-origin: left; transition: transform .25s var(--ease);
+}
+.nav .links a:hover::after, .nav .links a.active::after { transform: scaleX(1); }
+.btn-nav { white-space: nowrap; }
+.nav .brand { min-width: 0; white-space: nowrap; }
+@media (max-width: 520px) {
+  .nav { padding: 10px 14px; gap: 8px; }
+  .nav .brand { font-size: 1.05rem; }
+  .nav .brand img { height: 30px !important; margin-right: 4px !important; }
+  .nav .right { gap: 6px; }
+  .btn-nav { padding: 9px 12px; font-size: .8rem; min-height: 38px; }
+}
+@media (max-width: 380px) { .nav .brand { font-size: 0; } .nav .brand img { margin-right: 0 !important; } }
+
+/* ---------- Preguntas (test y onboarding) ---------- */
+.ux-q .panel { counter-reset: q; }
+
+.ux-q .q-label {
+  counter-increment: q;
+  display: flex; align-items: center; gap: 10px;
+  font-size: .95rem; color: var(--ink);
+  margin: 26px 0 10px;
+}
+.ux-q .q-label:first-child, .ux-q .panel > .q-label:first-of-type { margin-top: 6px; }
+.ux-q .q-label::before {
+  content: counter(q);
+  flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--mint-bg); color: var(--mint);
+  font-family: var(--font-mono); font-size: .78rem; font-weight: 700;
+  transition: background-color .25s, color .25s, transform .3s var(--ease);
+}
+.ux-q .q-label.q-optional { counter-increment: none; color: var(--ink-soft); }
+.ux-q .q-label.q-optional::before { content: "+"; background: var(--bg); color: var(--ink-faint); }
+.ux-q .q-label.q-optional.q-done::before { content: "✓"; background: var(--mint); color: #fff; }
+.ux-q .q-label.q-done::before { content: "✓"; background: var(--mint); color: #fff; transform: scale(1.08); }
+.ux-q .q-label .q-opt {
+  font-family: var(--font-mono); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 500; margin-left: auto;
+}
+
+.ux-q .choice-group { gap: 10px; margin-top: 0; }
+.ux-q .choice-chip {
+  min-height: 46px; padding: 11px 18px; border-radius: 16px;
+  font-size: .9rem; font-weight: 600; gap: 9px;
+  background: var(--bg-soft);
+}
+.ux-q .choice-chip .ci { font-size: 1.2rem; line-height: 1; }
+.ux-q .choice-chip:hover { border-color: var(--mint); transform: translateY(-1px); }
+.ux-q .choice-chip:active { transform: scale(.96); }
+.ux-q .choice-chip.selected {
+  background: var(--mint); border-color: var(--mint); color: #fff;
+  box-shadow: 0 8px 18px rgba(79, 157, 141, .28);
+  animation: ux-pop .28s var(--ease);
+}
+.ux-q .choice-chip.selected::after { content: "✓"; font-weight: 800; margin-left: 2px; }
+@keyframes ux-pop { 0% { transform: scale(.92); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+/* Barra de progreso fija */
+.q-progress {
+  position: sticky; top: var(--ux-nav-h, 0px); z-index: 30;
+  background: rgba(251, 248, 240, .92);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  margin: 0 -24px 6px; padding: 12px 24px 10px;
+  border-bottom: 1px solid var(--line);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+.q-progress-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--font-mono); font-size: .72rem; color: var(--ink-soft); letter-spacing: .04em;
+}
+.q-progress-top b { color: var(--mint); }
+.q-track { height: 7px; border-radius: 99px; background: var(--mint-bg); margin-top: 8px; overflow: hidden; }
+.q-track i {
+  display: block; height: 100%; width: 0; border-radius: 99px;
+  background: linear-gradient(90deg, var(--mint), var(--sage));
+  transition: width .45s var(--ease);
+}
+.q-live {
+  margin-top: 8px; font-size: .82rem; color: #2E6B5D; min-height: 1.1em;
+  opacity: 0; transform: translateY(-3px); transition: opacity .3s, transform .3s var(--ease);
+}
+.q-live.show { opacity: 1; transform: none; }
+
+/* Botón principal de envío: se activa visualmente al completar */
+.ux-q .btn-primary.ux-ready { animation: ux-pulse 1.8s ease-in-out 2; }
+@keyframes ux-pulse {
+  0%, 100% { box-shadow: 0 10px 24px rgba(232, 131, 107, .35); }
+  50% { box-shadow: 0 10px 34px rgba(232, 131, 107, .65); }
+}
+
+/* ---------- Aparecer al hacer scroll ---------- */
+.ux-reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.ux-reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Esqueletos de carga (catálogo) ---------- */
+.sk-card { border-radius: 18px; overflow: hidden; background: var(--paper-card); box-shadow: var(--shadow-card); }
+.sk-img, .sk-line {
+  background: linear-gradient(100deg, #EFE9D6 30%, #F8F3E4 50%, #EFE9D6 70%);
+  background-size: 200% 100%; animation: ux-shimmer 1.3s linear infinite;
+}
+.sk-img { height: 150px; }
+.sk-line { height: 12px; border-radius: 8px; margin: 14px 14px 0; width: 60%; }
+.sk-line.s { width: 38%; margin-bottom: 16px; }
+@keyframes ux-shimmer { to { background-position: -200% 0; } }
+
+/* ---------- Insignia «% para ti» en el catálogo ---------- */
+.foryou-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: var(--mint); color: #fff; border-radius: 10px; padding: 5px 9px;
+  font-family: var(--font-mono); font-size: .72rem; font-weight: 700;
+  box-shadow: 0 6px 14px rgba(79, 157, 141, .35);
+}
+
+/* ---------- Estadísticas reales en la portada ---------- */
+.live-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.live-stats .stat {
+  background: var(--paper-card); border: 1px solid var(--line); border-radius: 999px;
+  padding: 8px 14px; font-size: .84rem; font-weight: 600; color: var(--ink);
+  display: inline-flex; align-items: center; gap: 7px;
+  animation: ux-pop .5s var(--ease) both;
+}
+.live-stats .stat b { font-family: var(--font-mono); color: var(--mint); }
+.hero-visual[data-pet-id]:not([data-pet-id=""]) { cursor: pointer; }
+
+/* ---------- Instalar como app ---------- */
+.ux-install {
+  position: fixed; left: 16px; bottom: 16px; z-index: 90;
+  display: flex; align-items: center; gap: 4px;
+  background: var(--ink); color: var(--bg-soft); border-radius: 999px;
+  padding: 6px 6px 6px 16px; box-shadow: var(--shadow-float);
+  animation: ux-rise .5s var(--ease) both;
+}
+.ux-install button { font-family: var(--font-display); }
+.ux-install .go {
+  background: var(--coral); color: #fff; border: none; border-radius: 999px;
+  padding: 9px 16px; font-weight: 700; cursor: pointer; margin-left: 8px;
+}
+.ux-install .x { background: none; border: none; color: rgba(251, 248, 240, .6); font-size: 1rem; cursor: pointer; padding: 6px 10px; }
+.ux-install span { font-size: .88rem; font-weight: 600; }
+@keyframes ux-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Huellitas al dar «me interesa» ---------- */
+.ux-paw {
+  position: fixed; z-index: 2000; pointer-events: none; font-size: 22px;
+  animation: ux-paw .9s var(--ease) forwards;
+}
+@keyframes ux-paw {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(.6); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2) rotate(var(--r)); }
+}
+
+/* ---------- Compartir resultado ---------- */
+.btn-share-result {
+  width: 100%; margin-top: 12px; background: var(--paper-card); color: var(--ink);
+  border: 1.5px solid var(--line); border-radius: 999px; padding: 13px 18px;
+  font-family: var(--font-display); font-weight: 700; font-size: .95rem; cursor: pointer;
+}
+.btn-share-result:hover { border-color: var(--mint); color: var(--mint); }
+
+/* ---------- Respeto a «reducir movimiento» ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .ux-reveal { opacity: 1; transform: none; }
+}
