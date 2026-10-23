@@ -16,6 +16,8 @@ en las páginas y todo vuelve a como estaba.
 - **Esqueletos de carga** en el catálogo en vez del texto «Cargando».
 - **App instalable (PWA)**: en el celular o en Chrome aparece «📲 Instala PetMatch». Usa `manifest.webmanifest`, `sw.js` y los iconos nuevos de `img/`.
 - Respeta «reducir movimiento» del sistema.
+- **Fotos completas, sin recortes** (compu y celular): en Descubrir, resultados del test, Mis matches, panel del refugio y la tarjeta para historias, el animal se ve entero. La caja de la foto toma la proporción real de la imagen (sin recortes y sin franjas); solo en fotos muy alargadas queda un borde mínimo difuminado. **La portada no se toca: sigue como la tenías.**
+- Los sellos «ME GUSTA / PASO» de Descubrir ahora solo aparecen al arrastrar la tarjeta.
 
 ## Cómo subirlo
 Es el sitio completo, así que sube **todo** el contenido del zip a GitHub (arrastra todas las carpetas y archivos juntos; reemplaza lo que ya existe).
