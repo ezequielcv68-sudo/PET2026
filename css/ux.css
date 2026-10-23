@@ -235,3 +235,44 @@
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .ux-reveal { opacity: 1; transform: none; }
 }
+
+/* ============================================================
+   FOTOS COMPLETAS: el animal se ve entero, sin recortes (compu y celular)
+   La foto se muestra completa y el espacio sobrante se rellena con la
+   misma foto desenfocada, así nunca quedan barras vacías ni cortes.
+   ============================================================ */
+
+/* Descubrir (tarjeta) y resultados del test: fondo difuminado + foto completa encima */
+.pet-card .photo, .res-photo {
+  isolation: isolate; overflow: hidden;
+  background-size: 0 0 !important;      /* la capa «cover» original se oculta */
+}
+.pet-card .photo::before, .res-photo::before,
+.pet-card .photo::after,  .res-photo::after {
+  content: ""; position: absolute; inset: 0;
+  background-image: inherit; background-position: center; background-repeat: no-repeat;
+}
+.pet-card .photo::before, .res-photo::before {
+  inset: -26px; background-size: cover; filter: blur(22px) saturate(1.1); opacity: .9; z-index: 0;
+}
+.pet-card .photo::after, .res-photo::after { background-size: contain; z-index: 1; }
+.pet-card .photo > *, .res-photo > * { z-index: 2; }
+
+/* Mis matches, panel del refugio y vista previa al subir foto */
+.match-item img { object-fit: contain; background: #f4f0e6; height: auto; max-height: 220px; }
+.pet-row img { object-fit: contain !important; background-color: #f4f0e6 !important; }
+#photoPreviewWrap img { object-fit: contain; background: #f4f0e6; max-height: 200px; }
+
+/* Sellos «ME GUSTA» / «PASO»: ocultos y solo aparecen al arrastrar la tarjeta */
+.swipe-indicator {
+  position: absolute; bottom: 16px; opacity: 0; pointer-events: none;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; letter-spacing: .04em;
+  padding: 4px 12px; border-radius: 10px; border: 3px solid; background: rgba(255, 255, 255, .85);
+}
+.swipe-indicator.like { left: 16px; color: var(--mint); border-color: var(--mint); transform: rotate(-10deg); }
+.swipe-indicator.nope { right: 16px; color: var(--coral-dark); border-color: var(--coral-dark); transform: rotate(10deg); }
+
+/* La foto toma la proporción real de la imagen: sin recorte y sin franjas.
+   (ux.js calcula la proporción; el difuminado solo rellena casos extremos) */
+.pet-card .photo[data-fit], .res-photo[data-fit] { height: auto; flex: 0 0 auto; }
+.pet-card .photo[data-fit] { max-height: 68%; min-height: 40%; }
