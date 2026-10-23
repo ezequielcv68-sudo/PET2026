@@ -28,7 +28,7 @@ onAuthStateChanged(auth, async (user) => {
   shelterName = userSnap.data().shelterName || userSnap.data().name || "Refugio";
   shelterCity = userSnap.data().city || "";
   shelterVerified = userSnap.data().verified === true;
-  document.getElementById("shelterNameTag").textContent = shelterName + (shelterVerified ? " ✓" : "");
+  document.getElementById("shelterNameTag").innerHTML = `${escapeHtml(shelterName)} · ${shelterVerified ? '<span class="ok">✓ Verificado</span>' : '<span class="pend">En revisión</span>'}`;
 
   await cargarMascotas();
 });
@@ -73,100 +73,206 @@ function mostrarBanner(total) {
   el.textContent = `🔔 Tienes ${total} ${total === 1 ? "interesado nuevo" : "interesados nuevos"}. ¡Respóndeles pronto!`;
 }
 
-async function cargarMascotas() {
-  const snap = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
-  const pets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  const nuevos = pets.length ? await contarNuevos() : {};
-  mostrarBanner(Object.values(nuevos).reduce((x, y) => x + y, 0));
+let filtroActual = "all";
+let ultimaLista = { pets: [], nuevos: {}, totalInteresados: 0 };
+
+function diasDesde(pet) {
+  const t = pet.createdAt && pet.createdAt.toMillis ? pet.createdAt.toMillis() : 0;
+  return t ? Math.floor((Date.now() - t) / 86400000) : null;
+}
+function completitud(pet) {
+  const campos = [pet.photoURL, pet.nombre, pet.raza, pet.edad, pet.tamano, pet.energia, pet.descripcion && String(pet.descripcion).length >= 40, pet.buenoConNinos !== undefined && pet.buenoConNinos !== null && pet.buenoConNinos !== "", pet.buenoConOtrasMascotas !== undefined && pet.buenoConOtrasMascotas !== null && pet.buenoConOtrasMascotas !== ""];
+  const ok = campos.filter(Boolean).length;
+  return Math.round((ok / campos.length) * 100);
+}
+
+async function contarTotalInteresados() {
+  try {
+    const snap = await getDocs(query(collection(db, "swipes"), where("shelterId", "==", uid), where("liked", "==", true)));
+    return typeof snap.size === "number" ? snap.size : snap.docs.length;
+  } catch (e) { return 0; }
+}
+
+function pintarResumen() {
+  const { pets, nuevos, totalInteresados } = ultimaLista;
+  const disp = pets.filter(p => p.status !== "adopted").length;
+  const adop = pets.filter(p => p.status === "adopted").length;
+  const nNuevos = Object.values(nuevos).reduce((x, y) => x + y, 0);
+  const h = new Date().getHours();
+  const saludo = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
+  document.getElementById("spHello").textContent = `${saludo}, ${shelterName} 👋`;
+
+  document.getElementById("spKpis").innerHTML = `
+    <div class="sp-kpi"><b>${disp}</b><span>Disponibles</span></div>
+    <div class="sp-kpi ${nNuevos ? "hot" : ""}"><b>${nNuevos}</b><span>Interesados nuevos</span></div>
+    <div class="sp-kpi"><b>${totalInteresados}</b><span>Total de interesados</span></div>
+    <div class="sp-kpi"><b>${adop}</b><span>Adoptados</span></div>`;
+
+  // Qué hacer hoy (reglas simples)
+  const tips = [];
+  if (nNuevos) tips.push(`Responde a tus ${nNuevos} ${nNuevos === 1 ? "interesado nuevo" : "interesados nuevos"}: entre más rápido contestas, más adopciones.`);
+  const incompletas = pets.filter(p => p.status !== "adopted" && completitud(p) < 80);
+  if (incompletas.length) tips.push(`Completa la ficha de ${incompletas.slice(0, 2).map(p => p.nombre || "un animal").join(" y ")}: las fichas completas reciben más “Me interesa”.`);
+  const largos = pets.filter(p => p.status !== "adopted" && (diasDesde(p) || 0) >= 14);
+  if (largos.length) tips.push(`${largos[0].nombre || "Un animal"} lleva ${diasDesde(largos[0])} días publicado: compártelo en historias con su tarjeta.`);
+  if (pets.length && !pets.some(p => p.status === "adopted")) tips.push("Cuando alguien sea adoptado, márcalo: tus adopciones se ven en tu panel.");
+  document.getElementById("spTodo").innerHTML = tips.length
+    ? `<div class="sp-todo"><h4>💡 Qué hacer hoy</h4><ul>${tips.slice(0, 3).map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul></div>` : "";
+
+  // Primeros pasos para refugios nuevos
+  const chk = document.getElementById("spCheck");
+  const pasos = [
+    ["Crea tu cuenta de refugio", true],
+    ["Publica tu primer animal", pets.length > 0],
+    ["Agrega tus redes sociales (⋯ menú)", !!ultimaLista.tieneRedes],
+    ["Comparte una tarjeta en historias", false],
+  ];
+  if (pets.length >= 3) { chk.innerHTML = ""; return; }
+  const hechos = pasos.filter(x => x[1]).length;
+  chk.innerHTML = `<div class="sp-check"><b>Primeros pasos · ${hechos} de ${pasos.length}</b>
+    <div class="sp-meter" style="margin-top:8px"><i style="width:${Math.round(hechos / pasos.length * 100)}%"></i></div>
+    <ol>${pasos.map(x => `<li class="${x[1] ? "done" : ""}">${x[0]}</li>`).join("")}</ol></div>`;
+}
+
+function pintarTarjetas() {
+  const { pets, nuevos } = ultimaLista;
+  let lista = pets;
+  if (filtroActual === "available") lista = pets.filter(p => p.status !== "adopted");
+  if (filtroActual === "adopted") lista = pets.filter(p => p.status === "adopted");
 
   if (!pets.length) {
     petsArea.innerHTML = `
       <div class="empty-state">
         <span class="paw-big">🐾</span>
         <h3>Aún no has subido animales</h3>
-        <p>Toca el botón + para publicar a tu primer perrito o gatito.</p>
+        <p>Toca “＋ Publicar animal” para subir a tu primer perrito o gatito.</p>
       </div>`;
     return;
   }
+  if (!lista.length) { petsArea.innerHTML = `<div class="empty-state"><p>No hay animales en esta sección.</p></div>`; return; }
 
   petsArea.innerHTML = "";
-  for (const pet of pets) {
-    const row = document.createElement("div");
-    row.className = "pet-row";
-    row.innerHTML = `
-      <img src="${pet.photoURL || ""}" alt="${escapeHtml(pet.nombre || "")}">
-      <div class="p-body">
-        <h3>${escapeHtml(pet.nombre || "Sin nombre")}</h3>
-        <div class="meta">${pet.especie === "gato" ? "🐈 Gato" : "🐕 Perro"} · ${escapeHtml(pet.raza || "")} · ${escapeHtml(pet.edad || "")}</div>
+  const grid = document.createElement("div");
+  grid.className = "sp-grid";
+  petsArea.appendChild(grid);
+
+  for (const pet of lista) {
+    const adoptado = pet.status === "adopted";
+    const nNuevos = nuevos[pet.id] || 0;
+    const dias = diasDesde(pet);
+    const comp = completitud(pet);
+    const card = document.createElement("div");
+    card.className = "sp-card" + (adoptado ? " adopted" : "");
+    const foto = pet.photoURL ? String(pet.photoURL).replace(/"/g, "%22") : "";
+    card.innerHTML = `
+      <div class="sp-photo" style="${foto ? `background-image:url('${foto.replace(/'/g, "%27")}')` : ""}">
+        <div class="sp-pills">
+          <span class="sp-pill ${adoptado ? "done" : "ok"}">${adoptado ? "Adoptado" : "Disponible"}</span>
+          ${nNuevos ? `<span class="sp-pill new">🔔 ${nNuevos} ${nNuevos === 1 ? "nuevo" : "nuevos"}</span>` : ""}
+        </div>
+        ${foto ? `<img src="${escapeHtml(pet.photoURL)}" alt="${escapeHtml(pet.nombre || "")}">` : ""}
       </div>
-      <span class="status-pill ${pet.status === "adopted" ? "adopted" : ""}">${pet.status === "adopted" ? "Adoptado" : "Disponible"}</span>
-    `;
-    const actions = document.createElement("div");
-    actions.style.display = "flex";
-    actions.style.flexDirection = "column";
-    actions.style.gap = "6px";
-    actions.style.marginLeft = "10px";
+      <div class="sp-body">
+        <h3>${escapeHtml(pet.nombre || "Sin nombre")}</h3>
+        <div class="sp-meta">${pet.especie === "gato" ? "🐈 Gato" : "🐕 Perro"} · ${escapeHtml(pet.raza || "")} · ${escapeHtml(pet.edad || "")}</div>
+        ${dias !== null ? `<div class="sp-days">Publicado hace ${dias === 0 ? "menos de un día" : dias + (dias === 1 ? " día" : " días")}</div>` : ""}
+        ${adoptado ? "" : `<div class="sp-meter"><i style="width:${comp}%"></i></div><div class="sp-meterlbl">Ficha ${comp}% completa${comp < 100 ? " · edítala para mejorarla" : " ✓"}</div>`}
+        <div class="sp-actions"></div>
+      </div>`;
+    const actions = card.querySelector(".sp-actions");
 
     const btnInteresados = document.createElement("button");
-    btnInteresados.className = "btn-ghost";
-    btnInteresados.style.fontSize = "0.72rem";
-    const nNuevos = nuevos[pet.id] || 0;
-    btnInteresados.textContent = nNuevos ? `Interesados 🔔${nNuevos}` : "Interesados";
-    if (nNuevos) btnInteresados.style.cssText += "color:#D96B50;border-color:#E8836B;font-weight:700;";
+    btnInteresados.className = "sp-primary" + (nNuevos ? "" : " calm");
+    btnInteresados.textContent = nNuevos ? `Ver interesados (${nNuevos})` : "Ver interesados";
     btnInteresados.onclick = () => {
       marcarVistos(pet.id);
-      btnInteresados.textContent = "Interesados";
-      btnInteresados.style.color = ""; btnInteresados.style.borderColor = ""; btnInteresados.style.fontWeight = "";
+      btnInteresados.textContent = "Ver interesados";
+      btnInteresados.classList.add("calm");
+      const pill = card.querySelector(".sp-pill.new"); if (pill) pill.remove();
       verInteresados(pet);
     };
 
+    const row2 = document.createElement("div");
+    row2.className = "sp-row2";
     const btnTarjeta = document.createElement("button");
-    btnTarjeta.className = "btn-ghost";
-    btnTarjeta.style.fontSize = "0.72rem";
-    btnTarjeta.textContent = "🖼️ Tarjeta";
+    btnTarjeta.className = "sp-sec";
+    btnTarjeta.textContent = "🖼️ Compartir";
     btnTarjeta.onclick = () => abrirTarjeta(pet);
-
-    const btnToggle = document.createElement("button");
-    btnToggle.className = "btn-ghost";
-    btnToggle.style.fontSize = "0.72rem";
-    btnToggle.textContent = pet.status === "adopted" ? "Reactivar" : "Marcar adoptado";
-    btnToggle.onclick = async () => {
-      await updateDoc(doc(db, "pets", pet.id), { status: pet.status === "adopted" ? "available" : "adopted" });
-      cargarMascotas();
-    };
-
     const btnEditar = document.createElement("button");
-    btnEditar.className = "btn-ghost";
-    btnEditar.style.fontSize = "0.72rem";
-    btnEditar.textContent = "Editar";
+    btnEditar.className = "sp-sec";
+    btnEditar.textContent = "✏️ Editar";
     btnEditar.onclick = () => abrirModalEditar(pet);
 
+    const dots = document.createElement("div");
+    dots.className = "sp-dots";
+    dots.innerHTML = `<button class="sp-sec" style="width:44px" aria-label="Más">⋯</button><div class="sp-menu"></div>`;
+    const menu = dots.querySelector(".sp-menu");
+    const btnToggle = document.createElement("button");
+    btnToggle.textContent = adoptado ? "↩️ Reactivar" : "🏡 Marcar adoptado";
+    btnToggle.onclick = async () => {
+      await updateDoc(doc(db, "pets", pet.id), { status: adoptado ? "available" : "adopted" });
+      cargarMascotas();
+    };
     const btnBorrar = document.createElement("button");
-    btnBorrar.className = "btn-ghost";
-    btnBorrar.style.fontSize = "0.72rem";
-    btnBorrar.style.color = "#c0392b";
-    btnBorrar.style.borderColor = "rgba(192, 57, 43, 0.3)";
-    btnBorrar.textContent = "Borrar";
+    btnBorrar.className = "danger";
+    btnBorrar.textContent = "🗑️ Borrar";
     btnBorrar.onclick = async () => {
       if (confirm(`¿Estás seguro de que deseas eliminar a "${pet.nombre || "este animal"}"?`)) {
         await deleteDoc(doc(db, "pets", pet.id));
         await cargarMascotas();
       }
     };
+    menu.appendChild(btnToggle);
+    menu.appendChild(btnBorrar);
+    dots.querySelector("button").onclick = (ev) => {
+      ev.stopPropagation();
+      document.querySelectorAll(".sp-menu.open").forEach(m => { if (m !== menu) m.classList.remove("open"); });
+      menu.classList.toggle("open");
+    };
 
+    row2.appendChild(btnTarjeta);
+    row2.appendChild(btnEditar);
+    row2.appendChild(dots);
     actions.appendChild(btnInteresados);
-    actions.appendChild(btnTarjeta);
-    actions.appendChild(btnToggle);
-    actions.appendChild(btnEditar);
-    actions.appendChild(btnBorrar);
-    row.appendChild(actions);
-    petsArea.appendChild(row);
+    actions.appendChild(row2);
+    grid.appendChild(card);
   }
 }
 
+async function cargarMascotas() {
+  const snap = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
+  const pets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const nuevos = pets.length ? await contarNuevos() : {};
+  const totalInteresados = pets.length ? await contarTotalInteresados() : 0;
+  let tieneRedes = false;
+  try {
+    const u = await getDoc(doc(db, "users", uid));
+    const d = u.exists() ? u.data() : {};
+    tieneRedes = !!(d.facebook || d.instagram);
+  } catch (e) {}
+  ultimaLista = { pets, nuevos, totalInteresados, tieneRedes };
+  const prev = document.getElementById("avisoNuevos"); if (prev) prev.remove();
+  pintarResumen();
+  pintarTarjetas();
+}
+
+// Pestañas, menú ⋯ y botones de publicar
+document.querySelectorAll("#spTabs .sp-tab").forEach(b => {
+  b.onclick = () => {
+    filtroActual = b.dataset.f;
+    document.querySelectorAll("#spTabs .sp-tab").forEach(x => x.classList.toggle("on", x === b));
+    pintarTarjetas();
+  };
+});
+const spMenu = document.getElementById("spMenu");
+document.getElementById("btnMore").onclick = (ev) => { ev.stopPropagation(); spMenu.classList.toggle("open"); };
+document.addEventListener("click", () => { document.querySelectorAll(".sp-menu.open").forEach(m => m.classList.remove("open")); });
+
 // ---------- Modal y Formulario ----------
 const modalOverlay = document.getElementById("modalOverlay");
-document.getElementById("btnAdd").onclick = () => { resetForm(); modalOverlay.style.display = "flex"; };
+const abrirNuevo = () => { resetForm(); modalOverlay.style.display = "flex"; };
+document.getElementById("btnAdd").onclick = abrirNuevo;
+document.getElementById("btnAddTop").onclick = abrirNuevo;
 document.getElementById("btnCancelar").onclick = () => { modalOverlay.style.display = "none"; };
 
 function abrirModalEditar(pet) {
