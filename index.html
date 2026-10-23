@@ -8,12 +8,15 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="PetMatch — Encuentra a tu mejor amigo">
 <meta property="og:description" content="Test de 2 minutos, sin registro. Descubre qué mejor amigo de refugio va con tu vida.">
-<meta property="og:image" content="https://pet-2026.vercel.app/img/logo.png">
+<meta property="og:image" content="https://hazpetmatch.com/img/logo.png">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/png" href="img/logo.png">
 <style>
   /* --- ESTILOS DEL HERO --- */
+  /* Evita el parpadeo del ejemplo: el hero aparece cuando ya cargaron los datos reales (o a los 2.5 s) */
+  .hero-visual .hero-photo, .hero-visual .float-card { transition: opacity .35s ease; }
+  .hero-visual.hv-wait .hero-photo, .hero-visual.hv-wait .float-card { opacity: 0; }
   .hero-photo {
     transition: opacity 0.5s ease-in-out;
     object-fit: cover;
@@ -353,9 +356,12 @@
 <section class="hero">
   <div class="hero-copy">
    <!-- <span class="badge-pill">🐕 Más de 300 refugios registrados</span>-->
-    <h1>Encuentra a tu<br><span class="grad">mejor amigo</span><span class="grad"> que encaje mejor en tu vida</span></h1>
+    <h1>Encuentra a tu<br><span class="grad">mejor amigo que encaje mejor en tu vida</span></h1>
     <p class="lead">
-      Cada perrito y gatito merece un hogar seguro y lleno de paz para vivir plenamente, ofreciendo su lealtad y compañía. Contesta una breve encuesta sobre tu rutina diaria y descubre, con match inteligente, qué perros y gatos de refugio se adaptan mejor a tu estilo de vida.
+      Cada perrito y gatito merece un hogar seguro y lleno de paz para vivir plenamente,
+      ofreciendo su lealtad y compañía. Contesta una breve encuesta sobre tu rutina diaria y
+      descubre, con match inteligente, qué perros y gatos de refugio se adaptan mejor a tu
+      estilo de vida.
     </p>
     <div class="hero-ctas">
       <a href="test.html"><button class="btn-hero-primary">Hacer el test (sin registro) →</button></a>
@@ -366,7 +372,7 @@
     </div>
   </div>
 
-  <div class="hero-visual" style="background-color: #d16343; border-radius: 24px; overflow: hidden; position: relative;">
+  <div class="hero-visual hv-wait" style="background-color: #d16343; border-radius: 24px; overflow: hidden; position: relative;">
     <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Animal de compañía en adopción">
     
     <div class="float-card match-alert">
@@ -566,6 +572,7 @@
     { name: "Max", match: "92% de compatibilidad", alert: "Max es ideal para departamentos", photo: "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=900&auto=format&fit=crop" }
   ];
 
+  setTimeout(() => { const v = document.querySelector('.hero-visual'); if (v) v.classList.remove('hv-wait'); }, 2500);
   window.__heroPets = heroPets; // js/home.js lo reemplaza con animales reales cuando los hay
   let currentHeroIndex = 0;
   const heroPhotoEl = document.getElementById('heroPetPhoto');
