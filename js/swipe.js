@@ -47,7 +47,7 @@ async function procesarLikePendiente() {
 
     const { score } = calcularMatch(perfil, pet);
     await guardarSwipe(pet, true, score);
-    mostrarToast(`Guardamos tu interés en ${pet.nombre || "la mascota"} 💛`);
+    mostrarToast(`Guardamos tu interés en ${pet.nombre || "ese animal"} 💛`);
   } catch (err) {
     console.error("No se pudo guardar el like pendiente:", err);
   }
@@ -83,7 +83,7 @@ function render() {
       <div class="empty-state">
         <span class="paw-big">🐾</span>
         <h3>¡Ya viste a todos los disponibles!</h3>
-        <p>Vuelve más tarde, los refugios suben mascotas nuevas seguido.</p>
+        <p>Vuelve más tarde, los refugios suben nuevos animales seguido.</p>
       </div>`;
     return;
   }

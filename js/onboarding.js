@@ -122,7 +122,7 @@ $("btnUbicacion").addEventListener("click", () => {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      msg.textContent = "✓ Ubicación guardada. Te mostraremos primero las mascotas cercanas.";
+      msg.textContent = "✓ Ubicación guardada. Te mostraremos primero los animales cercanos.";
     },
     () => {
       msg.textContent = "No pudimos obtener tu ubicación. Puedes continuar sin ella.";
@@ -143,7 +143,7 @@ async function guardar() {
 
   const faltan = OBLIGATORIAS.filter((g) => !valor(g));
   if (faltan.length) {
-    mensaje("Contesta todas las preguntas principales (vivienda, niños, mascotas, horas solo, energía, experiencia, especie y tamaño).");
+    mensaje("Contesta todas las preguntas principales (vivienda, niños, otros animales, horas solo, energía, experiencia, especie y tamaño).");
     return false;
   }
 

@@ -83,7 +83,7 @@ async function cargarMascotas() {
     petsArea.innerHTML = `
       <div class="empty-state">
         <span class="paw-big">🐾</span>
-        <h3>Aún no has subido mascotas</h3>
+        <h3>Aún no has subido animales</h3>
         <p>Toca el botón + para publicar a tu primer perrito o gatito.</p>
       </div>`;
     return;
@@ -148,7 +148,7 @@ async function cargarMascotas() {
     btnBorrar.style.borderColor = "rgba(192, 57, 43, 0.3)";
     btnBorrar.textContent = "Borrar";
     btnBorrar.onclick = async () => {
-      if (confirm(`¿Estás seguro de que deseas eliminar a "${pet.nombre || "esta mascota"}"?`)) {
+      if (confirm(`¿Estás seguro de que deseas eliminar a "${pet.nombre || "este animal"}"?`)) {
         await deleteDoc(doc(db, "pets", pet.id));
         await cargarMascotas();
       }
@@ -172,7 +172,7 @@ document.getElementById("btnCancelar").onclick = () => { modalOverlay.style.disp
 function abrirModalEditar(pet) {
   resetForm();
   editingPetId = pet.id;
-  document.getElementById("modalTitle").textContent = "Editar mascota";
+  document.getElementById("modalTitle").textContent = "Editar animal";
   document.getElementById("btnGuardarPet").textContent = "Guardar cambios";
 
   document.getElementById("pNombre").value = pet.nombre || "";
@@ -234,8 +234,8 @@ document.getElementById("pFoto").addEventListener("change", (e) => {
 
 function resetForm() {
   editingPetId = null;
-  document.getElementById("modalTitle").textContent = "Nueva mascota";
-  document.getElementById("btnGuardarPet").textContent = "Publicar mascota";
+  document.getElementById("modalTitle").textContent = "Nuevo animal";
+  document.getElementById("btnGuardarPet").textContent = "Publicar animal";
   document.getElementById("pNombre").value = "";
   document.getElementById("pRaza").value = "";
   document.getElementById("pEdad").value = "";
@@ -308,7 +308,7 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
     document.getElementById("petMsg").innerHTML = `<div class="error-msg">Error al guardar. Intenta de nuevo.</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = editingPetId ? "Guardar cambios" : "Publicar mascota";
+    btn.textContent = editingPetId ? "Guardar cambios" : "Publicar animal";
   }
 });
 
@@ -351,7 +351,7 @@ async function verInteresados(pet) {
       exp: { primera_vez: "Primera vez", algo: "Algo de exp.", mucha: "Mucha exp." },
       tipo: { propia: "Vivienda propia", renta_permitida: "Renta (con permiso)" },
       acuerdo: { si: "Familia de acuerdo", en_proceso: "Familia aún lo platica" },
-      viajes: { familiares: "Viajes: familiares/amigos", pension: "Viajes: pensión", viaja: "Viaja con la mascota" },
+      viajes: { familiares: "Viajes: familiares/amigos", pension: "Viajes: pensión", viaja: "Viaja con el animal" },
     };
 
     // Etiquetas rápidas para el refugio
@@ -412,7 +412,7 @@ document.getElementById("btnExportarCSV").onclick = async () => {
     const petsSnap = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
     const pets = petsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    let csvContent = "\uFEFFMascota,Especie,Estado,Nombre Adoptante,Correo Adoptante,Telefono Adoptante,Ciudad Adoptante,Match Score (%)\n";
+    let csvContent = "\uFEFFAnimal,Especie,Estado,Nombre Adoptante,Correo Adoptante,Telefono Adoptante,Ciudad Adoptante,Match Score (%)\n";
 
     for (const pet of pets) {
       const swipesSnap = await getDocs(query(

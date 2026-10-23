@@ -288,7 +288,7 @@ export async function abrirTarjeta(pet) {
     };
 
     overlay.querySelector("#scCompartir").onclick = async () => {
-      const texto = `Conoce a ${pet.nombre || "esta mascota"}, busca hogar 🐾 ${urlMascota(pet)}`;
+      const texto = `Conoce a ${pet.nombre || "este animal"}, busca hogar 🐾 ${urlMascota(pet)}`;
       try {
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], text: texto });
@@ -308,6 +308,6 @@ export async function abrirTarjeta(pet) {
   } catch (err) {
     console.error("No se pudo crear la tarjeta:", err);
     overlay.querySelector("#scEstado").textContent =
-      "No pudimos crear la tarjeta con esta foto. Intenta de nuevo o comparte el enlace de la mascota.";
+      "No pudimos crear la tarjeta con esta foto. Intenta de nuevo o comparte el enlace del animal.";
   }
 }

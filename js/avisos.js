@@ -6,7 +6,7 @@
 import { auth } from "./firebase-config.js";
 
 // Pega aquí la URL de la implementación web de Apps Script (termina en /exec).
-export const AVISOS_URL = "";
+export const AVISOS_URL = "https://script.google.com/macros/s/AKfycby3jCr_Ko75zulByJObfr2zEqAPRTbIwS2JGKswuAFTvMweYKpsFxgqu_nHG_TG4vyn/exec";
 
 export async function avisarRefugio(swipeId) {
   try {

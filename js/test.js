@@ -8,7 +8,7 @@ import {
   db, auth, collection, getDocs, onAuthStateChanged,
   track, esc, safeUrl, GUEST_KEY, PENDING_KEY,
 } from "./firebase-config.js";
-import { ordenarPorMatch, explicarMatch } from "./matching.js";
+import { ordenarPorMatch, explicarMatch, calcularMatch, especieCompatible } from "./matching.js";
 
 const FOTO_DEFAULT = {
   perro: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=800&auto=format&fit=crop",
@@ -57,6 +57,46 @@ function leerGuardado() {
   }
 })();
 
+// ---------- Conteo en vivo: cuántos animales siguen siendo compatibles ----------
+// Mientras contestas, se ve cómo se va afinando tu lista (sin pedir registro).
+let animales = null;
+getDocs(collection(db, "pets"))
+  .then((s) => { animales = s.docs.map((d) => ({ id: d.id, ...d.data() })).filter((p) => p.status !== "adopted"); actualizarVivo(); })
+  .catch(() => {});
+
+const EXP_DE_DIFICULTAD = { facil: "primera_vez", moderado: "algo", dificil: "mucha" };
+
+function actualizarVivo() {
+  const el = document.getElementById("qLive");
+  if (!el || !animales) return;
+  const parcial = {
+    especiePreferida: valor("especie"), vivienda: valor("vivienda"), ninos: valor("ninos"),
+    otrasMascotas: valor("otrasMascotas"), horasSolo: valor("horasSolo"), energia: valor("energia"),
+    experiencia: valor("experiencia"), tamanoPreferido: valor("tamanoPreferido"),
+  };
+  const respondidas = Object.values(parcial).filter(Boolean).length;
+  if (!animales.length || respondidas < 1) { el.classList.remove("show"); return; }
+
+  // Lo que aún no contestas no penaliza: así el número solo baja por lo que ya dijiste
+  const compatibles = animales.filter((pet) => {
+    const p = {
+      ...parcial,
+      vivienda: parcial.vivienda || "casa_patio_grande",
+      ninos: parcial.ninos || "no",
+      otrasMascotas: parcial.otrasMascotas || "no",
+      horasSolo: parcial.horasSolo || "menos2",
+      experiencia: parcial.experiencia || EXP_DE_DIFICULTAD[pet.nivelDificultad] || "algo",
+    };
+    return especieCompatible(p, pet) && calcularMatch(p, pet).score >= 75;
+  }).length;
+
+  el.textContent = respondidas === 8
+    ? `🐾 ${compatibles} de ${animales.length} ${animales.length === 1 ? "animal encaja" : "animales encajan"} muy bien contigo`
+    : `🐾 Hasta ahora: ${compatibles} de ${animales.length} ${animales.length === 1 ? "animal podría ser tu match" : "animales podrían ser tu match"}`;
+  el.classList.add("show");
+}
+document.addEventListener("pm:progress", actualizarVivo);
+
 // ---------- Enviar ----------
 document.getElementById("btnVerMatches").addEventListener("click", async () => {
   const btn = document.getElementById("btnVerMatches");
@@ -95,12 +135,28 @@ document.getElementById("btnVerMatches").addEventListener("click", async () => {
     pintarResultados(perfil, ordenadas);
   } catch (err) {
     console.error(err);
-    msg.innerHTML = `<div class="error-msg">No pudimos cargar las mascotas. Intenta de nuevo.</div>`;
+    msg.innerHTML = `<div class="error-msg">No pudimos cargar a los animales. Intenta de nuevo.</div>`;
   } finally {
     btn.disabled = false;
     btn.textContent = "Ver mis matches →";
   }
 });
+
+// Compartir el resultado (el mejor match) por WhatsApp, redes o donde la persona prefiera
+let mejorResultado = null;
+const btnCompartirRes = document.getElementById("btnCompartirRes");
+if (btnCompartirRes) {
+  btnCompartirRes.addEventListener("click", async () => {
+    if (!mejorResultado) return;
+    const texto = `Mi mejor amigo ideal en PetMatch es ${mejorResultado.nombre || "alguien especial"} (${mejorResultado.matchScore}% de compatibilidad) 🐾 Descubre el tuyo:`;
+    const url = `${window.location.origin}/test.html`;
+    track("compartir_resultado", { pet_id: mejorResultado.id });
+    try {
+      if (navigator.share) { await navigator.share({ title: "PetMatch", text: texto, url }); return; }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
+  });
+}
 
 document.getElementById("btnRehacer").addEventListener("click", () => {
   vistaResultados.classList.add("hidden");
@@ -118,14 +174,17 @@ function pintarResultados(perfil, lista) {
   const sub = document.getElementById("resSub");
   resArea.innerHTML = "";
 
+  mejorResultado = lista[0] || null;
+  if (btnCompartirRes) btnCompartirRes.style.display = lista.length ? "" : "none";
+
   if (!lista.length) {
-    titulo.textContent = "Aún no hay mascotas que encajen";
-    sub.textContent = "Todavía estamos sumando refugios. Crea tu cuenta y te avisamos cuando lleguen mascotas para ti.";
+    titulo.textContent = "Aún no hay animales que encajen";
+    sub.textContent = "Todavía estamos sumando refugios. Crea tu cuenta y te avisamos cuando lleguen animales para ti.";
     return;
   }
 
-  titulo.textContent = "Estas mascotas van contigo";
-  sub.textContent = `Encontramos ${lista.length} ${lista.length === 1 ? "mascota" : "mascotas"}. Te mostramos las que mejor encajan.`;
+  titulo.textContent = "Estos mejores amigos van contigo";
+  sub.textContent = `Encontramos ${lista.length} ${lista.length === 1 ? "mejor amigo" : "mejores amigos"}. Te mostramos las que mejor encajan.`;
 
   lista.slice(0, 12).forEach(pet => {
     const { razones, avisos } = explicarMatch(perfil, pet);
