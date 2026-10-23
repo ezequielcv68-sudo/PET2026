@@ -57,6 +57,10 @@
   }
   .btn-whatsapp:hover { background: #1ebd59; }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E8836B">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="stylesheet" href="css/ux.css">
 </head>
 <body>
 <div class="shell shell-wide">
@@ -73,18 +77,18 @@
     </div>
   </div>
 
-  <h2 style="margin-bottom:6px;">Tus mascotas en adopción</h2>
+  <h2 style="margin-bottom:6px;">Tus animales en adopción</h2>
   <p style="color:var(--ink-soft);font-size:0.9rem;margin:0 0 24px;">Sube fotos y datos para que más familias las encuentren.</p>
 
   <div id="petsArea"><div class="center-loading">Cargando…</div></div>
 
-  <button class="fab" id="btnAdd" title="Agregar mascota">+</button>
+  <button class="fab" id="btnAdd" title="Agregar animal">+</button>
 </div>
 
 <!-- Modal agregar/editar mascota -->
 <div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(28,26,22,0.5); z-index:50; align-items:center; justify-content:center; padding:20px;">
   <div class="panel" style="max-width:440px; width:100%; max-height:88vh; overflow-y:auto;">
-    <h2 id="modalTitle">Nueva mascota</h2>
+    <h2 id="modalTitle">Nuevo animal</h2>
     <p class="sub">Completa los datos para publicarla.</p>
 
     <label>Nombre</label>
@@ -134,7 +138,7 @@
       <div class="choice-chip" data-value="false">No / No probado</div>
     </div>
 
-    <label>¿Bueno con otras mascotas?</label>
+    <label>¿Bueno con otros animales?</label>
     <div class="choice-group" data-group="pOtrasMascotas">
       <div class="choice-chip" data-value="true">Sí</div>
       <div class="choice-chip" data-value="false">No / No probado</div>
@@ -153,7 +157,7 @@
       <div id="photoPreviewWrap"></div>
     </div>
 
-    <button class="btn-primary" id="btnGuardarPet">Publicar mascota</button>
+    <button class="btn-primary" id="btnGuardarPet">Publicar animal</button>
     <button class="btn-secondary" id="btnCancelar">Cancelar</button>
     <div id="petMsg"></div>
   </div>
@@ -187,5 +191,6 @@
 </div>
 
 <script type="module" src="js/shelter.js"></script>
+<script type="module" src="js/ux.js"></script>
 </body>
 </html>

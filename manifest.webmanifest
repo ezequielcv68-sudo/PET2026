@@ -1,0 +1,20 @@
+{
+  "name": "PetMatch — Encuentra a tu mejor amigo",
+  "short_name": "PetMatch",
+  "description": "Adopta animales de compañía de refugios con un match según tu estilo de vida.",
+  "lang": "es-MX",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F5EFDD",
+  "theme_color": "#E8836B",
+  "icons": [
+    { "src": "img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Hacer el test", "url": "/test.html" },
+    { "name": "Ver catálogo", "url": "/catalogo.html" }
+  ]
+}

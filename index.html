@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PetMatch — Encuentra a tu compañero ideal</title>
+<title>PetMatch — Encuentra a tu mejor amigo</title>
 <meta name="description" content="Contesta un test de 2 minutos y descubre qué perros y gatos de refugio se adaptan a tu estilo de vida. Adopta en Morelos y todo México.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="PetMatch — Encuentra a tu compañero ideal">
-<meta property="og:description" content="Test de 2 minutos, sin registro. Descubre qué mascota de refugio va con tu vida.">
+<meta property="og:title" content="PetMatch — Encuentra a tu mejor amigo">
+<meta property="og:description" content="Test de 2 minutos, sin registro. Descubre qué mejor amigo de refugio va con tu vida.">
 <meta property="og:image" content="https://pet-2026.vercel.app/img/logo.png">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="css/styles.css">
@@ -327,6 +327,10 @@
     .swipe-card.card-left-2, .swipe-card.card-right-2 { opacity: 0; }
   }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E8836B">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="stylesheet" href="css/ux.css">
 </head>
 <body>
 
@@ -349,15 +353,15 @@
 <section class="hero">
   <div class="hero-copy">
    <!-- <span class="badge-pill">🐕 Más de 300 refugios registrados</span>-->
-    <h1>Encuentra a tu<br><span class="grad">compañero perfecto</span></h1>
+    <h1>Encuentra a tu<br><span class="grad">mejor amigo</span></h1>
     <p class="lead">
-      Cada mascota merece un hogar con amor. Contesta una breve encuesta sobre tu
+      Cada animal de compañía merece un hogar con amor. Contesta una breve encuesta sobre tu
       rutina diaria y descubre, con match inteligente, qué perros y gatos de refugio
       se adaptan mejor a tu estilo de vida.
     </p>
     <div class="hero-ctas">
       <a href="test.html"><button class="btn-hero-primary">Hacer el test (sin registro) →</button></a>
-      <a href="catalogo.html"><button class="btn-hero-secondary">Ver todas las mascotas</button></a>
+      <a href="catalogo.html"><button class="btn-hero-secondary">Ver animales en adopción</button></a>
     </div>
     <div class="trust-row">
       <div class="trust-text">📍 Hecho en Cuernavaca, Morelos · Gratis para adoptantes y refugios</div>
@@ -365,7 +369,7 @@
   </div>
 
   <div class="hero-visual" style="background-color: #d16343; border-radius: 24px; overflow: hidden; position: relative;">
-    <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Mascota en adopción">
+    <img id="heroPetPhoto" class="hero-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=900&auto=format&fit=crop" alt="Animal de compañía en adopción">
     
     <div class="float-card match-alert">
       <span class="ic-heart">♥</span>
@@ -396,7 +400,7 @@
     <div class="feature-card">
       <div class="fc-icon">🎯</div>
       <h3>Algoritmo de Compatibilidad</h3>
-      <p>Analizamos tu espacio, tiempo disponible y estilo de vida para conectarte únicamente con mascotas con las que tendrás una convivencia armónica.</p>
+      <p>Analizamos tu espacio, tiempo disponible y estilo de vida para conectarte únicamente con animales de compañía con los que tendrás una convivencia armónica.</p>
     </div>
     <div class="feature-card">
       <div class="fc-icon">🛡️</div>
@@ -457,7 +461,7 @@
         <img class="card-pet-photo" src="https://images.unsplash.com/photo-1543466835-00a7907e9de1" alt="Perrito de refugio">
         <div class="fc-icon">🐾</div>
         <h3>Nuestra Misión: Un Nuevo Comienzo para Ellos</h3>
-        <p>En PetMatch no solo conectamos; transformamos vidas. Buscamos un mundo donde ninguna mascota sea abandonada.</p>
+        <p>En PetMatch no solo conectamos; transformamos vidas. Buscamos un mundo donde ningún animal de compañía sea abandonado.</p>
         <div class="progress-indicator">1 of 4</div>
       </div>
       
@@ -465,7 +469,7 @@
         <img class="card-pet-photo" src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=600&auto=format&fit=crop" alt="Perritos jugando">
         <div class="fc-icon">🧠</div>
         <h3>Tu Historia, Su Compatibilidad</h3>
-        <p>Nuestro algoritmo cruza tu rutina con la personalidad de cada mascota para encontrar la coincidencia ideal.</p>
+        <p>Nuestro algoritmo cruza tu rutina con la personalidad de cada animal para encontrar la coincidencia ideal.</p>
         <div class="progress-indicator">2 of 4</div>
       </div>
       
@@ -528,7 +532,7 @@
       <ul class="footer-links">
         <li><a href="#conocenos">Conócenos</a></li>
         <li><a href="#como-ayudamos">¿Cómo funciona?</a></li>
-        <li><a href="catalogo.html">Catálogo de Mascotas</a></li>
+        <li><a href="catalogo.html">Catálogo de animales en adopción</a></li>
         <li><a href="auth.html">Iniciar Sesión / Registro</a></li>
       </ul>
     </div>
@@ -564,6 +568,7 @@
     { name: "Max", match: "92% de compatibilidad", alert: "Max es ideal para departamentos", photo: "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=900&auto=format&fit=crop" }
   ];
 
+  window.__heroPets = heroPets; // js/home.js lo reemplaza con animales reales cuando los hay
   let currentHeroIndex = 0;
   const heroPhotoEl = document.getElementById('heroPetPhoto');
   const heroMiniPhotoEl = document.getElementById('heroMiniPhoto');
@@ -581,6 +586,8 @@
       heroNameEl.textContent = pet.name;
       heroPctEl.textContent = pet.match;
       heroAlertEl.textContent = pet.alert;
+      const hv = document.querySelector('.hero-visual');
+      if (hv) hv.dataset.petId = pet.id || '';
       heroPhotoEl.style.opacity = '1';
     }, 400);
   }, 3500);
@@ -650,5 +657,7 @@
   update3DCarousel();
 </script>
 
+<script type="module" src="js/ux.js"></script>
+<script type="module" src="js/home.js"></script>
 </body>
 </html>

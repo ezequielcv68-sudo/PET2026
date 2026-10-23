@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tu rutina — PetMatch</title>
 <link rel="stylesheet" href="css/styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E8836B">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="stylesheet" href="css/ux.css">
 </head>
 <body>
 <div class="topbar">
@@ -35,7 +39,7 @@
 <label>Estatus de la vivienda</label>
 <div class="choice-group" data-group="tipo_vivienda">
   <div class="choice-chip" data-value="propia">Propia</div>
-  <div class="choice-chip" data-value="renta_permitida">Rentada (con permiso de mascotas)</div>
+  <div class="choice-chip" data-value="renta_permitida">Rentada (con permiso para animales)</div>
 </div>
 
 <!-- Acuerdo en casa -->
@@ -46,7 +50,7 @@
 </div>
 
 <!-- Plan en ausencias -->
-<label>¿Qué pasará con la mascota cuando salgas de viaje?</label>
+<label>¿Qué pasará con tu nuevo mejor amigo cuando salgas de viaje?</label>
 <div class="choice-group" data-group="plan_viajes">
   <div class="choice-chip" data-value="familiares">Se queda con familiares/amigos</div>
   <div class="choice-chip" data-value="pension">Irá a pensión/hotel canino</div>
@@ -59,13 +63,13 @@
       <div class="choice-chip" data-value="no">No</div>
     </div>
 
-    <label>¿Tienes otras mascotas actualmente?</label>
+    <label>¿Tienes otros animales en casa actualmente?</label>
     <div class="choice-group" data-group="otras_mascotas">
       <div class="choice-chip" data-value="si">Sí</div>
       <div class="choice-chip" data-value="no">No</div>
     </div>
 
-    <label>¿Cuántas horas al día estaría sola la mascota?</label>
+    <label>¿Cuántas horas al día estaría solo tu nuevo mejor amigo?</label>
     <div class="choice-group" data-group="horas_solo">
       <div class="choice-chip" data-value="menos2">Menos de 2 h</div>
       <div class="choice-chip" data-value="2a4">2–4 h</div>
@@ -80,7 +84,7 @@
       <div class="choice-chip" data-value="alto">Muy activo (correr, deporte)</div>
     </div>
 
-    <label>Tu experiencia con mascotas</label>
+    <label>Tu experiencia con animales de compañía</label>
     <div class="choice-group" data-group="experiencia">
       <div class="choice-chip" data-value="primera_vez">Primera vez</div>
       <div class="choice-chip" data-value="algo">Algo de experiencia</div>
@@ -112,7 +116,7 @@
 
 <textarea id="obBio" placeholder="Cuéntanos sobre tu estilo de vida, con quién vives y qué esperas de tu nuevo compañero..."></textarea>
 
-    <button class="btn-secondary" id="btnUbicacion" type="button">📍 Usar mi ubicación para buscar mascotas cercanas</button>
+    <button class="btn-secondary" id="btnUbicacion" type="button">📍 Usar mi ubicación para buscar animales cercanos</button>
     <div id="ubicacionMsg" style="font-size:0.8rem;color:var(--ink-soft);margin-top:8px;"></div>
 
     <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
@@ -125,5 +129,6 @@
 </div>
 
 <script type="module" src="js/onboarding.js"></script>
+<script type="module" src="js/ux.js" data-questions data-required="vivienda,ninos,otras_mascotas,horas_solo,energia,experiencia,especie,tamano"></script>
 </body>
 </html>

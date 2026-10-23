@@ -6,7 +6,7 @@
 <title>Test de compatibilidad — PetMatch</title>
 <meta name="description" content="Contesta 8 preguntas en 2 minutos y descubre qué perros y gatos de refugio se adaptan a tu estilo de vida. Sin registro.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="¿Qué mascota de refugio va contigo? — PetMatch">
+<meta property="og:title" content="¿Qué mejor amigo de refugio va contigo? — PetMatch">
 <meta property="og:description" content="Test de 2 minutos, sin registro. Descubre tu match.">
 <meta property="og:image" content="https://pet-2026.vercel.app/img/logo.png">
 <meta name="twitter:card" content="summary">
@@ -58,6 +58,10 @@
   .progress { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 14px; }
   .hidden { display: none; }
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E8836B">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="stylesheet" href="css/ux.css">
 </head>
 <body>
 
@@ -82,7 +86,7 @@
     <div id="vistaTest">
       <div class="section-head" style="margin-bottom: 20px;">
         <span class="eyebrow">Sin registro · 2 minutos</span>
-        <h2>¿Qué mascota va con tu vida?</h2>
+        <h2>¿Qué mejor amigo va con tu vida?</h2>
         <p>Contesta 8 preguntas y te mostramos a los perritos y gatitos de refugio que mejor encajan contigo.</p>
       </div>
 
@@ -108,13 +112,13 @@
           <div class="choice-chip" data-value="no">No</div>
         </div>
 
-        <label>¿Tienes otras mascotas?</label>
+        <label>¿Tienes otros animales en casa?</label>
         <div class="choice-group" data-group="otrasMascotas">
           <div class="choice-chip" data-value="si">Sí</div>
           <div class="choice-chip" data-value="no">No</div>
         </div>
 
-        <label>¿Cuántas horas al día estaría sola la mascota?</label>
+        <label>¿Cuántas horas al día estaría solo tu nuevo mejor amigo?</label>
         <div class="choice-group" data-group="horasSolo">
           <div class="choice-chip" data-value="menos2">Menos de 2 h</div>
           <div class="choice-chip" data-value="2a4">2–4 h</div>
@@ -129,7 +133,7 @@
           <div class="choice-chip" data-value="alto">Muy activo (correr, deporte)</div>
         </div>
 
-        <label>Tu experiencia con mascotas</label>
+        <label>Tu experiencia con animales de compañía</label>
         <div class="choice-group" data-group="experiencia">
           <div class="choice-chip" data-value="primera_vez">Primera vez</div>
           <div class="choice-chip" data-value="algo">Algo de experiencia</div>
@@ -153,7 +157,7 @@
     <div id="vistaResultados" class="hidden">
       <div class="section-head" style="margin-bottom: 0;">
         <span class="eyebrow">Tus resultados</span>
-        <h2 id="resTitulo">Estas mascotas van contigo</h2>
+        <h2 id="resTitulo">Estos mejores amigos van contigo</h2>
         <p id="resSub"></p>
       </div>
 
@@ -161,9 +165,11 @@
 
       <div class="cta-save" id="ctaGuardar">
         <h3>Guarda tus matches y contacta al refugio</h3>
-        <p>Crea tu cuenta gratis: conservamos tus respuestas y avisas al refugio cuando te interese una mascota.</p>
+        <p>Crea tu cuenta gratis: conservamos tus respuestas y avisas al refugio cuando te interese un animal.</p>
         <a href="auth.html"><button class="btn-hero-primary" type="button">Crear mi cuenta →</button></a>
       </div>
+
+      <button class="btn-share-result" id="btnCompartirRes" type="button">📤 Compartir mi resultado</button>
 
       <div style="text-align:center; margin-top: 16px;">
         <button class="btn-ghost" id="btnRehacer" type="button">← Cambiar mis respuestas</button>
@@ -176,5 +182,6 @@
 <footer class="footer">PetMatch · Hecho con 🐾 en Cuernavaca, Morelos para conectar refugios con familias</footer>
 
 <script type="module" src="js/test.js"></script>
+<script type="module" src="js/ux.js" data-questions></script>
 </body>
 </html>
