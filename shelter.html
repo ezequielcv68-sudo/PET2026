@@ -159,8 +159,10 @@
     <label>Descripción</label>
     <textarea id="pDescripcion" placeholder="Personalidad, historia, cuidados especiales..."></textarea>
 
-    <label>Ciudad</label>
-    <input type="text" id="pCiudad" placeholder="Ej. Cuernavaca, Morelos">
+    <label>¿Dónde está ahora? (estado y municipio)</label>
+    <select id="pEstado" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(28,26,22,.15);font:inherit;margin-bottom:8px;"></select>
+    <input type="text" id="pCiudad" placeholder="Municipio o ciudad. Ej. Cuernavaca">
+    <p style="font-size:.78rem;color:var(--ink-soft);margin:4px 0 0;">Solo se muestra el municipio y el estado, nunca la dirección exacta.</p>
 
     <label>Foto</label>
     <div class="photo-drop" id="photoDrop">
@@ -190,6 +192,11 @@
     <h2>Perfil del Refugio</h2>
     <p class="sub">Agrega tus redes sociales para que los adoptantes te conozcan mejor.</p>
     
+    <label>Estado del refugio</label>
+    <select id="cfgEstado" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(28,26,22,.15);font:inherit;margin-bottom:8px;"></select>
+    <label>Municipio o ciudad del refugio</label>
+    <input type="text" id="cfgCiudad" placeholder="Ej. Cuernavaca">
+
     <label>Facebook (Enlace o usuario)</label>
     <input type="text" id="cfgFb" placeholder="Ej. facebook.com/mirefugio">
     
