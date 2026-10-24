@@ -21,3 +21,4 @@ Para quitar la parte visual del catálogo: borra el `<link>` de `css/geo.css` en
 - Lista «Conócenos» (index): texto en un solo bloque junto a la palomita, sin columnas cortadas en celular.
 - Fotos nuevas: se reducen solas al subirlas (`js/imagen.js`, máx. 1280 px, JPEG) para que el catálogo cargue rápido.
 - Catálogo: tarjetas con render perezoso y scroll vertical siempre libre.
+- Descubrir (deslizar): la foto llena todo el ancho de la tarjeta y toma el espacio que sobra; la ficha (nombre, etiquetas, razones, descripción y refugio) siempre se ve completa y los botones ✕ ♥ ya no quedan tapados por la barra de abajo.
