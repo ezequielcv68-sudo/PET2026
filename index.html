@@ -70,16 +70,20 @@
   }
 
   .info-card ul li {
-    padding: 8px 0;
+    padding: 8px 0 8px 28px;
     font-size: 0.95rem;
     color: var(--ink-soft, #6E6759);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
+    display: block;
+    position: relative;
     line-height: 1.5;
   }
 
+  .info-card ul li strong { color: var(--ink, #1C1A16); }
+
   .info-card ul li span.bullet-icon {
+    position: absolute;
+    left: 2px;
+    top: 8px;
     color: var(--mint, #4F9D8D);
     font-weight: bold;
   }

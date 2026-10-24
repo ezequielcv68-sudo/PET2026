@@ -16,3 +16,8 @@ Para quitar la parte visual del catálogo: borra el `<link>` de `css/geo.css` en
 - La distancia en km solo se muestra si se conoce la ciudad o el GPS; con solo el estado se muestra «En tu estado».
 - Las coordenadas del municipio se obtienen de una tabla interna o de OpenStreetMap (Nominatim); si no hay red, se usa el centro del estado.
 - No se necesita cambiar las reglas de Firestore.
+
+## Ajustes posteriores
+- Lista «Conócenos» (index): texto en un solo bloque junto a la palomita, sin columnas cortadas en celular.
+- Fotos nuevas: se reducen solas al subirlas (`js/imagen.js`, máx. 1280 px, JPEG) para que el catálogo cargue rápido.
+- Catálogo: tarjetas con render perezoso y scroll vertical siempre libre.
