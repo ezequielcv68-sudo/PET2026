@@ -35,3 +35,18 @@
 .geo-filters select{width:100%}
 
 .geo-filters select{min-width:0;text-overflow:ellipsis}
+
+/* --- Versión compacta: una sola línea, los filtros se abren con el botón --- */
+.geo-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+#geoPanel .geo-pill{border:1.5px solid rgba(28,26,22,.14);border-radius:999px;background:#fff;padding:9px 16px;font:inherit;font-weight:700;font-size:.86rem;color:#1c1a16;cursor:pointer;width:auto;max-width:210px}
+.geo-toggle{display:inline-flex;align-items:center;gap:6px}
+.geo-toggle[aria-expanded=true]{background:#2ec4b6;color:#fff;border-color:#2ec4b6}
+.geo-n{background:#E8836B;color:#fff;border-radius:999px;font-size:.72rem;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 5px}
+.geo-icon{border:1.5px solid rgba(28,26,22,.14);background:#fff;border-radius:50%;width:38px;height:38px;font-size:1rem;cursor:pointer}
+.geo-icon:hover{background:#FDEBE5}.geo-icon:disabled{opacity:.5}
+.geo-top .geo-view{margin-left:auto}
+#geoFiltros.geo-filters{background:#fff;border-radius:16px;padding:12px;box-shadow:0 4px 14px rgba(0,0,0,.06);margin-bottom:8px}
+.geo-links{grid-column:1/-1;display:flex;gap:16px}
+.geo-link-btn{background:none;border:none;color:#D96B50;font:inherit;font-weight:700;font-size:.82rem;cursor:pointer;padding:2px 0}
+.geo-count{font-size:.82rem;font-weight:600;color:#777;margin:2px 4px 6px}
+@media(max-width:520px){.geo-top{gap:6px}.geo-top .geo-view{margin-left:0;width:100%;justify-content:center}.geo-view button{flex:1}#geoPanel .geo-pill{max-width:170px;padding:8px 12px}}
