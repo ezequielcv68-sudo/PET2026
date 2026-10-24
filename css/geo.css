@@ -50,3 +50,7 @@
 .geo-link-btn{background:none;border:none;color:#D96B50;font:inherit;font-weight:700;font-size:.82rem;cursor:pointer;padding:2px 0}
 .geo-count{font-size:.82rem;font-weight:600;color:#777;margin:2px 4px 6px}
 @media(max-width:520px){.geo-top{gap:6px}.geo-top .geo-view{margin-left:0;width:100%;justify-content:center}.geo-view button{flex:1}#geoPanel .geo-pill{max-width:170px;padding:8px 12px}}
+
+/* Catálogo fluido en celulares modestos: pinta solo lo que se ve y nunca bloquea el scroll vertical */
+#catalogArea{touch-action:pan-y}
+#catalogArea .pet-card{content-visibility:auto;contain-intrinsic-size:auto 320px}
