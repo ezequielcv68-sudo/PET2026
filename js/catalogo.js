@@ -141,7 +141,7 @@ function renderPets(petsToRender) {
     const card = document.createElement('div');
     card.className = 'pet-card';
     card.innerHTML = `
-      <img class="pet-card-img" src="${esc(data.photo)}" alt="${esc(data.name)}" loading="lazy">
+      <img class="pet-card-img" src="${esc(data.photo)}" alt="${esc(data.name)}" loading="lazy" decoding="async">
       <div class="pet-card-body">
         <h3 class="pet-card-title">${esc(data.name)}</h3>
         <div class="pet-card-sub">

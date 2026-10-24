@@ -5,6 +5,7 @@ import {
   ref, uploadBytes, getDownloadURL,
 } from "./firebase-config.js";
 import { abrirTarjeta } from "./sharecard.js";
+import { comprimirImagen } from "./imagen.js";
 import { ESTADOS, inferirEstado, normalizarEstado, geocodificar } from "./geo.js";
 
 let uid = null;
@@ -402,8 +403,9 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   try {
     let photoURL = null;
     if (selectedFile) {
-      const fileRef = ref(storage, `pets/${uid}/${Date.now()}_${selectedFile.name}`);
-      await uploadBytes(fileRef, selectedFile);
+      const archivo = await comprimirImagen(selectedFile);
+      const fileRef = ref(storage, `pets/${uid}/${Date.now()}_${archivo.name}`);
+      await uploadBytes(fileRef, archivo);
       photoURL = await getDownloadURL(fileRef);
     }
 
