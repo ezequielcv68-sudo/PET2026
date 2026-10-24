@@ -14,6 +14,8 @@
 // de match escritas por un LLM (requiere backend/API key).
 // ============================================================
 
+import { puntoAdoptante, coordsMascota, distanciaKm, estadoDeMascota } from "./geo.js";
+
 const PESOS = {
   tamano: 20,
   energia: 20,
@@ -66,13 +68,20 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 }
 
 function puntosDistancia(perfil, pet) {
-  if (!perfil.lat || !perfil.lng || !pet.lat || !pet.lng) return 0.7; // sin datos, neutral
-  const km = haversineKm(perfil.lat, perfil.lng, pet.lat, pet.lng);
-  if (km <= 5) return 1;
-  if (km <= 15) return 0.85;
-  if (km <= 30) return 0.65;
-  if (km <= 60) return 0.4;
-  return 0.2;
+  const ref = puntoAdoptante(perfil);
+  const dst = coordsMascota(pet);
+  if (!ref || !dst) return 0.7; // sin datos, neutral
+  const km = distanciaKm(ref, dst);
+  let p = km <= 5 ? 1 : km <= 15 ? 0.85 : km <= 30 ? 0.65 : km <= 60 ? 0.4 : 0.2;
+  // Mismo estado: nunca se castiga como «lejos» (los centros de estado son aproximados)
+  if (ref.estado && ref.estado === estadoDeMascota(pet)) p = Math.max(p, 0.65);
+  return p;
+}
+
+/** Km entre el adoptante y la mascota (o null si falta algún dato). */
+export function kmHasta(perfil, pet) {
+  const ref = puntoAdoptante(perfil), dst = coordsMascota(pet);
+  return ref && dst ? distanciaKm(ref, dst) : null;
 }
 
 /**
@@ -143,7 +152,12 @@ export function explicarMatch(perfil, pet) {
   if (perfil.ninos === "si" && pet.buenoConNinos === true) razones.push("Bueno con niños");
   if (perfil.otrasMascotas === "si" && pet.buenoConOtrasMascotas === true) razones.push("Se lleva bien con otras mascotas");
   if (breakdown.experiencia >= 1) razones.push("Su cuidado va con tu experiencia");
-  if (perfil.lat && perfil.lng && pet.lat && pet.lng && breakdown.distancia >= 0.85) razones.push("Vive cerca de ti");
+  const ref = puntoAdoptante(perfil);
+  if (ref) {
+    const km = kmHasta(perfil, pet);
+    if (km !== null && !ref.aprox && km <= 30) razones.push("Vive cerca de ti");
+    else if (ref.estado && ref.estado === estadoDeMascota(pet)) razones.push("Está en tu estado");
+  }
 
   if (perfil.ninos === "si" && pet.buenoConNinos === false) avisos.push("No probado con niños");
   if (perfil.otrasMascotas === "si" && pet.buenoConOtrasMascotas === false) avisos.push("No probado con otras mascotas");

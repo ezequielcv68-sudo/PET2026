@@ -3,7 +3,11 @@ import {
   track, esc, safeUrl, PENDING_KEY, GUEST_KEY,
 } from './firebase-config.js';
 import { abrirTarjeta } from './sharecard.js';
-import { calcularMatch, ordenarPorMatch, especieCompatible } from './matching.js';
+import { calcularMatch, ordenarPorMatch, especieCompatible, kmHasta } from './matching.js';
+import {
+  ESTADOS, centroEstado, estadoDeMascota, coordsMascota, textoDistancia, textoUbicacion,
+  puntoAdoptante, guardarUbicacion, leerUbicacion, pedirGPS, estadoMasCercano, urlGoogleMaps, urlComoLlegar,
+} from './geo.js';
 
 const catalogArea = document.getElementById('catalogArea');
 const petModal = document.getElementById('petModal');
@@ -36,7 +40,7 @@ async function cargarPerfilCuenta(u) {
     if (!s.exists()) return;
     perfil = s.data();
     if (allPets.length && !filtroTocado && !new URLSearchParams(window.location.search).get('m')) activarParaTi();
-    else if (allPets.length) inyectarBotonParaTi();
+    else if (allPets.length) { inyectarBotonParaTi(); refrescar(); }
   } catch (e) { /* sin perfil: el catálogo funciona igual */ }
 }
 
@@ -109,8 +113,9 @@ async function loadCatalog() {
 
     // Enlace directo a un animal: catalogo.html?m=ID
     const directo = new URLSearchParams(window.location.search).get('m');
+    montarPanel();
     if (perfil && !directo) activarParaTi();
-    else { inyectarBotonParaTi(); renderPets(allPets); }
+    else { inyectarBotonParaTi(); aplicarFiltro('all'); }
     if (directo) {
       const idx = currentPetsList.findIndex(p => p.id === directo);
       if (idx >= 0) showPetAtIndex(idx);
@@ -141,8 +146,9 @@ function renderPets(petsToRender) {
         <h3 class="pet-card-title">${esc(data.name)}</h3>
         <div class="pet-card-sub">
           <span>${esGato(data) ? '🐱 Gato' : '🐕 Perro'}</span> •
-          <span>${esc(data.city)}</span>
+          <span>📍 ${esc(textoUbicacion(pet) || data.city)}</span>
         </div>
+        ${etiquetaCerca(pet)}
       </div>
     `;
 
@@ -167,7 +173,8 @@ function showPetAtIndex(index) {
   const pet = currentPetsList[currentIndex];
   const data = getPetData(pet);
 
-  const sub = [esGato(data) ? 'Gato' : 'Perro', pet.raza, pet.edad, data.city].filter(Boolean).join(' • ');
+  const km = kmPreciso(pet);
+  const sub = [esGato(data) ? 'Gato' : 'Perro', pet.raza, pet.edad, textoUbicacion(pet) || data.city, km != null ? textoDistancia(km) : ''].filter(Boolean).join(' • ');
   const verificado = pet.shelterVerified === true ? ' · ✓ Refugio verificado' : '';
   const paraTi = (perfil && especieCompatible(perfil, pet))
     ? ` · ${pet.matchScore ?? calcularMatch(perfil, pet).score}% para ti` : '';
@@ -181,6 +188,8 @@ function showPetAtIndex(index) {
   tagsContainer.innerHTML = `
     <span class="modal-tag">Tamaño: ${esc(etiquetaTamano(data.size))}</span>
     <span class="modal-tag">Energía: ${esc(etiquetaEnergia(data.energy))}</span>
+    ${urlGoogleMaps(pet) ? `<a class="modal-tag geo-link" href="${esc(urlGoogleMaps(pet))}" target="_blank" rel="noopener">🗺️ Ver en Google Maps</a>
+    <a class="modal-tag geo-link" href="${esc(urlComoLlegar(pet))}" target="_blank" rel="noopener">🧭 Cómo llegar</a>` : ''}
   `;
 
   // "Me interesa": se recuerda la mascota y se manda a registrarse (o directo a Descubrir si ya hay sesión).
@@ -250,16 +259,9 @@ document.addEventListener('keydown', (e) => {
 // Filtros
 function aplicarFiltro(filter) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-filter') === filter));
-  if (filter === 'all') {
-    renderPets(allPets);
-  } else if (filter === 'foryou' && perfil) {
-    renderPets(ordenarPorMatch(perfil, allPets));
-  } else {
-    renderPets(allPets.filter(p => {
-      const cat = esGato(getPetData(p));
-      return filter === 'dog' ? !cat : cat;
-    }));
-  }
+  fil.paraTi = filter === 'foryou' && !!perfil;
+  fil.especie = (filter === 'dog' || filter === 'cat') ? filter : 'all';
+  refrescar();
 }
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -267,6 +269,237 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     filtroTocado = true;
     aplicarFiltro(btn.getAttribute('data-filter'));
   });
+});
+
+
+// ============================================================
+// UBICACIÓN, FILTROS Y MAPA
+// ============================================================
+const fil = { especie: 'all', paraTi: false, estado: '', tamano: '', energia: '', edad: '', orden: 'auto', vista: 'lista' };
+
+function refPerfil() { return perfil || {}; }
+function kmDe(pet) { return kmHasta(refPerfil(), pet); }
+// Distancia mostrable: solo si se conoce la ciudad o el GPS (con solo el estado sería inventar precisión)
+function kmPreciso(pet) { const r = puntoAdoptante(refPerfil()); return r && !r.aprox ? kmDe(pet) : null; }
+
+function etiquetaCerca(pet) {
+  const ref = puntoAdoptante(refPerfil());
+  if (!ref) return '';
+  const km = kmDe(pet);
+  const mismo = ref.estado && ref.estado === estadoDeMascota(pet);
+  if (km != null && !ref.aprox && km <= 60) return `<div class="geo-chip near">🎯 ${textoDistancia(km)}</div>`;
+  if (mismo) return `<div class="geo-chip same">📍 En tu estado</div>`;
+  if (km != null && !ref.aprox) return `<div class="geo-chip far">${textoDistancia(km)}</div>`;
+  return '';
+}
+
+function categoriaEdad(txt) {
+  const t = String(txt || '').toLowerCase();
+  if (/cachorr|bebe|bebé/.test(t)) return 'cachorro';
+  if (/senior|sénior|viejit|anciano/.test(t)) return 'senior';
+  const n = parseFloat((t.match(/(\d+([.,]\d+)?)/) || [])[1]?.replace(',', '.'));
+  if (isNaN(n)) return '';
+  const meses = /mes/.test(t) && !/a(ñ|n)o/.test(t);
+  const anios = meses ? n / 12 : n;
+  if (anios < 1) return 'cachorro';
+  if (anios <= 3) return 'joven';
+  if (anios < 8) return 'adulto';
+  return 'senior';
+}
+function normTam(p) { return String(p.tamano || '').toLowerCase().replace('ñ', 'n'); }
+
+function pasaFiltros(p, saltar) {
+  if (fil.especie === 'dog' && esGato(getPetData(p))) return false;
+  if (fil.especie === 'cat' && !esGato(getPetData(p))) return false;
+  if (saltar !== 'estado' && fil.estado && estadoDeMascota(p) !== fil.estado) return false;
+  if (fil.tamano && normTam(p) !== fil.tamano) return false;
+  if (fil.energia && p.energia !== fil.energia) return false;
+  if (fil.edad && categoriaEdad(p.edad) !== fil.edad) return false;
+  return true;
+}
+
+function refrescar() {
+  let lista = allPets.filter(p => pasaFiltros(p));
+  if (fil.paraTi && perfil) lista = ordenarPorMatch(perfil, lista);
+  const ref = puntoAdoptante(refPerfil());
+  const orden = fil.orden === 'auto' ? (fil.paraTi ? 'matchear' : (ref ? 'cerca' : 'ninguno')) : fil.orden;
+  if (orden === 'cerca' && ref) {
+    lista = [...lista].sort((a, b) => (kmDe(a) ?? 1e9) - (kmDe(b) ?? 1e9));
+  } else if (orden === 'nuevos') {
+    const t = (p) => (p.createdAt && p.createdAt.toMillis ? p.createdAt.toMillis() : 0);
+    lista = [...lista].sort((a, b) => t(b) - t(a));
+  } else if (orden === 'paraTi' && perfil) {
+    lista = ordenarPorMatch(perfil, lista);
+  }
+  if (fil.vista === 'mapa') renderMapa(lista); else { ocultarMapa(); renderPets(lista); }
+  actualizarPanel(lista);
+}
+
+function montarPanel() {
+  if (document.getElementById('geoPanel')) return;
+  const filtros = document.querySelector('.catalog-filters');
+  if (!filtros) return;
+  const opts = (arr) => arr.map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+  const panel = document.createElement('div');
+  panel.id = 'geoPanel';
+  panel.innerHTML = `
+    <div class="geo-loc">
+      <span class="geo-pin">📍</span>
+      <span id="geoTxt" class="geo-txt">Dinos dónde estás y ordenamos por cercanía</span>
+      <select id="gEstadoTu" aria-label="Tu estado"><option value="">Elige tu estado…</option>${ESTADOS.map(e => `<option value="${e.n}">${e.n}</option>`).join('')}</select>
+      <button type="button" id="gGPS" class="geo-btn">🎯 Usar mi ubicación</button>
+      <button type="button" id="gQuitar" class="geo-btn ghost" style="display:none">✕ Quitar</button>
+    </div>
+    <div class="geo-filters">
+      <select id="fEstado" aria-label="Estado"></select>
+      <select id="fTamano" aria-label="Tamaño"><option value="">Cualquier tamaño</option>${opts([['pequeno','Pequeño'],['mediano','Mediano'],['grande','Grande']])}</select>
+      <select id="fEnergia" aria-label="Energía"><option value="">Cualquier energía</option>${opts([['bajo','Tranquilo'],['medio','Activo'],['alto','Muy activo']])}</select>
+      <select id="fEdad" aria-label="Edad"><option value="">Cualquier edad</option>${opts([['cachorro','Cachorro (menos de 1 año)'],['joven','Joven (1 a 3 años)'],['adulto','Adulto (4 a 7 años)'],['senior','Senior (8 años o más)']])}</select>
+      <select id="fOrden" aria-label="Ordenar por">${opts([['auto','Orden recomendado'],['cerca','📍 Más cerca de mí'],['paraTi','✨ Más compatibles'],['nuevos','🆕 Más recientes']])}</select>
+    </div>
+    <div class="geo-row">
+      <div id="resultCount" class="geo-count"></div>
+      <div class="geo-view">
+        <button type="button" data-vista="lista" class="on">🧱 Lista</button>
+        <button type="button" data-vista="mapa">🗺️ Mapa</button>
+      </div>
+    </div>
+    <div id="petMapWrap" style="display:none"><div id="petMap"></div><p class="geo-note">Los pines muestran el municipio de cada animal, nunca una dirección exacta.</p></div>`;
+  filtros.insertAdjacentElement('afterend', panel);
+
+  const $ = (id) => document.getElementById(id);
+  $('fTamano').onchange = (e) => { fil.tamano = e.target.value; refrescar(); };
+  $('fEnergia').onchange = (e) => { fil.energia = e.target.value; refrescar(); };
+  $('fEdad').onchange = (e) => { fil.edad = e.target.value; refrescar(); };
+  $('fOrden').onchange = (e) => { fil.orden = e.target.value; refrescar(); };
+  $('fEstado').onchange = (e) => { fil.estado = e.target.value; refrescar(); };
+  panel.querySelectorAll('.geo-view button').forEach(b => b.onclick = () => {
+    fil.vista = b.dataset.vista;
+    panel.querySelectorAll('.geo-view button').forEach(x => x.classList.toggle('on', x === b));
+    refrescar();
+  });
+  $('gEstadoTu').onchange = (e) => {
+    const c = centroEstado(e.target.value);
+    if (c) guardarUbicacion({ estado: c.n, lat: c.lat, lng: c.lng, gps: false, aprox: true });
+    else guardarUbicacion(null);
+    track('ubicacion_estado', { estado: e.target.value });
+    reordenarPorUbicacion();
+  };
+  $('gGPS').onclick = async () => {
+    const btn = $('gGPS'); btn.disabled = true; btn.textContent = 'Buscando…';
+    try {
+      const p = await pedirGPS();
+      guardarUbicacion({ estado: estadoMasCercano(p), lat: +p.lat.toFixed(3), lng: +p.lng.toFixed(3), gps: true });
+      track('ubicacion_gps');
+      reordenarPorUbicacion();
+    } catch (e) {
+      $('geoTxt').textContent = 'No pudimos ubicarte. Elige tu estado en la lista.';
+    } finally { btn.disabled = false; btn.textContent = '🎯 Usar mi ubicación'; }
+  };
+  $('gQuitar').onclick = () => { guardarUbicacion(null); $('gEstadoTu').value = ''; reordenarPorUbicacion(); };
+  // Si ya había ubicación guardada, se refleja
+  const u = leerUbicacion();
+  if (u && u.estado) $('gEstadoTu').value = u.estado;
+}
+
+function reordenarPorUbicacion() {
+  fil.orden = 'auto';
+  const o = document.getElementById('fOrden'); if (o) o.value = 'auto';
+  refrescar();
+}
+
+function actualizarPanel(lista) {
+  const $ = (id) => document.getElementById(id);
+  if (!$('geoPanel')) return;
+  const ref = puntoAdoptante(refPerfil());
+  const txt = $('geoTxt');
+  if (ref && ref.estado) {
+    txt.textContent = ref.gps ? `Estás cerca de ${ref.estado}. Te mostramos primero lo más cercano.` : `Tu estado: ${ref.estado}. Te mostramos primero los de tu zona.`;
+  } else if (ref) {
+    txt.textContent = 'Ordenado por cercanía a tu ciudad.';
+  } else {
+    txt.textContent = 'Dinos dónde estás y ordenamos por cercanía';
+  }
+  const tieneU = !!leerUbicacion();
+  $('gQuitar').style.display = tieneU ? '' : 'none';
+  if (ref && ref.estado && $('gEstadoTu').value !== ref.estado && !leerUbicacion()) $('gEstadoTu').value = ref.estado;
+
+  // Estados con animales (con conteo según los demás filtros)
+  const conteo = {};
+  allPets.filter(p => pasaFiltros(p, 'estado')).forEach(p => { const e = estadoDeMascota(p) || 'Sin estado'; conteo[e] = (conteo[e] || 0) + 1; });
+  const total = Object.values(conteo).reduce((a, b) => a + b, 0);
+  const sel = $('fEstado');
+  const nombres = Object.keys(conteo).sort((a, b) => a.localeCompare(b, 'es'));
+  if (fil.estado && !conteo[fil.estado]) nombres.push(fil.estado);
+  sel.innerHTML = `<option value="">Todos los estados (${total})</option>` +
+    nombres.filter(n => n !== 'Sin estado').map(n => `<option value="${n}">${n} (${conteo[n] || 0})</option>`).join('');
+  sel.value = fil.estado;
+
+  const enTuEstado = ref && ref.estado ? lista.filter(p => estadoDeMascota(p) === ref.estado).length : null;
+  $('resultCount').textContent = `${lista.length} ${lista.length === 1 ? 'animal' : 'animales'}` + (enTuEstado != null ? ` · ${enTuEstado} en tu estado` : '');
+}
+
+// ---------- Mapa (Leaflet + OpenStreetMap: gratis y sin llaves) ----------
+let mapa = null, capaPines = null, leafletListo = null;
+function cargarLeaflet() {
+  if (window.L) return Promise.resolve();
+  if (leafletListo) return leafletListo;
+  leafletListo = new Promise((ok, mal) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+    document.head.appendChild(css);
+    const js = document.createElement('script');
+    js.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    js.onload = ok; js.onerror = () => mal(new Error('leaflet'));
+    document.head.appendChild(js);
+  });
+  return leafletListo;
+}
+function ocultarMapa() { const w = document.getElementById('petMapWrap'); if (w) w.style.display = 'none'; catalogArea.style.display = ''; }
+
+async function renderMapa(lista) {
+  currentPetsList = lista;
+  const wrap = document.getElementById('petMapWrap');
+  wrap.style.display = ''; catalogArea.style.display = 'none';
+  try { await cargarLeaflet(); } catch (e) {
+    wrap.innerHTML = '<p class="geo-note">No pudimos cargar el mapa. Revisa tu conexión o usa la vista de lista.</p>'; return;
+  }
+  const L = window.L;
+  if (!mapa) {
+    mapa = L.map('petMap', { scrollWheelZoom: false }).setView([23.6, -102.5], 5);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(mapa);
+  }
+  if (capaPines) capaPines.remove();
+  capaPines = L.layerGroup().addTo(mapa);
+  const usados = {};
+  const puntos = [];
+  lista.forEach((pet, idx) => {
+    const c = coordsMascota(pet); if (!c) return;
+    const k = c.lat.toFixed(2) + ',' + c.lng.toFixed(2);
+    const n = usados[k] = (usados[k] || 0) + 1;
+    // Si varios están en el mismo municipio, se abren en abanico para verlos todos
+    const ang = n * 2.4, r = n > 1 ? 0.012 * Math.sqrt(n) : 0;
+    const lat = c.lat + Math.sin(ang) * r, lng = c.lng + Math.cos(ang) * r;
+    const d = getPetData(pet);
+    const icon = L.divIcon({ className: 'pm-pin', html: `<img src="${esc(d.photo)}" alt="">`, iconSize: [46, 46], iconAnchor: [23, 46], popupAnchor: [0, -44] });
+    const km = kmPreciso(pet);
+    const html = `<div class="pm-pop"><b>${esc(d.name)}</b><br><span>${esGato(d) ? '🐱' : '🐕'} ${esc(textoUbicacion(pet) || d.city)}${km != null ? ' · ' + esc(textoDistancia(km)) : ''}</span><br>
+      <button type="button" class="pm-ver" data-i="${idx}">Ver ficha</button>
+      <a href="${esc(urlGoogleMaps(pet))}" target="_blank" rel="noopener">Google Maps</a></div>`;
+    L.marker([lat, lng], { icon }).addTo(capaPines).bindPopup(html);
+    puntos.push([lat, lng]);
+  });
+  const ref = puntoAdoptante(refPerfil());
+  if (ref) { L.circleMarker([ref.lat, ref.lng], { radius: 8, color: '#fff', weight: 3, fillColor: '#2f7bf5', fillOpacity: 1 }).addTo(capaPines).bindTooltip('Tú'); if (!ref.aprox) puntos.push([ref.lat, ref.lng]); }
+  setTimeout(() => {
+    mapa.invalidateSize();
+    if (puntos.length > 1) mapa.fitBounds(puntos, { padding: [40, 40], maxZoom: 11 });
+    else if (puntos.length === 1) mapa.setView(puntos[0], 10);
+  }, 60);
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('.pm-ver');
+  if (b) showPetAtIndex(+b.dataset.i);
 });
 
 loadCatalog();

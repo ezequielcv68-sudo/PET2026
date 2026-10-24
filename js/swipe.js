@@ -3,7 +3,8 @@ import {
   doc, setDoc, getDoc, collection, getDocs, query, where, serverTimestamp,
   track, esc, safeUrl, PENDING_KEY,
 } from "./firebase-config.js";
-import { ordenarPorMatch, calcularMatch, explicarMatch } from "./matching.js";
+import { ordenarPorMatch, calcularMatch, explicarMatch, kmHasta } from "./matching.js";
+import { textoUbicacion, textoDistancia, puntoAdoptante } from "./geo.js";
 import { avisarRefugio } from "./avisos.js";
 
 let uid = null;
@@ -119,7 +120,7 @@ function render() {
         </div>
         ${porque ? `<div style="font-size:0.78rem;color:#2E6B5D;margin-bottom:4px;">${esc(porque)}</div>` : ""}
         <p class="desc">${escapeHtml(pet.descripcion || "")}</p>
-        <div class="shelter-line">📍 ${escapeHtml(pet.shelterName || "Refugio")}${pet.shelterVerified === true ? " ✓" : ""} · ${escapeHtml(pet.city || "")}</div>
+        <div class="shelter-line">📍 ${escapeHtml(pet.shelterName || "Refugio")}${pet.shelterVerified === true ? " ✓" : ""} · ${escapeHtml(textoUbicacion(pet) || pet.city || "")}${(() => { const r = puntoAdoptante(perfil); const km = kmHasta(perfil, pet); return r && !r.aprox && km != null && km <= 120 ? " · " + escapeHtml(textoDistancia(km)) : ""; })()}</div>
       </div>
     `;
     wrap.appendChild(card);

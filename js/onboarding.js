@@ -7,6 +7,10 @@ import {
   auth, db, onAuthStateChanged, signOut,
   doc, setDoc, getDoc, updateDoc, serverTimestamp, track,
 } from "./firebase-config.js";
+import { ESTADOS, inferirEstado, normalizarEstado, geocodificar, guardarUbicacion } from "./geo.js";
+
+// Lista de estados para el selector
+(() => { const sel = document.getElementById("obEstado"); if (sel) sel.innerHTML = `<option value="">Elige tu estado…</option>` + ESTADOS.map(e => `<option value="${e.n}">${e.n}</option>`).join(""); })();
 
 let uid = null;
 let coords = null;
@@ -81,6 +85,7 @@ onAuthStateChanged(auth, async (user) => {
       const u = userDoc.data();
       if (u.role === "shelter") { window.location.href = "shelter.html"; return; }
       if (u.city) $("obCity").value = u.city;
+      if (u.estado || u.city) $("obEstado").value = normalizarEstado(u.estado) || inferirEstado(u.city);
       if (u.phone) $("obPhone").value = u.phone;
     }
   } catch (err) {
@@ -94,10 +99,11 @@ onAuthStateChanged(auth, async (user) => {
       const data = profileDoc.data();
 
       if (data.city) $("obCity").value = data.city;
+      if (data.estado || data.city) $("obEstado").value = normalizarEstado(data.estado) || inferirEstado(data.city);
       if (data.phone) $("obPhone").value = data.phone;
       if (data.biografia) $("obBio").value = data.biografia;
 
-      if (data.lat && data.lng) {
+      if (data.gps && data.lat && data.lng) {
         coords = { lat: data.lat, lng: data.lng };
         $("ubicacionMsg").textContent = "✓ Ubicación guardada previamente.";
       }
@@ -160,12 +166,19 @@ async function guardar() {
     return false;
   }
 
-  const data = { ...perfil, phone, city, biografia, updatedAt: serverTimestamp() };
-  if (coords) { data.lat = coords.lat; data.lng = coords.lng; }
+  const estado = $("obEstado").value || inferirEstado(city);
+  const data = { ...perfil, phone, city, estado, biografia, updatedAt: serverTimestamp() };
+  if (!coords) {
+    // Sin GPS: se usa la ciudad escrita para saber qué tan cerca están los animales
+    const g = await geocodificar(city, estado);
+    if (g) { data.lat = g.lat; data.lng = g.lng; }
+  } else { data.lat = coords.lat; data.lng = coords.lng; }
+  data.gps = !!coords;
+  guardarUbicacion({ estado, lat: data.lat, lng: data.lng, gps: !!coords });
 
   try {
     await setDoc(doc(db, "adopterProfiles", uid), data, { merge: true });
-    await updateDoc(doc(db, "users", uid), { phone, city });
+    await updateDoc(doc(db, "users", uid), { phone, city, estado });
     track("perfil_guardado");
     return true;
   } catch (err) {

@@ -5,10 +5,12 @@ import {
   ref, uploadBytes, getDownloadURL,
 } from "./firebase-config.js";
 import { abrirTarjeta } from "./sharecard.js";
+import { ESTADOS, inferirEstado, normalizarEstado, geocodificar } from "./geo.js";
 
 let uid = null;
 let shelterName = "";
 let shelterCity = "";
+let shelterEstado = "";
 let shelterVerified = false;
 let selectedFile = null;
 let editingPetId = null;
@@ -27,11 +29,28 @@ onAuthStateChanged(auth, async (user) => {
   }
   shelterName = userSnap.data().shelterName || userSnap.data().name || "Refugio";
   shelterCity = userSnap.data().city || "";
+  shelterEstado = normalizarEstado(userSnap.data().estado) || inferirEstado(shelterCity);
+  llenarEstados();
   shelterVerified = userSnap.data().verified === true;
   document.getElementById("shelterNameTag").innerHTML = `${escapeHtml(shelterName)} · ${shelterVerified ? '<span class="ok">✓ Verificado</span>' : '<span class="pend">En revisión</span>'}`;
 
   await cargarMascotas();
 });
+
+
+// ---------- Ubicación: estados ----------
+function soloMunicipio(texto, estado) {
+  let t = String(texto || "").trim();
+  if (estado) t = t.replace(new RegExp("[,\\s]+" + estado.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "i"), "").trim();
+  return t;
+}
+function llenarEstados() {
+  for (const id of ["pEstado", "cfgEstado"]) {
+    const sel = document.getElementById(id);
+    if (!sel || sel.options.length) continue;
+    sel.innerHTML = `<option value="">Elige el estado…</option>` + ESTADOS.map(e => `<option value="${e.n}">${e.n}</option>`).join("");
+  }
+}
 
 // ---------- Interesados nuevos (desde la última vez que abriste cada mascota) ----------
 function claveVistos() { return `pm_vistos_${uid}`; }
@@ -285,7 +304,8 @@ function abrirModalEditar(pet) {
   document.getElementById("pRaza").value = pet.raza || "";
   document.getElementById("pEdad").value = pet.edad || "";
   document.getElementById("pDescripcion").value = pet.descripcion || "";
-  document.getElementById("pCiudad").value = pet.city || shelterCity;
+  document.getElementById("pCiudad").value = pet.municipio || soloMunicipio(pet.city || shelterCity, normalizarEstado(pet.estado) || inferirEstado(pet.city));
+  document.getElementById("pEstado").value = normalizarEstado(pet.estado) || inferirEstado(pet.city) || shelterEstado;
 
   setChipSelected("pEspecie", pet.especie);
   setChipSelected("pTamano", pet.tamano);
@@ -346,7 +366,8 @@ function resetForm() {
   document.getElementById("pRaza").value = "";
   document.getElementById("pEdad").value = "";
   document.getElementById("pDescripcion").value = "";
-  document.getElementById("pCiudad").value = shelterCity;
+  document.getElementById("pCiudad").value = soloMunicipio(shelterCity, shelterEstado);
+  document.getElementById("pEstado").value = shelterEstado || "";
   document.getElementById("photoPreviewWrap").innerHTML = "";
   selectedFile = null;
   document.querySelectorAll(".choice-chip.selected").forEach(c => c.classList.remove("selected"));
@@ -365,12 +386,15 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
   const buenoConNinos = getSelected("pNinos");
   const buenoConOtrasMascotas = getSelected("pOtrasMascotas");
   const descripcion = document.getElementById("pDescripcion").value.trim();
-  const city = document.getElementById("pCiudad").value.trim();
+  const municipio = document.getElementById("pCiudad").value.trim();
+  const estado = document.getElementById("pEstado").value;
 
-  if (!nombre || !especie || !tamano || !energia || !nivelDificultad || !city) {
-    document.getElementById("petMsg").innerHTML = `<div class="error-msg">Completa nombre, especie, tamaño, energía, cuidado y ciudad.</div>`;
+  if (!nombre || !especie || !tamano || !energia || !nivelDificultad || !estado || !municipio) {
+    document.getElementById("petMsg").innerHTML = `<div class="error-msg">Completa nombre, especie, tamaño, energía, cuidado, estado y municipio.</div>`;
     return;
   }
+  // «Cuernavaca, Morelos» (así lo siguen mostrando las tarjetas de siempre)
+  const city = municipio.toLowerCase().includes(estado.toLowerCase()) ? municipio : `${municipio}, ${estado}`;
 
   btn.disabled = true;
   btn.textContent = editingPetId ? "Guardando..." : "Publicando...";
@@ -383,6 +407,9 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
       photoURL = await getDownloadURL(fileRef);
     }
 
+    // Coordenadas para el mapa y «cerca de mí» (si falla la red, queda el centro del estado)
+    const geo = await geocodificar(municipio, estado);
+
     const petData = {
       shelterId: uid,
       shelterName,
@@ -391,9 +418,10 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
       nivelDificultad,
       buenoConNinos: buenoConNinos === "true",
       buenoConOtrasMascotas: buenoConOtrasMascotas === "true",
-      descripcion, city,
+      descripcion, city, estado, municipio,
       updatedAt: serverTimestamp(),
     };
+    if (geo) { petData.lat = geo.lat; petData.lng = geo.lng; }
 
     if (photoURL) petData.photoURL = photoURL;
 
@@ -584,6 +612,8 @@ if (btnConfigRefugio) {
         const d = snap.data();
         document.getElementById("cfgFb").value = d.facebook || "";
         document.getElementById("cfgIg").value = d.instagram || "";
+        document.getElementById("cfgEstado").value = normalizarEstado(d.estado) || inferirEstado(d.city) || "";
+        document.getElementById("cfgCiudad").value = soloMunicipio(d.city || "", normalizarEstado(d.estado) || inferirEstado(d.city));
       }
       document.getElementById("cfgMsg").innerHTML = "";
     } catch(err) {
@@ -602,10 +632,18 @@ document.getElementById("btnGuardarConfig").onclick = async () => {
   btn.textContent = "Guardando...";
   
   try {
-    await updateDoc(doc(db, "users", uid), {
+    const cfgEstado = document.getElementById("cfgEstado").value;
+    const cfgMun = document.getElementById("cfgCiudad").value.trim();
+    const datos = {
       facebook: document.getElementById("cfgFb").value.trim(),
       instagram: document.getElementById("cfgIg").value.trim()
-    });
+    };
+    if (cfgEstado) {
+      datos.estado = cfgEstado;
+      if (cfgMun) datos.city = cfgMun.toLowerCase().includes(cfgEstado.toLowerCase()) ? cfgMun : `${cfgMun}, ${cfgEstado}`;
+    }
+    await updateDoc(doc(db, "users", uid), datos);
+    if (cfgEstado) { shelterEstado = cfgEstado; if (datos.city) shelterCity = datos.city; }
     document.getElementById("cfgMsg").innerHTML = `<div class="ok-msg" style="color:var(--mint); margin-top:8px; font-weight:bold;">✓ Guardado con éxito</div>`;
     
     // Cerrar el modal automáticamente después de un segundo
