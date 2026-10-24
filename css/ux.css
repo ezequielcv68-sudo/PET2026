@@ -292,3 +292,81 @@
 .pet-card .shelter-line { margin-top: 6px; }
 /* los botones ✕ ♥ no quedan tapados por la barra de abajo */
 .deck-actions { padding-bottom: 96px; }
+
+/* ============================================================
+   DESCUBRIR — TARJETA COMPLETA (estilo Tinder)
+   La foto cubre toda la tarjeta; nombre y ubicación van encima;
+   al tocar la tarjeta se abre la ficha completa en una ventana.
+   ============================================================ */
+.deck-wrap { height: clamp(380px, calc(100vh - 270px), 760px); height: clamp(380px, calc(100dvh - 270px), 760px); min-height: 380px; }
+.pet-card { cursor: pointer; border-radius: 26px; background: #2b2722; }
+.pet-card .photo, .pet-card .photo[data-fit] {
+  position: absolute; inset: 0; width: 100%; height: 100% !important; aspect-ratio: auto !important;
+  max-height: none; min-height: 0; flex: none; border-radius: 0;
+}
+/* foto casi vertical: llena toda la tarjeta; muy ancha/alta: se ve completa sobre fondo difuminado */
+.pet-card .photo.cover::after { background-size: cover; }
+.pet-card .photo.cover::before { display: none; }
+
+/* degradado para que el texto se lea sobre cualquier foto */
+.pet-card .info {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 70px 18px 18px; color: #fff;
+  background: linear-gradient(to top, rgba(18, 14, 10, .82) 0%, rgba(18, 14, 10, .55) 45%, rgba(18, 14, 10, 0) 100%);
+  pointer-events: none;
+}
+.pet-card .name-row { display: flex; align-items: baseline; gap: 10px; margin: 0; }
+.pet-card .name-row h2 { color: #fff; font-size: 2rem; line-height: 1.05; text-shadow: 0 2px 10px rgba(0, 0, 0, .45); margin: 0; }
+.pet-card .name-row .age { color: rgba(255, 255, 255, .92); font-size: 1.15rem; font-weight: 600; }
+.pet-card .loc-line { margin-top: 6px; font-size: .9rem; color: rgba(255, 255, 255, .95); text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
+.pet-card .more-hint {
+  display: inline-block; margin-top: 10px; font-size: .74rem; font-weight: 700; letter-spacing: .03em;
+  padding: 4px 11px; border-radius: 999px; background: rgba(255, 255, 255, .22); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.pet-card .stamp { z-index: 4; top: 14px; right: 14px; }
+.pet-card .swipe-indicator { z-index: 5; top: 28px; bottom: auto; }
+.pet-card .swipe-indicator.like { left: 18px; }
+.pet-card .swipe-indicator.nope { right: 18px; }
+
+/* botones siempre a la vista, encima de la barra inferior */
+.deck-actions { padding: 14px 0 92px; gap: 34px; justify-content: center; }
+.deck-btn { width: 66px; height: 66px; font-size: 1.7rem; box-shadow: 0 8px 22px rgba(0, 0, 0, .18); }
+
+/* ---------- Ficha emergente ---------- */
+body.ficha-open { overflow: hidden; }
+.ficha-ov {
+  position: fixed; inset: 0; z-index: 300; background: rgba(20, 15, 10, .62);
+  display: flex; align-items: flex-end; justify-content: center; animation: fichaFade .2s ease;
+}
+.ficha {
+  position: relative; width: 100%; max-width: 520px; max-height: 92vh; max-height: 92dvh;
+  background: var(--cream, #FBF8F0); border-radius: 26px 26px 0 0; overflow: hidden;
+  display: flex; flex-direction: column; animation: fichaUp .28s cubic-bezier(.2, .8, .2, 1);
+}
+.ficha-x {
+  position: absolute; top: 12px; right: 12px; z-index: 5; width: 38px; height: 38px; border-radius: 50%;
+  border: 0; background: rgba(255, 255, 255, .92); color: #1C1A16; font-size: 1.05rem; font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .25); cursor: pointer;
+}
+.ficha-foto { position: relative; flex: 0 0 auto; height: 38vh; height: 38dvh; max-height: 340px; min-height: 200px; background-size: cover; background-position: center; overflow: hidden; }
+.ficha-foto::before { content: ""; position: absolute; inset: 0; backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); background: rgba(0, 0, 0, .12); }
+.ficha-foto-img { position: absolute; inset: 0; background-size: contain; background-position: center; background-repeat: no-repeat; }
+.ficha-body { padding: 16px 20px 6px; overflow-y: auto; flex: 1 1 auto; -webkit-overflow-scrolling: touch; }
+.ficha-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.ficha-head h2 { margin: 0; font-size: 1.8rem; }
+.ficha-head .age { color: #6b6256; font-weight: 600; }
+.ficha-match { margin-left: auto; background: #E3F2EC; color: #2E6B5D; border: 1.5px dashed #2E6B5D; border-radius: 999px; padding: 3px 11px; font-size: .8rem; font-weight: 800; }
+.ficha-why { list-style: none; margin: 10px 0; padding: 0; font-size: .88rem; color: #2E6B5D; }
+.ficha-why li { padding: 2px 0; }
+.ficha-why li.warn { color: #b0562f; }
+.ficha-desc { margin: 10px 0; line-height: 1.5; font-size: .95rem; color: #3a352d; white-space: pre-line; }
+.ficha-shelter, .ficha-ubic { font-size: .9rem; margin: 6px 0; color: #3a352d; }
+.ficha-shelter .ver { color: #2E6B5D; font-weight: 700; }
+.ficha-maps { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 6px; }
+.ficha-maps a { flex: 1 1 140px; text-align: center; padding: 10px 12px; border-radius: 12px; background: #fff; border: 1.5px solid #e6dfd0; color: #1C1A16; font-weight: 700; font-size: .85rem; text-decoration: none; }
+.ficha-actions { display: flex; justify-content: center; gap: 34px; padding: 12px 0 calc(16px + env(safe-area-inset-bottom)); background: linear-gradient(to top, var(--cream, #FBF8F0) 70%, rgba(251, 248, 240, 0)); }
+@keyframes fichaUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fichaFade { from { opacity: 0; } to { opacity: 1; } }
+@media (min-width: 700px) {
+  .ficha-ov { align-items: center; }
+  .ficha { border-radius: 26px; max-height: 88vh; }
+}
