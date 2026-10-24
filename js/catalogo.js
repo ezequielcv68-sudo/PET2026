@@ -343,27 +343,25 @@ function montarPanel() {
   const panel = document.createElement('div');
   panel.id = 'geoPanel';
   panel.innerHTML = `
-    <div class="geo-loc">
-      <span class="geo-pin">📍</span>
-      <span id="geoTxt" class="geo-txt">Dinos dónde estás y ordenamos por cercanía</span>
-      <select id="gEstadoTu" aria-label="Tu estado"><option value="">Elige tu estado…</option>${ESTADOS.map(e => `<option value="${e.n}">${e.n}</option>`).join('')}</select>
-      <button type="button" id="gGPS" class="geo-btn">🎯 Usar mi ubicación</button>
-      <button type="button" id="gQuitar" class="geo-btn ghost" style="display:none">✕ Quitar</button>
-    </div>
-    <div class="geo-filters">
-      <select id="fEstado" aria-label="Estado"></select>
-      <select id="fTamano" aria-label="Tamaño"><option value="">Cualquier tamaño</option>${opts([['pequeno','Pequeño'],['mediano','Mediano'],['grande','Grande']])}</select>
-      <select id="fEnergia" aria-label="Energía"><option value="">Cualquier energía</option>${opts([['bajo','Tranquilo'],['medio','Activo'],['alto','Muy activo']])}</select>
-      <select id="fEdad" aria-label="Edad"><option value="">Cualquier edad</option>${opts([['cachorro','Cachorro (menos de 1 año)'],['joven','Joven (1 a 3 años)'],['adulto','Adulto (4 a 7 años)'],['senior','Senior (8 años o más)']])}</select>
-      <select id="fOrden" aria-label="Ordenar por">${opts([['auto','Orden recomendado'],['cerca','📍 Más cerca de mí'],['paraTi','✨ Más compatibles'],['nuevos','🆕 Más recientes']])}</select>
-    </div>
-    <div class="geo-row">
-      <div id="resultCount" class="geo-count"></div>
+    <div class="geo-top">
+      <select id="gEstadoTu" class="geo-pill" aria-label="Tu estado"><option value="">📍 ¿Dónde estás?</option>${ESTADOS.map(e => `<option value="${e.n}">📍 ${e.n}</option>`).join('')}</select>
+      <button type="button" id="gGPS" class="geo-icon" title="Usar mi ubicación" aria-label="Usar mi ubicación">🎯</button>
+      <button type="button" id="gFiltrosBtn" class="geo-pill geo-toggle" aria-expanded="false">⚙️ Filtros<span id="gFiltrosN" class="geo-n" style="display:none"></span></button>
       <div class="geo-view">
         <button type="button" data-vista="lista" class="on">🧱 Lista</button>
         <button type="button" data-vista="mapa">🗺️ Mapa</button>
       </div>
     </div>
+    <div id="geoFiltros" class="geo-filters" style="display:none">
+      <select id="fEstado" aria-label="Estado"></select>
+      <select id="fTamano" aria-label="Tamaño"><option value="">Cualquier tamaño</option>${opts([['pequeno','Pequeño'],['mediano','Mediano'],['grande','Grande']])}</select>
+      <select id="fEnergia" aria-label="Energía"><option value="">Cualquier energía</option>${opts([['bajo','Tranquilo'],['medio','Activo'],['alto','Muy activo']])}</select>
+      <select id="fEdad" aria-label="Edad"><option value="">Cualquier edad</option>${opts([['cachorro','Cachorro (menos de 1 año)'],['joven','Joven (1 a 3 años)'],['adulto','Adulto (4 a 7 años)'],['senior','Senior (8 años o más)']])}</select>
+      <select id="fOrden" aria-label="Ordenar por">${opts([['auto','Orden recomendado'],['cerca','📍 Más cerca de mí'],['paraTi','✨ Más compatibles'],['nuevos','🆕 Más recientes']])}</select>
+      <div class="geo-links"><button type="button" id="gLimpiar" class="geo-link-btn">Limpiar filtros</button><button type="button" id="gQuitar" class="geo-link-btn" style="display:none">Quitar mi ubicación</button></div>
+    </div>
+    <div id="resultCount" class="geo-count"></div>
+    <span id="geoTxt" style="display:none"></span>
     <div id="petMapWrap" style="display:none"><div id="petMap"></div><p class="geo-note">Los pines muestran el municipio de cada animal, nunca una dirección exacta.</p></div>`;
   filtros.insertAdjacentElement('afterend', panel);
 
@@ -397,6 +395,17 @@ function montarPanel() {
     } finally { btn.disabled = false; btn.textContent = '🎯 Usar mi ubicación'; }
   };
   $('gQuitar').onclick = () => { guardarUbicacion(null); $('gEstadoTu').value = ''; reordenarPorUbicacion(); };
+  $('gFiltrosBtn').onclick = () => {
+    const f = $('geoFiltros'); const abrir = f.style.display === 'none';
+    f.style.display = abrir ? '' : 'none';
+    $('gFiltrosBtn').setAttribute('aria-expanded', String(abrir));
+  };
+  $('gLimpiar').onclick = () => {
+    Object.assign(fil, { estado: '', tamano: '', energia: '', edad: '', orden: 'auto' });
+    ['fTamano', 'fEnergia', 'fEdad'].forEach(id => $(id).value = '');
+    $('fOrden').value = 'auto';
+    refrescar();
+  };
   // Si ya había ubicación guardada, se refleja
   const u = leerUbicacion();
   if (u && u.estado) $('gEstadoTu').value = u.estado;
@@ -422,6 +431,8 @@ function actualizarPanel(lista) {
   }
   const tieneU = !!leerUbicacion();
   $('gQuitar').style.display = tieneU ? '' : 'none';
+  const nAct = [fil.estado, fil.tamano, fil.energia, fil.edad, fil.orden !== 'auto' ? fil.orden : ''].filter(Boolean).length;
+  const bd = $('gFiltrosN'); bd.textContent = nAct; bd.style.display = nAct ? '' : 'none';
   if (ref && ref.estado && $('gEstadoTu').value !== ref.estado && !leerUbicacion()) $('gEstadoTu').value = ref.estado;
 
   // Estados con animales (con conteo según los demás filtros)
