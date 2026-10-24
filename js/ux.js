@@ -75,6 +75,7 @@ function adaptarFoto(el) {
     const enSwipe = el.closest(".pet-card");
     const ratio = enSwipe ? Math.min(Math.max(r, 0.6), 2.1) : Math.min(Math.max(r, 0.75), 1.9);
     el.style.aspectRatio = String(ratio);
+    if (enSwipe) el.classList.toggle('cover', r >= 0.6 && r <= 0.98);
   };
   im.onerror = () => { delete el.dataset.fit; };
   im.src = u;

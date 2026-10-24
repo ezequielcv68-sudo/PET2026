@@ -4,7 +4,7 @@ import {
   track, esc, safeUrl, PENDING_KEY,
 } from "./firebase-config.js";
 import { ordenarPorMatch, calcularMatch, explicarMatch, kmHasta } from "./matching.js";
-import { textoUbicacion, textoDistancia, puntoAdoptante } from "./geo.js";
+import { textoUbicacion, textoDistancia, puntoAdoptante, urlGoogleMaps, urlComoLlegar } from "./geo.js";
 import { avisarRefugio } from "./avisos.js";
 
 let uid = null;
@@ -104,6 +104,8 @@ function render() {
     const { razones, avisos } = explicarMatch(perfil, pet);
     const fotoSegura = safeUrl(pet.photoURL, fotoDefault(pet.especie));
     const porque = [...razones.slice(0, 2).map(r => "✓ " + r), ...avisos.slice(0, 1).map(a => "⚠ " + a)].join(" · ");
+    const kmTxt = (() => { const r = puntoAdoptante(perfil); const km = kmHasta(perfil, pet); return r && !r.aprox && km != null && km <= 120 ? textoDistancia(km) : ""; })();
+    const ubic = [textoUbicacion(pet) || pet.city || "", kmTxt].filter(Boolean).join(" · ");
     card.innerHTML = `
       <div class="photo" style="background-image:url('${esc(fotoSegura)}')">
         <div class="stamp">${pet.matchScore}% match</div>
@@ -112,17 +114,11 @@ function render() {
       </div>
       <div class="info">
         <div class="name-row"><h2>${escapeHtml(pet.nombre || "Sin nombre")}</h2><span class="age">${esc(pet.edad || "?")}</span></div>
-        <div class="tag-row">
-          <span class="tag">${etiquetaEspecie(pet.especie)}</span>
-          <span class="tag">${esc(pet.raza || "Raza mixta")}</span>
-          <span class="tag">${etiquetaTamano(pet.tamano)}</span>
-          <span class="tag">${etiquetaEnergia(pet.energia)}</span>
-        </div>
-        ${porque ? `<div style="font-size:0.78rem;color:#2E6B5D;margin-bottom:4px;">${esc(porque)}</div>` : ""}
-        <p class="desc">${escapeHtml(pet.descripcion || "")}</p>
-        <div class="shelter-line">📍 ${escapeHtml(pet.shelterName || "Refugio")}${pet.shelterVerified === true ? " ✓" : ""} · ${escapeHtml(textoUbicacion(pet) || pet.city || "")}${(() => { const r = puntoAdoptante(perfil); const km = kmHasta(perfil, pet); return r && !r.aprox && km != null && km <= 120 ? " · " + escapeHtml(textoDistancia(km)) : ""; })()}</div>
+        ${ubic ? `<div class="loc-line">📍 ${escapeHtml(ubic)}</div>` : ""}
+        <div class="more-hint">Toca para ver más</div>
       </div>
     `;
+    card._ficha = () => abrirFicha(pet, { razones, avisos, porque, ubic, fotoSegura });
     wrap.appendChild(card);
     if (isTop) attachDrag(card, pet);
   });
@@ -148,21 +144,21 @@ function render() {
 }
 
 function attachDrag(card, pet) {
-  let startX = 0, startY = 0, dx = 0, dragging = false;
+  let startX = 0, startY = 0, dx = 0, dy0 = 0, dragging = false, t0 = 0;
   const likeInd = card.querySelector(".swipe-indicator.like");
   const nopeInd = card.querySelector(".swipe-indicator.nope");
 
   function onDown(e) {
     dragging = true;
     const p = e.touches ? e.touches[0] : e;
-    startX = p.clientX; startY = p.clientY;
+    startX = p.clientX; startY = p.clientY; dx = 0; dy0 = 0; t0 = Date.now();
     card.style.transition = "none";
   }
   function onMove(e) {
     if (!dragging) return;
     const p = e.touches ? e.touches[0] : e;
     dx = p.clientX - startX;
-    const dy = p.clientY - startY;
+    const dy = p.clientY - startY; dy0 = dy;
     const rot = dx / 18;
     card.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
     likeInd.style.opacity = Math.max(0, Math.min(1, dx / 90));
@@ -172,6 +168,11 @@ function attachDrag(card, pet) {
     if (!dragging) return;
     dragging = false;
     card.style.transition = "";
+    if (Math.abs(dx) < 8 && Math.abs(dy0) < 8 && Date.now() - t0 < 600) {
+      card.style.transform = "translate(0,0) rotate(0)";
+      if (card._ficha) card._ficha();
+      dx = 0; return;
+    }
     if (dx > 110) { animarSalida(card, 1, () => commitSwipe(true)); }
     else if (dx < -110) { animarSalida(card, -1, () => commitSwipe(false)); }
     else {
@@ -184,6 +185,53 @@ function attachDrag(card, pet) {
   card.addEventListener("pointerdown", onDown);
   window.addEventListener("pointermove", onMove);
   window.addEventListener("pointerup", onUp);
+}
+
+
+// ---------- Ficha emergente (al tocar la foto) ----------
+function abrirFicha(pet, ctx) {
+  cerrarFicha();
+  const { razones, avisos, ubic, fotoSegura } = ctx;
+  const mapa = urlGoogleMaps(pet), ruta = urlComoLlegar(pet);
+  const ov = document.createElement("div");
+  ov.className = "ficha-ov"; ov.id = "fichaOv";
+  ov.innerHTML = `
+    <div class="ficha" role="dialog" aria-modal="true" aria-label="Ficha de ${esc(pet.nombre || "mascota")}">
+      <button class="ficha-x" aria-label="Cerrar">✕</button>
+      <div class="ficha-foto" style="background-image:url('${esc(fotoSegura)}')"><div class="ficha-foto-img" style="background-image:url('${esc(fotoSegura)}')"></div></div>
+      <div class="ficha-body">
+        <div class="ficha-head"><h2>${escapeHtml(pet.nombre || "Sin nombre")}</h2><span class="age">${esc(pet.edad || "?")}</span><span class="ficha-match">${pet.matchScore}% match</span></div>
+        <div class="tag-row">
+          <span class="tag">${etiquetaEspecie(pet.especie)}</span>
+          <span class="tag">${esc(pet.raza || "Raza mixta")}</span>
+          <span class="tag">${etiquetaTamano(pet.tamano)}</span>
+          <span class="tag">${etiquetaEnergia(pet.energia)}</span>
+        </div>
+        ${(razones.length || avisos.length) ? `<ul class="ficha-why">${razones.slice(0, 4).map(r => `<li>✓ ${esc(r)}</li>`).join("")}${avisos.slice(0, 2).map(a => `<li class="warn">⚠ ${esc(a)}</li>`).join("")}</ul>` : ""}
+        ${pet.descripcion ? `<p class="ficha-desc">${escapeHtml(pet.descripcion)}</p>` : ""}
+        <div class="ficha-shelter">🏠 ${escapeHtml(pet.shelterName || "Refugio")}${pet.shelterVerified === true ? ' <span class="ver">✓ verificado</span>' : ""}</div>
+        ${ubic ? `<div class="ficha-ubic">📍 ${escapeHtml(ubic)}</div>` : ""}
+        ${mapa ? `<div class="ficha-maps"><a href="${esc(mapa)}" target="_blank" rel="noopener">🗺️ Ver en Google Maps</a><a href="${esc(ruta)}" target="_blank" rel="noopener">🧭 Cómo llegar</a></div>` : ""}
+      </div>
+      <div class="ficha-actions">
+        <button class="deck-btn pass" id="fPass" aria-label="Paso">✕</button>
+        <button class="deck-btn like" id="fLike" aria-label="Me gusta">♥</button>
+      </div>
+    </div>`;
+  document.body.appendChild(ov);
+  document.body.classList.add("ficha-open");
+  ov.addEventListener("click", (e) => { if (e.target === ov) cerrarFicha(); });
+  ov.querySelector(".ficha-x").onclick = cerrarFicha;
+  ov.querySelector("#fPass").onclick = () => { cerrarFicha(); document.getElementById("btnPass")?.click(); };
+  ov.querySelector("#fLike").onclick = () => { cerrarFicha(); document.getElementById("btnLike")?.click(); };
+  document.addEventListener("keydown", escCierra);
+  ov.querySelector(".ficha-x").focus();
+}
+function escCierra(e) { if (e.key === "Escape") cerrarFicha(); }
+function cerrarFicha() {
+  document.getElementById("fichaOv")?.remove();
+  document.body.classList.remove("ficha-open");
+  document.removeEventListener("keydown", escCierra);
 }
 
 function animarSalida(card, dir, cb) {
