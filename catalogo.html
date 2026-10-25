@@ -231,8 +231,8 @@
 
 <!-- Modal Interactivo con Navegación -->
 <div class="modal-overlay" id="petModal">
-  <div class="modal-card">
-    <button class="modal-close" id="closeModal">✕</button>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <button class="modal-close" id="closeModal" aria-label="Cerrar">✕</button>
     
     <!-- Flechas de navegación -->
     <button class="modal-nav-btn prev-btn" id="prevPetBtn" aria-label="Anterior">❮</button>
@@ -249,8 +249,8 @@
 
       <div class="modal-actions">
         <button class="btn-match" id="btnMatchAction">Me interesa 🐾</button>
-        <button class="btn-match" id="btnShare" type="button" style="background:#4F9D8D; flex:0 0 auto; padding:14px 18px;" aria-label="Compartir">Compartir</button>
-        <button class="btn-match" id="btnCard" type="button" style="background:#1C1A16; flex:0 0 auto; padding:14px 18px;" aria-label="Crear tarjeta para historias">🖼️ Tarjeta</button>
+        <button class="btn-match" id="btnShare" type="button" style="background:#2f7f70;" aria-label="Compartir">Compartir</button>
+        <button class="btn-match" id="btnCard" type="button" style="background:#1C1A16;" aria-label="Crear tarjeta para historias">🖼️ Tarjeta</button>
       </div>
     </div>
   </div>
