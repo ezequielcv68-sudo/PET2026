@@ -190,12 +190,16 @@
 <div id="configOverlay" style="display:none; position:fixed; inset:0; background:rgba(28,26,22,0.6); z-index:60; align-items:center; justify-content:center; padding:20px;">
   <div class="panel" style="max-width:420px; width:100%;">
     <h2>Perfil del Refugio</h2>
-    <p class="sub">Agrega tus redes sociales para que los adoptantes te conozcan mejor.</p>
+    <p class="sub">Agrega tu WhatsApp y tus redes para que los adoptantes te contacten y te conozcan mejor.</p>
     
     <label>Estado del refugio</label>
     <select id="cfgEstado" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(28,26,22,.15);font:inherit;margin-bottom:8px;"></select>
     <label>Municipio o ciudad del refugio</label>
     <input type="text" id="cfgCiudad" placeholder="Ej. Cuernavaca">
+
+    <label>WhatsApp del refugio</label>
+    <input type="tel" id="cfgWa" inputmode="tel" placeholder="Ej. 777 123 4567" autocomplete="tel">
+    <p style="font-size:.8rem;color:var(--ink-soft);margin:-2px 0 10px;line-height:1.4;">Cuando alguien da «Me interesa» a uno de tus animales, le mostramos un botón para escribirte directo por WhatsApp con su información. Solo lo ven personas con interés.</p>
 
     <label>Facebook (Enlace o usuario)</label>
     <input type="text" id="cfgFb" placeholder="Ej. facebook.com/mirefugio">

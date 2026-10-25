@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Test de compatibilidad — PetMatch</title>
-<meta name="description" content="Contesta 8 preguntas en 2 minutos y descubre qué perros y gatos de refugio se adaptan a tu estilo de vida. Sin registro.">
+<meta name="description" content="Contesta unas preguntas rápidas en 2 minutos y descubre qué perros y gatos de refugio se adaptan a tu estilo de vida. Sin registro.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="¿Qué mejor amigo de refugio va contigo? — PetMatch">
 <meta property="og:description" content="Test de 2 minutos, sin registro. Descubre tu match.">
@@ -56,6 +56,33 @@
   .cta-save h3 { color: var(--bg-soft); margin-bottom: 6px; }
   .cta-save p { color: rgba(251,248,240,0.7); margin: 0 0 14px; font-size: 0.92rem; }
   .progress { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-faint); margin-bottom: 14px; }
+
+  /* ---- Test por pasos: una pregunta por pantalla ---- */
+  .st { padding-top: 14px; }
+  .st-top { display: flex; align-items: center; justify-content: space-between; min-height: 32px; }
+  .st-back { background: none; border: 0; font: inherit; font-weight: 700; color: var(--ink-soft); cursor: pointer; padding: 6px 4px; min-height: 40px; }
+  .st-back[hidden] { visibility: hidden; display: inline-block; }
+  .st-count { font-size: .82rem; font-weight: 700; color: var(--mint); }
+  .st .q-track { height: 7px; border-radius: 99px; background: var(--mint-bg); overflow: hidden; margin: 2px 0 18px; }
+  .st .q-track i { display: block; height: 100%; width: 0; background: var(--mint); border-radius: 99px; transition: width .35s ease; }
+  .st-q { animation: stIn .28s ease; }
+  @keyframes stIn { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+  .st-q h3 { font-size: clamp(1.25rem, 5vw, 1.5rem); line-height: 1.25; margin: 0 0 6px; }
+  .st-why { font-size: .88rem; color: var(--ink-soft); margin: 0 0 16px; line-height: 1.45; }
+  .st-opts { display: flex; flex-direction: column; gap: 10px; }
+  .st-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; font-size: 1rem; background: #fff; border: 2px solid rgba(28,26,22,.1); border-radius: 16px; padding: 14px 16px; min-height: 56px; cursor: pointer; color: var(--ink); transition: border-color .15s, background .15s, transform .1s; }
+  .st-opt:hover { border-color: var(--mint); }
+  .st-opt:active { transform: scale(.98); }
+  .st-opt:focus-visible, .st-back:focus-visible, .st-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .st-opt.sel { border-color: var(--mint); background: var(--mint-bg); font-weight: 700; }
+  .st-opt .ic { font-size: 1.5rem; width: 32px; text-align: center; flex: none; }
+  .st-link { background: none; border: 0; font: inherit; font-weight: 700; color: var(--ink-soft); text-decoration: underline; cursor: pointer; margin: 14px auto 0; display: block; padding: 8px; min-height: 40px; }
+  .st-live { margin-top: 16px; font-size: .84rem; font-weight: 700; color: #2E6B5D; background: var(--mint-bg); border-radius: 12px; padding: 9px 12px; display: none; }
+  .st-live.show { display: block; }
+  .st-loc select, .st-loc input { width: 100%; padding: 13px; border-radius: 12px; border: 1.5px solid rgba(28,26,22,.18); font: inherit; font-size: 1rem; margin-bottom: 10px; background: #fff; }
+  .st-gps { background: #fff; border: 2px dashed var(--mint); color: #1F5C50; }
+  .st-note { font-size: .8rem; color: var(--ink-soft); margin: 4px 2px 14px; line-height: 1.4; }
+  @media (prefers-reduced-motion: reduce) { .st-q { animation: none; } .st .q-track i { transition: none; } }
   .hidden { display: none; }
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -87,68 +114,17 @@
       <div class="section-head" style="margin-bottom: 20px;">
         <span class="eyebrow">Sin registro · 2 minutos</span>
         <h2>¿Qué mejor amigo va con tu vida?</h2>
-        <p>Contesta 8 preguntas y te mostramos a los perritos y gatitos de refugio que mejor encajan contigo.</p>
+        <p>Una pregunta a la vez. Al final te mostramos a los perritos y gatitos de refugio que mejor encajan contigo, y qué tan cerca están.</p>
       </div>
 
-      <div class="panel">
-        <label>¿Qué te gustaría adoptar?</label>
-        <div class="choice-group" data-group="especie">
-          <div class="choice-chip" data-value="perro">Perro</div>
-          <div class="choice-chip" data-value="gato">Gato</div>
-          <div class="choice-chip" data-value="cualquiera">Cualquiera</div>
+      <div class="panel st" id="stepper" aria-live="polite">
+        <div class="st-top">
+          <button class="st-back" id="stBack" type="button" aria-label="Pregunta anterior">← Atrás</button>
+          <span class="st-count" id="stCount"></span>
         </div>
-
-        <label>¿Dónde vives?</label>
-        <div class="choice-group" data-group="vivienda">
-          <div class="choice-chip" data-value="depto">Departamento</div>
-          <div class="choice-chip" data-value="casa_sin_patio">Casa sin patio</div>
-          <div class="choice-chip" data-value="casa_patio_chico">Casa con patio chico</div>
-          <div class="choice-chip" data-value="casa_patio_grande">Casa con patio grande</div>
-        </div>
-
-        <label>¿Hay niños pequeños en casa?</label>
-        <div class="choice-group" data-group="ninos">
-          <div class="choice-chip" data-value="si">Sí</div>
-          <div class="choice-chip" data-value="no">No</div>
-        </div>
-
-        <label>¿Tienes otros animales en casa?</label>
-        <div class="choice-group" data-group="otrasMascotas">
-          <div class="choice-chip" data-value="si">Sí</div>
-          <div class="choice-chip" data-value="no">No</div>
-        </div>
-
-        <label>¿Cuántas horas al día estaría solo tu nuevo mejor amigo?</label>
-        <div class="choice-group" data-group="horasSolo">
-          <div class="choice-chip" data-value="menos2">Menos de 2 h</div>
-          <div class="choice-chip" data-value="2a4">2–4 h</div>
-          <div class="choice-chip" data-value="4a8">4–8 h</div>
-          <div class="choice-chip" data-value="mas8">Más de 8 h</div>
-        </div>
-
-        <label>¿Cuánta energía/ejercicio le puedes dedicar?</label>
-        <div class="choice-group" data-group="energia">
-          <div class="choice-chip" data-value="bajo">Tranquilo (paseos cortos)</div>
-          <div class="choice-chip" data-value="medio">Activo (paseos diarios)</div>
-          <div class="choice-chip" data-value="alto">Muy activo (correr, deporte)</div>
-        </div>
-
-        <label>Tu experiencia con animales de compañía</label>
-        <div class="choice-group" data-group="experiencia">
-          <div class="choice-chip" data-value="primera_vez">Primera vez</div>
-          <div class="choice-chip" data-value="algo">Algo de experiencia</div>
-          <div class="choice-chip" data-value="mucha">Mucha experiencia</div>
-        </div>
-
-        <label>Tamaño de preferencia</label>
-        <div class="choice-group" data-group="tamanoPreferido">
-          <div class="choice-chip" data-value="pequeno">Pequeño</div>
-          <div class="choice-chip" data-value="mediano">Mediano</div>
-          <div class="choice-chip" data-value="grande">Grande</div>
-          <div class="choice-chip" data-value="cualquiera">Cualquiera</div>
-        </div>
-
-        <button class="btn-primary" id="btnVerMatches" type="button">Ver mis matches →</button>
+        <div class="q-track"><i id="stFill"></i></div>
+        <div id="stBody"></div>
+        <div class="st-live" id="qLive" role="status"></div>
         <div id="testMsg"></div>
       </div>
     </div>
@@ -182,6 +158,6 @@
 <footer class="footer">PetMatch · Hecho con 🐾 en Cuernavaca, Morelos para conectar refugios con familias</footer>
 
 <script type="module" src="js/test.js"></script>
-<script type="module" src="js/ux.js" data-questions></script>
+<script type="module" src="js/ux.js"></script>
 </body>
 </html>
