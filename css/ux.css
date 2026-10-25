@@ -283,7 +283,7 @@
    rellenando los lados) y la ficha de abajo toma su altura natural.
    ============================================================ */
 .deck-wrap { height: clamp(400px, calc(100vh - 300px), 740px); height: clamp(400px, calc(100dvh - 300px), 740px); min-height: 400px; }
-.pet-card .photo, .pet-card .photo[data-fit] {
+.deck-wrap .pet-card .photo, .deck-wrap .pet-card .photo[data-fit] {
   width: 100%; height: auto !important; aspect-ratio: auto !important;
   flex: 1 1 0; min-height: 150px; max-height: none;
 }
@@ -299,33 +299,33 @@
    al tocar la tarjeta se abre la ficha completa en una ventana.
    ============================================================ */
 .deck-wrap { height: clamp(380px, calc(100vh - 270px), 760px); height: clamp(380px, calc(100dvh - 270px), 760px); min-height: 380px; }
-.pet-card { cursor: pointer; border-radius: 26px; background: #2b2722; }
-.pet-card .photo, .pet-card .photo[data-fit] {
+.deck-wrap .pet-card { cursor: pointer; border-radius: 26px; background: #2b2722; }
+.deck-wrap .pet-card .photo, .pet-card .photo[data-fit] {
   position: absolute; inset: 0; width: 100%; height: 100% !important; aspect-ratio: auto !important;
   max-height: none; min-height: 0; flex: none; border-radius: 0;
 }
 /* foto casi vertical: llena toda la tarjeta; muy ancha/alta: se ve completa sobre fondo difuminado */
-.pet-card .photo.cover::after { background-size: cover; }
-.pet-card .photo.cover::before { display: none; }
+.deck-wrap .pet-card .photo.cover::after { background-size: cover; }
+.deck-wrap .pet-card .photo.cover::before { display: none; }
 
 /* degradado para que el texto se lea sobre cualquier foto */
-.pet-card .info {
+.deck-wrap .pet-card .info {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 70px 18px 18px; color: #fff;
   background: linear-gradient(to top, rgba(18, 14, 10, .82) 0%, rgba(18, 14, 10, .55) 45%, rgba(18, 14, 10, 0) 100%);
   pointer-events: none;
 }
-.pet-card .name-row { display: flex; align-items: baseline; gap: 10px; margin: 0; }
-.pet-card .name-row h2 { color: #fff; font-size: 2rem; line-height: 1.05; text-shadow: 0 2px 10px rgba(0, 0, 0, .45); margin: 0; }
-.pet-card .name-row .age { color: rgba(255, 255, 255, .92); font-size: 1.15rem; font-weight: 600; }
-.pet-card .loc-line { margin-top: 6px; font-size: .9rem; color: rgba(255, 255, 255, .95); text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
-.pet-card .more-hint {
+.deck-wrap .pet-card .name-row { display: flex; align-items: baseline; gap: 10px; margin: 0; }
+.deck-wrap .pet-card .name-row h2 { color: #fff; font-size: 2rem; line-height: 1.05; text-shadow: 0 2px 10px rgba(0, 0, 0, .45); margin: 0; }
+.deck-wrap .pet-card .name-row .age { color: rgba(255, 255, 255, .92); font-size: 1.15rem; font-weight: 600; }
+.deck-wrap .pet-card .loc-line { margin-top: 6px; font-size: .9rem; color: rgba(255, 255, 255, .95); text-shadow: 0 1px 6px rgba(0, 0, 0, .5); }
+.deck-wrap .pet-card .more-hint {
   display: inline-block; margin-top: 10px; font-size: .74rem; font-weight: 700; letter-spacing: .03em;
   padding: 4px 11px; border-radius: 999px; background: rgba(255, 255, 255, .22); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
-.pet-card .stamp { z-index: 4; top: 14px; right: 14px; }
-.pet-card .swipe-indicator { z-index: 5; top: 28px; bottom: auto; }
-.pet-card .swipe-indicator.like { left: 18px; }
-.pet-card .swipe-indicator.nope { right: 18px; }
+.deck-wrap .pet-card .stamp { z-index: 4; top: 14px; right: 14px; }
+.deck-wrap .pet-card .swipe-indicator { z-index: 5; top: 28px; bottom: auto; }
+.deck-wrap .pet-card .swipe-indicator.like { left: 18px; }
+.deck-wrap .pet-card .swipe-indicator.nope { right: 18px; }
 
 /* botones siempre a la vista, encima de la barra inferior */
 .deck-actions { padding: 14px 0 92px; gap: 34px; justify-content: center; }
@@ -370,3 +370,49 @@ body.ficha-open { overflow: hidden; }
   .ficha-ov { align-items: center; }
   .ficha { border-radius: 26px; max-height: 88vh; }
 }
+
+
+/* ============================================================
+   CATÁLOGO — correcciones: contraste y scroll
+   (los estilos de la tarjeta de Descubrir ya no se mezclan aquí)
+   ============================================================ */
+#catalogArea .pet-card { touch-action: pan-y !important; position: relative; inset: auto; background: #fff; cursor: pointer; display: block; }
+#catalogArea .pet-card-title { color: #1C1A16; }
+#catalogArea .pet-card-sub { color: #4a443a; }
+@media (hover: none) { #catalogArea .pet-card:hover { transform: none; } }
+
+/* ============================================================
+   CATÁLOGO — ventana de detalle adaptable y accesible
+   Celular: hoja que sube desde abajo, todo el contenido se desplaza
+   y los botones quedan siempre visibles. Compu: ventana centrada.
+   ============================================================ */
+.modal-overlay { padding: 0 !important; align-items: flex-end !important; overscroll-behavior: contain; }
+.modal-card {
+  max-width: 560px !important; width: 100%; display: flex; flex-direction: column;
+  max-height: 94vh; max-height: 94dvh; border-radius: 26px 26px 0 0 !important;
+  animation: fichaUp .28s cubic-bezier(.2, .8, .2, 1) !important;
+}
+.modal-img { flex: 0 0 auto; height: min(42dvh, 360px); height: min(42vh, 360px); max-height: none !important; width: 100%; background: #efe9da !important; }
+.modal-body { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 18px 20px 8px !important; }
+.modal-body h2 { font-size: clamp(1.5rem, 5vw, 1.9rem); line-height: 1.15; }
+#modalSub { color: #4a443a !important; font-size: .95rem !important; line-height: 1.45; }
+#modalDesc { color: #2f2a22 !important; font-size: 1rem !important; line-height: 1.6 !important; }
+.modal-tags { margin: 12px 0 14px !important; }
+.modal-tag { font-size: .85rem !important; padding: 7px 12px !important; color: #1f6f63 !important; background: #e4f3f0 !important; text-decoration: none; }
+.modal-tag.geo-link { border: 1.5px solid #2ec4b6; background: #fff !important; min-height: 38px; display: inline-flex; align-items: center; }
+.modal-actions {
+  flex: 0 0 auto; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px !important; margin: 0 !important;
+  padding: 12px 20px calc(14px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #eee7d8;
+}
+.modal-actions .btn-match { min-height: 48px; padding: 12px 10px !important; font-size: .95rem; white-space: nowrap; flex: none !important; }
+.modal-actions #btnMatchAction { grid-column: 1 / -1; font-size: 1.05rem; }
+.modal-close { width: 44px !important; height: 44px !important; top: 10px !important; right: 10px !important; box-shadow: 0 4px 12px rgba(0, 0, 0, .25); }
+.modal-nav-btn { width: 46px !important; height: 46px !important; top: calc(min(42dvh, 360px) / 2) !important; }
+.modal-close:focus-visible, .modal-nav-btn:focus-visible, .btn-match:focus-visible, .modal-tag:focus-visible { outline: 3px solid #1C1A16; outline-offset: 2px; }
+@media (min-width: 700px) {
+  .modal-overlay { align-items: center !important; padding: 20px !important; }
+  .modal-card { border-radius: 26px !important; max-height: 90vh; }
+  .modal-actions { grid-template-columns: 2fr 1fr 1fr; }
+  .modal-actions #btnMatchAction { grid-column: auto; font-size: .95rem; }
+}
+@media (prefers-reduced-motion: reduce) { .modal-card, .ficha, .ficha-ov { animation: none !important; } }

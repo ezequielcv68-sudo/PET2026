@@ -53,4 +53,4 @@
 
 /* Catálogo fluido en celulares modestos: pinta solo lo que se ve y nunca bloquea el scroll vertical */
 #catalogArea{touch-action:pan-y}
-#catalogArea .pet-card{content-visibility:auto;contain-intrinsic-size:auto 320px}
+
