@@ -210,7 +210,21 @@ function showPetAtIndex(index) {
     btnCard.onclick = () => abrirTarjeta({ ...pet, photoURL: data.photo, nombre: data.name, city: data.city });
   }
 
+  abrirModal();
+}
+
+let _foco = null;
+function abrirModal() {
+  if (!petModal.classList.contains('active')) _foco = document.activeElement;
   petModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  const b = document.querySelector('#petModal .modal-body'); if (b) b.scrollTop = 0;
+  setTimeout(() => closeModal && closeModal.focus({ preventScroll: true }), 30);
+}
+function cerrarModal() {
+  petModal.classList.remove('active');
+  document.body.style.overflow = '';
+  if (_foco && _foco.focus) { try { _foco.focus({ preventScroll: true }); } catch (e) {} }
 }
 
 async function compartirMascota(pet, data) {
@@ -238,12 +252,12 @@ if (nextPetBtn) {
 }
 
 if (closeModal) {
-  closeModal.addEventListener('click', () => petModal.classList.remove('active'));
+  closeModal.addEventListener('click', cerrarModal);
 }
 
 if (petModal) {
   petModal.addEventListener('click', (e) => {
-    if (e.target === petModal) petModal.classList.remove('active');
+    if (e.target === petModal) cerrarModal();
   });
 }
 
@@ -252,7 +266,7 @@ document.addEventListener('keydown', (e) => {
   if (petModal && petModal.classList.contains('active')) {
     if (e.key === 'ArrowRight') showPetAtIndex(currentIndex + 1);
     if (e.key === 'ArrowLeft') showPetAtIndex(currentIndex - 1);
-    if (e.key === 'Escape') petModal.classList.remove('active');
+    if (e.key === 'Escape') cerrarModal();
   }
 });
 
