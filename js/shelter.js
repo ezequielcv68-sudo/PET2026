@@ -7,9 +7,11 @@ import {
 import { abrirTarjeta } from "./sharecard.js";
 import { comprimirImagen } from "./imagen.js";
 import { ESTADOS, inferirEstado, normalizarEstado, geocodificar } from "./geo.js";
+import { normalizarWhatsApp, urlWhatsApp, mensajeAlAdoptante } from "./whatsapp.js";
 
 let uid = null;
 let shelterName = "";
+let shelterWhatsapp = "";
 let shelterCity = "";
 let shelterEstado = "";
 let shelterVerified = false;
@@ -30,6 +32,7 @@ onAuthStateChanged(auth, async (user) => {
   }
   shelterName = userSnap.data().shelterName || userSnap.data().name || "Refugio";
   shelterCity = userSnap.data().city || "";
+  shelterWhatsapp = normalizarWhatsApp(userSnap.data().whatsapp);
   shelterEstado = normalizarEstado(userSnap.data().estado) || inferirEstado(shelterCity);
   llenarEstados();
   shelterVerified = userSnap.data().verified === true;
@@ -131,6 +134,7 @@ function pintarResumen() {
   // Qué hacer hoy (reglas simples)
   const tips = [];
   if (nNuevos) tips.push(`Responde a tus ${nNuevos} ${nNuevos === 1 ? "interesado nuevo" : "interesados nuevos"}: entre más rápido contestas, más adopciones.`);
+  if (!shelterWhatsapp) tips.unshift("Agrega el WhatsApp de tu refugio en la configuración del perfil: así los interesados te escriben directo con su información.");
   const incompletas = pets.filter(p => p.status !== "adopted" && completitud(p) < 80);
   if (incompletas.length) tips.push(`Completa la ficha de ${incompletas.slice(0, 2).map(p => p.nombre || "un animal").join(" y ")}: las fichas completas reciben más “Me interesa”.`);
   const largos = pets.filter(p => p.status !== "adopted" && (diasDesde(p) || 0) >= 14);
@@ -416,6 +420,7 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
       shelterId: uid,
       shelterName,
       shelterVerified,
+      shelterWhatsapp,
       nombre, especie, raza, edad, tamano, energia,
       nivelDificultad,
       buenoConNinos: buenoConNinos === "true",
@@ -485,7 +490,7 @@ async function verInteresados(pet) {
       vivienda: { depto: "Departamento", casa_sin_patio: "Casa sin patio", casa_patio_chico: "Casa patio chico", casa_patio_grande: "Casa patio grande" },
       horas: { menos2: "<2 h", "2a4": "2–4 h", "4a8": "4–8 h", mas8: ">8 h" },
       exp: { primera_vez: "Primera vez", algo: "Algo de exp.", mucha: "Mucha exp." },
-      tipo: { propia: "Vivienda propia", renta_permitida: "Renta (con permiso)" },
+      tipo: { propia: "Vivienda propia", renta_permitida: "Renta (con permiso)", renta_sin_permiso: "Renta (sin permiso aún)" },
       acuerdo: { si: "Familia de acuerdo", en_proceso: "Familia aún lo platica" },
       viajes: { familiares: "Viajes: familiares/amigos", pension: "Viajes: pensión", viaja: "Viaja con el animal" },
     };
@@ -499,8 +504,7 @@ async function verInteresados(pet) {
     const extras = [L.tipo[a.tipoVivienda], L.acuerdo[a.acuerdoFamiliar], L.viajes[a.planViajes]].filter(Boolean);
 
     const cleanPhone = phone.replace(/\D/g, "");
-    const waText = encodeURIComponent(`¡Hola ${name}! Te escribimos de ${shelterName} respecto a tu interés en adoptar a ${pet.nombre} en PetMatch 🐾`);
-    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${waText}` : null;
+    const waUrl = urlWhatsApp(phone, mensajeAlAdoptante(name, shelterName, pet.nombre, d.data().matchScore)) || null;
 
     const row = document.createElement("div");
     row.style.padding = "14px 0";
@@ -612,6 +616,7 @@ if (btnConfigRefugio) {
       const snap = await getDoc(doc(db, "users", uid));
       if(snap.exists()) {
         const d = snap.data();
+        document.getElementById("cfgWa").value = d.whatsapp || "";
         document.getElementById("cfgFb").value = d.facebook || "";
         document.getElementById("cfgIg").value = d.instagram || "";
         document.getElementById("cfgEstado").value = normalizarEstado(d.estado) || inferirEstado(d.city) || "";
@@ -636,7 +641,15 @@ document.getElementById("btnGuardarConfig").onclick = async () => {
   try {
     const cfgEstado = document.getElementById("cfgEstado").value;
     const cfgMun = document.getElementById("cfgCiudad").value.trim();
+    const waCrudo = document.getElementById("cfgWa").value.trim();
+    const wa = normalizarWhatsApp(waCrudo);
+    if (waCrudo && !wa) {
+      document.getElementById("cfgMsg").innerHTML = `<div class="error-msg" style="margin-top:8px;">Revisa el número de WhatsApp (10 dígitos con lada).</div>`;
+      btn.disabled = false; btn.textContent = "Guardar Configuración";
+      return;
+    }
     const datos = {
+      whatsapp: wa,
       facebook: document.getElementById("cfgFb").value.trim(),
       instagram: document.getElementById("cfgIg").value.trim()
     };
@@ -645,6 +658,14 @@ document.getElementById("btnGuardarConfig").onclick = async () => {
       if (cfgMun) datos.city = cfgMun.toLowerCase().includes(cfgEstado.toLowerCase()) ? cfgMun : `${cfgMun}, ${cfgEstado}`;
     }
     await updateDoc(doc(db, "users", uid), datos);
+    if (wa !== shelterWhatsapp) {
+      shelterWhatsapp = wa;
+      // Los animales ya publicados también llevan el número (solo se muestra tras «Me interesa»)
+      try {
+        const mine = await getDocs(query(collection(db, "pets"), where("shelterId", "==", uid)));
+        await Promise.all(mine.docs.map((p) => updateDoc(doc(db, "pets", p.id), { shelterWhatsapp: wa })));
+      } catch (e) { console.warn("No se pudo actualizar el WhatsApp en los animales:", e); }
+    }
     if (cfgEstado) { shelterEstado = cfgEstado; if (datos.city) shelterCity = datos.city; }
     document.getElementById("cfgMsg").innerHTML = `<div class="ok-msg" style="color:var(--mint); margin-top:8px; font-weight:bold;">✓ Guardado con éxito</div>`;
     

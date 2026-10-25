@@ -6,6 +6,7 @@ import {
 import { ordenarPorMatch, calcularMatch, explicarMatch, kmHasta } from "./matching.js";
 import { textoUbicacion, textoDistancia, puntoAdoptante, urlGoogleMaps, urlComoLlegar } from "./geo.js";
 import { avisarRefugio } from "./avisos.js";
+import { urlWhatsApp, mensajeAlRefugio } from "./whatsapp.js";
 
 let uid = null;
 let userData = {};
@@ -282,10 +283,25 @@ async function guardarSwipe(pet, liked, score) {
   }
 }
 
+// Aviso no bloqueante tras «Me gusta»: ofrece escribir al refugio por WhatsApp con un mensaje ya armado
+function avisoLike(pet) {
+  document.getElementById("likeSnack")?.remove();
+  const url = urlWhatsApp(pet.shelterWhatsapp, mensajeAlRefugio(pet, perfil, userData.name, pet.matchScore));
+  const s = document.createElement("div");
+  s.id = "likeSnack"; s.className = "like-snack"; s.setAttribute("role", "status");
+  s.innerHTML = `<div class="ls-txt"><b>💛 ¡Le avisamos a ${escapeHtml(pet.shelterName || "el refugio")}!</b><span>${url ? `Para ir más rápido, escríbeles por WhatsApp con tu información lista.` : `Te contactarán si tu perfil encaja.`}</span></div>${url ? `<a class="ls-wa" href="${esc(url)}" target="_blank" rel="noopener">Escribir por WhatsApp</a>` : ""}<button class="ls-x" aria-label="Cerrar">✕</button>`;
+  document.body.appendChild(s);
+  const quitar = () => s.remove();
+  s.querySelector(".ls-x").onclick = quitar;
+  s.querySelector(".ls-wa")?.addEventListener("click", () => { track("whatsapp_like", { pet_id: pet.id }); setTimeout(quitar, 300); });
+  setTimeout(quitar, url ? 9000 : 3500);
+}
+
 async function commitSwipe(liked) {
   const pet = deck[index];
   index++;
   render();
+  if (liked) avisoLike(pet);
   try {
     await guardarSwipe(pet, liked, pet.matchScore);
   } catch (err) {
