@@ -416,3 +416,17 @@ body.ficha-open { overflow: hidden; }
   .modal-actions #btnMatchAction { grid-column: auto; font-size: .95rem; }
 }
 @media (prefers-reduced-motion: reduce) { .modal-card, .ficha, .ficha-ov { animation: none !important; } }
+
+
+/* ---------- Aviso tras «Me gusta» (WhatsApp) ---------- */
+.like-snack {
+  position: fixed; left: 12px; right: 12px; top: 70px; z-index: 200; max-width: 520px; margin: 0 auto;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: #1C1A16; color: #FBF8F0; border-radius: 18px; padding: 12px 14px 12px 16px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .3); animation: fichaUp .25s ease;
+}
+.like-snack .ls-txt { flex: 1 1 200px; display: flex; flex-direction: column; gap: 2px; font-size: .9rem; }
+.like-snack .ls-txt span { font-size: .8rem; opacity: .85; line-height: 1.35; }
+.like-snack .ls-wa { background: #25D366; color: #0B2E17; font-weight: 800; font-size: .88rem; border-radius: 999px; padding: 11px 16px; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+.like-snack .ls-x { background: none; border: 0; color: #FBF8F0; font-size: 1rem; cursor: pointer; width: 40px; height: 40px; }
+.like-snack a:focus-visible, .like-snack button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
