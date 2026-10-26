@@ -1,0 +1,47 @@
+/* PetMatch — Administración. Mismos colores y tipografías que el resto de la app. */
+.ad-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+.topbar{flex-wrap:wrap;gap:10px}
+.ad-chip{background:#1C1A16;color:#FBF8F0;border-radius:999px;padding:7px 14px;font-weight:700;font-size:.82rem}
+.ad-tabs{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0;margin:6px 0 10px}
+#adMsg .ok-msg,#adMsg .error-msg{margin:8px 0}
+.ad-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:14px 0 10px}
+.ad-h h3{margin:0}
+.ad-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 12px}
+.ad-tools input,.ad-tools select{padding:10px 12px;border-radius:12px;border:1.5px solid rgba(28,26,22,.15);font:inherit;font-size:.9rem;background:#fff;min-width:0;max-width:100%}
+.ad-tools input{flex:1 1 180px}
+.ad-btn{border:1.5px solid rgba(28,26,22,.15);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--ink);min-height:38px}
+.ad-btn:hover{background:var(--bg-soft)}
+.ad-btn.pri{background:var(--coral);border-color:var(--coral);color:#fff}
+.ad-btn.ok{background:var(--mint);border-color:var(--mint);color:#fff}
+.ad-btn.dan{color:#b3261e;border-color:#e6b3ae}
+.ad-btn:focus-visible,.ad-x:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ad-btn:disabled{opacity:.55;cursor:wait}
+.ad-card{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 4px 14px rgba(0,0,0,.06);margin-bottom:10px}
+.ad-row{display:flex;gap:12px;align-items:flex-start}
+.ad-row .grow{flex:1;min-width:0}
+.ad-card h4{margin:0 0 2px;font-size:1rem;word-break:break-word}
+.ad-sub{font-size:.82rem;color:var(--ink-soft);line-height:1.45;word-break:break-word}
+.ad-acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.ad-badge{display:inline-block;font-size:.72rem;font-weight:800;border-radius:999px;padding:3px 9px;margin:0 4px 4px 0}
+.ad-badge.ok{background:#DEEFE7;color:#1F5C50}.ad-badge.wa{background:#FFF1C9;color:#7a5200}.ad-badge.no{background:#FDEBE5;color:#b3261e}.ad-badge.gr{background:#EFE9D8;color:#6E6759}
+.ad-thumb{width:64px;height:64px;border-radius:14px;background:#E4DEC9 center/cover no-repeat;flex:none}
+.ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.ad-todo{background:var(--bg-soft);border:1.5px dashed rgba(28,26,22,.15);border-radius:16px;padding:14px 16px;margin:0 0 14px}
+.ad-todo li{margin:6px 0;font-size:.88rem}
+.ad-empty{color:var(--ink-soft);padding:18px 4px;font-size:.92rem}
+.ad-ov{position:fixed;inset:0;background:rgba(28,26,22,.55);z-index:300;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.ad-ov[hidden]{display:none}
+.ad-modal{position:relative;background:var(--bg-soft);width:100%;max-width:560px;max-height:92vh;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+@media(min-width:700px){.ad-ov{align-items:center;padding:20px}.ad-modal{border-radius:24px}}
+.ad-x{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer;font-weight:800}
+.ad-modal h2{margin:0 40px 12px 0;font-size:1.3rem}
+.ad-modal label{display:block;font-weight:700;font-size:.85rem;margin:12px 0 4px}
+.ad-modal input,.ad-modal select,.ad-modal textarea{width:100%;padding:11px 12px;border-radius:12px;border:1.5px solid rgba(28,26,22,.15);font:inherit;background:#fff}
+.ad-modal textarea{min-height:90px;resize:vertical}
+.ad-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ad-modal .ad-prev{width:100%;max-height:220px;object-fit:contain;background:#efe9da;border-radius:14px;margin-top:8px}
+.ad-kv{display:grid;grid-template-columns:130px 1fr;gap:6px 10px;font-size:.88rem;margin:8px 0}
+.ad-kv dt{color:var(--ink-soft)}.ad-kv dd{margin:0;word-break:break-word}
+.ad-log{font-size:.85rem;border-bottom:1px solid var(--line);padding:9px 0}
+.ad-log b{font-weight:700}
+@media(max-width:520px){.ad-2{grid-template-columns:1fr}.ad-kv{grid-template-columns:100px 1fr}}
