@@ -24,6 +24,7 @@ onAuthStateChanged(auth, async (user) => {
   const userSnap = await getDoc(doc(db, "users", uid));
   userData = userSnap.exists() ? userSnap.data() : {};
   if (userData.role === "shelter") { window.location.href = "shelter.html"; return; }
+  if (userData.suspended === true) { alert("Tu cuenta está suspendida. Escríbenos para revisarla."); await signOut(auth); window.location.href = "index.html"; return; }
 
   const perfilSnap = await getDoc(doc(db, "adopterProfiles", uid));
   if (!perfilSnap.exists()) { window.location.href = "onboarding.html"; return; }

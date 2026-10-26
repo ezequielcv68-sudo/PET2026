@@ -103,7 +103,7 @@ async function loadCatalog() {
     querySnapshot.forEach((d) => {
       const petData = { id: d.id, ...d.data() };
       // Las mascotas ya adoptadas no se muestran como disponibles
-      if (petData.status !== 'adopted') allPets.push(petData);
+      if (petData.status !== 'adopted' && petData.status !== 'hidden') allPets.push(petData);
     });
 
     if (allPets.length === 0) {

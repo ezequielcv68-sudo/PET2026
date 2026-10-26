@@ -137,7 +137,7 @@ async function usarGPS() {
 // ---------- Conteo en vivo: cuántos animales siguen siendo compatibles ----------
 let animales = null;
 getDocs(collection(db, "pets"))
-  .then((s) => { animales = s.docs.map((d) => ({ id: d.id, ...d.data() })).filter((p) => p.status !== "adopted"); actualizarVivo(); })
+  .then((s) => { animales = s.docs.map((d) => ({ id: d.id, ...d.data() })).filter((p) => p.status !== "adopted" && p.status !== "hidden"); actualizarVivo(); })
   .catch(() => {});
 
 const EXP_DE_DIFICULTAD = { facil: "primera_vez", moderado: "algo", dificil: "mucha" };
@@ -210,7 +210,7 @@ async function terminar(conUbicacion) {
   stBody.innerHTML = `<div class="st-q"><h3>Buscando a tus mejores amigos…</h3><p class="st-why">Comparando tus respuestas con los animales de los refugios.</p></div>`;
   try {
     const snap = await getDocs(collection(db, "pets"));
-    const mascotas = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((p) => p.status !== "adopted");
+    const mascotas = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter((p) => p.status !== "adopted" && p.status !== "hidden");
     const ordenadas = ordenarPorMatch(perfil, mascotas);
     track("test_completado", { resultados: ordenadas.length, especie: perfil.especiePreferida, con_ubicacion: !!(ubic && ubic.estado) });
     perfilActual = perfil;

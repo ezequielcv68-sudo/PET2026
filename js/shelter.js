@@ -30,6 +30,7 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "onboarding.html";
     return;
   }
+  if (userSnap.data().suspended === true) { alert("Tu cuenta está suspendida. Escríbenos para revisarla."); await signOut(auth); window.location.href = "index.html"; return; }
   shelterName = userSnap.data().shelterName || userSnap.data().name || "Refugio";
   shelterCity = userSnap.data().city || "";
   shelterWhatsapp = normalizarWhatsApp(userSnap.data().whatsapp);
