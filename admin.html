@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Administración — PetMatch</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/ux.css">
+<link rel="stylesheet" href="css/shelter-panel.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="shell shell-wide">
+  <div class="topbar">
+    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PetMatch</a>
+    <div class="ad-top">
+      <span class="ad-chip">🛡️ Administrador</span>
+      <button class="btn-ghost" id="btnRefrescar" type="button" aria-label="Actualizar datos">↻ Actualizar</button>
+      <button class="btn-ghost" id="btnLogout" type="button">Salir</button>
+    </div>
+  </div>
+
+  <div id="adGate" class="panel" style="margin-top:24px"><p class="sub">Comprobando acceso…</p></div>
+
+  <div id="adApp" hidden>
+    <div class="sp-tabs ad-tabs" role="tablist" id="adTabs">
+      <button class="sp-tab active" data-tab="resumen" role="tab">Resumen</button>
+      <button class="sp-tab" data-tab="refugios" role="tab">Refugios</button>
+      <button class="sp-tab" data-tab="animales" role="tab">Animales</button>
+      <button class="sp-tab" data-tab="adoptantes" role="tab">Adoptantes</button>
+      <button class="sp-tab" data-tab="bitacora" role="tab">Bitácora</button>
+    </div>
+    <div id="adMsg" role="status"></div>
+    <section id="tab-resumen"></section>
+    <section id="tab-refugios" hidden></section>
+    <section id="tab-animales" hidden></section>
+    <section id="tab-adoptantes" hidden></section>
+    <section id="tab-bitacora" hidden></section>
+  </div>
+</div>
+
+<!-- Ventana genérica (editar animal, ver adoptante, confirmar) -->
+<div id="adModal" class="ad-ov" hidden>
+  <div class="ad-modal" role="dialog" aria-modal="true" aria-labelledby="adModalTitle">
+    <button class="ad-x" id="adModalX" type="button" aria-label="Cerrar">✕</button>
+    <h2 id="adModalTitle"></h2>
+    <div id="adModalBody"></div>
+  </div>
+</div>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
