@@ -200,6 +200,12 @@ function showPetAtIndex(index) {
     window.location.href = currentUser ? 'swipe.html' : 'auth.html';
   };
 
+  const btnApad = document.getElementById('btnApad');
+  if (btnApad) {
+    btnApad.style.display = pet.apadrinable ? '' : 'none';
+    btnApad.href = 'apadrinar.html?pet=' + encodeURIComponent(pet.id);
+  }
+
   const btnShare = document.getElementById('btnShare');
   if (btnShare) {
     btnShare.onclick = () => compartirMascota(pet, data);

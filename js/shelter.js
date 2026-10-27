@@ -313,6 +313,7 @@ function abrirModalEditar(pet) {
   document.getElementById("pCiudad").value = pet.municipio || soloMunicipio(pet.city || shelterCity, normalizarEstado(pet.estado) || inferirEstado(pet.city));
   document.getElementById("pEstado").value = normalizarEstado(pet.estado) || inferirEstado(pet.city) || shelterEstado;
 
+  setApad(pet);
   setChipSelected("pEspecie", pet.especie);
   setChipSelected("pTamano", pet.tamano);
   setChipSelected("pEnergia", pet.energia);
@@ -329,6 +330,18 @@ function abrirModalEditar(pet) {
 
   modalOverlay.style.display = "flex";
 }
+
+function setApad(pet) {
+  const on = !!(pet && pet.apadrinable);
+  document.getElementById("pApad").checked = on;
+  document.getElementById("apadCampos").style.display = on ? "block" : "none";
+  document.getElementById("pApadMeta").value = on && pet.apadrinaMeta ? pet.apadrinaMeta : "";
+  const cubre = (pet && pet.apadrinaCubre) || [];
+  document.querySelectorAll("#pApadCubre input").forEach((c) => { c.checked = cubre.includes(c.value); });
+}
+document.getElementById("pApad").addEventListener("change", (e) => {
+  document.getElementById("apadCampos").style.display = e.target.checked ? "block" : "none";
+});
 
 function setChipSelected(groupName, value) {
   if (value === undefined || value === null) return;
@@ -375,6 +388,7 @@ function resetForm() {
   document.getElementById("pCiudad").value = soloMunicipio(shelterCity, shelterEstado);
   document.getElementById("pEstado").value = shelterEstado || "";
   document.getElementById("photoPreviewWrap").innerHTML = "";
+  setApad(null);
   selectedFile = null;
   document.querySelectorAll(".choice-chip.selected").forEach(c => c.classList.remove("selected"));
   document.getElementById("petMsg").innerHTML = "";
@@ -429,6 +443,13 @@ document.getElementById("btnGuardarPet").addEventListener("click", async () => {
       descripcion, city, estado, municipio,
       updatedAt: serverTimestamp(),
     };
+    // Apadrinamiento (opcional)
+    const apad = document.getElementById("pApad").checked;
+    petData.apadrinable = apad;
+    if (apad) {
+      petData.apadrinaMeta = Math.max(0, Math.round(Number(document.getElementById("pApadMeta").value) || 0));
+      petData.apadrinaCubre = [...document.querySelectorAll("#pApadCubre input:checked")].map((c) => c.value);
+    }
     if (geo) { petData.lat = geo.lat; petData.lng = geo.lng; }
 
     if (photoURL) petData.photoURL = photoURL;
@@ -606,6 +627,7 @@ function csvCell(v) {
 function escapeHtml(s) { return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
 // ---------- CONFIGURACIÓN DE REDES SOCIALES ----------
 const configOverlay = document.getElementById("configOverlay");
+document.getElementById("btnPadrinos").onclick = () => { window.location.href = "padrinos.html"; };
 const btnConfigRefugio = document.getElementById("btnConfigRefugio");
 
 if (btnConfigRefugio) {

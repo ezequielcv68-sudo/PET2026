@@ -266,6 +266,14 @@ function pintarResultados(perfil, lista) {
     return;
   }
 
+  const muchoFuera = perfil && perfil.horasSolo === "mas8";
+  const cta = document.getElementById("apadCtaT");
+  if (cta) {
+    cta.textContent = muchoFuera ? "Quizá este no sea el momento de adoptar… pero sí puedes ayudar" : "¿No puedes adoptar ahora? Apadrina";
+    document.getElementById("apadCtaP").textContent = muchoFuera
+      ? "Pasarías mucho tiempo fuera de casa, y es responsable reconocerlo. Apadrinar es otra forma de cambiarle la vida a un animal: pagas parte de su cuidado y recibes recibos y novedades, sin tenerlo en casa."
+      : "Ayuda con la comida y los cuidados de un animal de un refugio verificado, aunque no lo tengas en casa. Tú decides cuánto aportar y ves en qué se usó.";
+  }
   titulo.textContent = "Estos mejores amigos van contigo";
   sub.textContent = `Encontramos ${lista.length} ${lista.length === 1 ? "mejor amigo" : "mejores amigos"}. Te mostramos las que mejor encajan.`;
 

@@ -10,7 +10,7 @@ import { ESTADOS, geocodificar } from "./geo.js";
 
 const $ = (id) => document.getElementById(id);
 let adminUser = null;
-const D = { users: [], profiles: {}, pets: [], swipes: [], log: [] };
+const D = { users: [], profiles: {}, pets: [], swipes: [], log: [], sps: [], pagos: [] };
 
 /* ---------- utilidades ---------- */
 const ts = (t) => (t && t.toDate ? t.toDate() : t ? new Date(t) : null);
@@ -56,6 +56,12 @@ async function cargar(aviso) {
       getDocs(collection(db, "pets")), getDocs(collection(db, "swipes")),
       getDocs(collection(db, "adminLog")).catch(() => ({ docs: [] })),
     ]);
+    const [spq, pgq] = await Promise.all([
+      getDocs(collection(db, "sponsorships")).catch(() => ({ docs: [] })),
+      getDocs(collection(db, "sponsorPayments")).catch(() => ({ docs: [] })),
+    ]);
+    D.sps = spq.docs.map((d) => ({ id: d.id, ...d.data() }));
+    D.pagos = pgq.docs.map((d) => ({ id: d.id, ...d.data() }));
     D.users = u.docs.map((d) => ({ id: d.id, ...d.data() }));
     D.profiles = {}; p.docs.forEach((d) => (D.profiles[d.id] = d.data()));
     D.pets = pets.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -99,7 +105,7 @@ function pResumen() {
   const k = (n, t) => `<div class="sp-kpi"><b>${n}</b><span>${t}</span></div>`;
   const lista = (tit, arr, fn) => arr.length ? `<div class="ad-todo"><b>${tit} (${arr.length})</b><ul>${arr.slice(0, 8).map(fn).join("")}${arr.length > 8 ? `<li>…y ${arr.length - 8} más</li>` : ""}</ul></div>` : "";
   $("tab-resumen").innerHTML = `
-    <div class="sp-kpis">${k(D.users.length, "usuarios")}${k(ad.length, "adoptantes")}${k(sh.length, `refugios (${ver} verificados)`)}${k(disp, "animales disponibles")}${k(adop, "adoptados")}${k(hid, "ocultos")}${k(likes, "“Me interesa”")}${k(D.swipes.length - likes, "pasados")}${k(nuevos, "registros 7 días")}</div>
+    <div class="sp-kpis">${k(D.users.length, "usuarios")}${k(ad.length, "adoptantes")}${k(sh.length, `refugios (${ver} verificados)`)}${k(disp, "animales disponibles")}${k(adop, "adoptados")}${k(hid, "ocultos")}${k(likes, "“Me interesa”")}${k(D.swipes.length - likes, "pasados")}${k(nuevos, "registros 7 días")}${k(D.sps.filter((x) => x.estado === "activo" && !x.cancelado && !x.pausado).length, "padrinos activos")}${k(D.pagos.filter((x) => !x.confirmadoRefugio).length, "aportaciones sin confirmar")}</div>
     ${lista("Refugios por verificar", pend, (s) => `<li>${esc(s.shelterName || s.name || s.email)} — <button class="ad-btn" data-go="refugios">revisar</button></li>`)}
     ${lista("Refugios sin WhatsApp", sinWa, (s) => `<li>${esc(s.shelterName || s.name || s.email)}</li>`)}
     ${lista("Animales sin foto", sinFoto, (p) => `<li>${esc(p.nombre)} · ${esc(p.shelterName || "")} — <button class="ad-btn" data-edit="${esc(p.id)}">subir foto</button></li>`)}

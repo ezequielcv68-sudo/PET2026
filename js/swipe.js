@@ -213,6 +213,7 @@ function abrirFicha(pet, ctx) {
         ${pet.descripcion ? `<p class="ficha-desc">${escapeHtml(pet.descripcion)}</p>` : ""}
         <div class="ficha-shelter">🏠 ${escapeHtml(pet.shelterName || "Refugio")}${pet.shelterVerified === true ? ' <span class="ver">✓ verificado</span>' : ""}</div>
         ${ubic ? `<div class="ficha-ubic">📍 ${escapeHtml(ubic)}</div>` : ""}
+        ${pet.apadrinable ? `<div class="ficha-apad"><a href="apadrinar.html?pet=${encodeURIComponent(pet.id)}">🤝 ¿No puedes adoptar? Apadrina a ${escapeHtml(pet.nombre || "este animal")}</a></div>` : ""}
         ${mapa ? `<div class="ficha-maps"><a href="${esc(mapa)}" target="_blank" rel="noopener">🗺️ Ver en Google Maps</a><a href="${esc(ruta)}" target="_blank" rel="noopener">🧭 Cómo llegar</a></div>` : ""}
       </div>
       <div class="ficha-actions">
