@@ -26,19 +26,7 @@
   <header class="ap-hero2 ap-rv">
     <span class="ap-eyebrow">AYUDA SIN ADOPTAR</span>
     <h1>Apadrina.<br><span>Cuida sin tenerlo en casa.</span></h1>
-    <p class="ap-lead">Tú pones lo que puedas. El refugio lo cuida. Tú ves cada recibo.</p>
-
-    <div class="ap-sim" id="apSim">
-      <div class="ap-sim-t">Si aportaras al mes…</div>
-      <div class="ap-sim-n"><span>$</span><input id="simNum" type="number" inputmode="numeric" min="1" value="200" aria-label="Monto mensual en pesos"></div>
-      <input id="simRange" type="range" min="50" max="1500" step="50" value="200" aria-label="Elegir monto mensual">
-      <div class="ap-sim-r"><span>$50</span><span>$1,500</span></div>
-      <div class="ap-sim-o">
-        <div><b id="simAnio">$2,400</b><small>al año</small></div>
-        <div id="simEq" hidden><b id="simPct">0%</b><small id="simEqT">de la meta de un animal</small></div>
-      </div>
-      <a class="ap-btn" href="#necesitan" style="width:100%">Ver a quién puedo ayudar</a>
-    </div>
+    <p class="ap-lead">Ellos esperan hogar. Mientras llega, tú puedes cuidarlos: el refugio los atiende y tú ves cada recibo.</p>
 
     <ul class="ap-trust" aria-label="Garantías">
       <li><i aria-hidden="true">🛡️</i>Refugios verificados</li>
@@ -49,6 +37,21 @@
 
   <h2 class="ap-h2 ap-rv" id="necesitan">Ellos necesitan padrino</h2>
   <div id="apPets" class="ap-pets"><div class="center-loading">Cargando…</div></div>
+  <details class="ap-calc ap-rv">
+    <summary><span>💡 ¿Cuánto podría aportar?</span><em>Calcúlalo</em></summary>
+    <div class="ap-sim" id="apSim">
+      <div class="ap-sim-t">Si aportaras al mes…</div>
+      <div class="ap-sim-n"><span>$</span><input id="simNum" type="number" inputmode="numeric" min="1" value="200" aria-label="Monto mensual en pesos"></div>
+      <input id="simRange" type="range" min="50" max="1500" step="50" value="200" aria-label="Elegir monto mensual">
+      <div class="ap-sim-r"><span>$50</span><span>$1,500</span></div>
+      <div class="ap-sim-o">
+        <div><b id="simAnio">$2,400</b><small>al año</small></div>
+        <div id="simEq" hidden><b id="simPct">0%</b><small id="simEqT">de la meta de un animal</small></div>
+      </div>
+      <a class="ap-btn" href="#necesitan" style="width:100%">Elegir a quién apadrinar</a>
+    </div>
+
+  </details>
 
   <h2 class="ap-h2 ap-rv">Así funciona</h2>
   <p class="ap-hint">Desliza para ver los 5 pasos →</p>
