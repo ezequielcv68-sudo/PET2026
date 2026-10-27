@@ -60,18 +60,26 @@ $("apChips").addEventListener("click", (e) => {
     const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { threshold: 0.12 });
     els.forEach((x) => io.observe(x));
   }
-  const fab = $("apFab"), sim = $("apSim");
+  const fab = $("apFab"), sim = $("apPets");
   if (fab && sim && "IntersectionObserver" in window) new IntersectionObserver((es) => { fab.hidden = es[0].isIntersecting; }, { threshold: 0 }).observe(sim);
 })();
 
 function cardPet(p) {
-  return `<article class="ap-pet"><div class="ap-pet-img" style="background-image:url('${esc(safeUrl(p.photoURL))}')" role="img" aria-label="Foto de ${esc(p.nombre)}"></div>
-    <div class="ap-pet-b"><h3>${esc(p.nombre)}</h3>
-    <div class="ap-mut">${esc([p.raza, p.edad].filter(Boolean).join(" · "))}${p.shelterVerified ? " · ✓ Refugio verificado" : ""}</div>
-    ${barra(p.apadrinaCubierto, p.apadrinaMeta)}
-    <div>${(p.apadrinaCubre || []).map((c) => `<span class="ap-tag">${esc(c)}</span>`).join("")}</div>
-    <div style="flex:1"></div>
-    <button class="ap-btn" type="button" data-id="${esc(p.id)}">Apadrinar a ${esc(p.nombre)}</button></div></article>`;
+  const pct = p.apadrinaMeta > 0 ? Math.max(0, Math.min(100, Math.round((p.apadrinaCubierto || 0) * 100 / p.apadrinaMeta))) : null;
+  const n = p.apadrinaPadrinos || 0;
+  const foto = safeUrl(p.photoURL);
+  return `<article class="ap-pet">
+    <div class="ap-pet-img${foto ? "" : " nofoto"}" ${foto ? `style="background-image:url('${esc(foto)}')"` : ""} role="img" aria-label="Foto de ${esc(p.nombre)}"></div>
+    <div class="ap-pet-ov">
+      <div class="ap-pet-top">${p.shelterVerified ? '<span class="ap-chip-w">✓ Refugio verificado</span>' : ""}${n ? `<span class="ap-chip-w">💚 ${n} ${n === 1 ? "padrino" : "padrinos"}</span>` : ""}</div>
+      <div class="ap-pet-bot">
+        <h3>${esc(p.nombre)}</h3>
+        <div class="ap-pet-sub">${esc([p.raza, p.edad].filter(Boolean).join(" · "))}</div>
+        ${(p.apadrinaCubre || []).length ? `<div class="ap-pet-need">Necesita: ${esc(p.apadrinaCubre.join(", ").toLowerCase())}</div>` : ""}
+        ${pct !== null ? `<div class="ap-pet-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Cuidado cubierto"><i style="width:${pct}%"></i></div><div class="ap-pet-pct">${pct}% de su cuidado cubierto</div>` : ""}
+        <button class="ap-btn" type="button" data-id="${esc(p.id)}">Conocer a ${esc(p.nombre)}</button>
+      </div>
+    </div></article>`;
 }
 $("apPets").addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) abrir(b.dataset.id); });
 
