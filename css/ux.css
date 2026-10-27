@@ -430,3 +430,12 @@ body.ficha-open { overflow: hidden; }
 .like-snack .ls-wa { background: #25D366; color: #0B2E17; font-weight: 800; font-size: .88rem; border-radius: 999px; padding: 11px 16px; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
 .like-snack .ls-x { background: none; border: 0; color: #FBF8F0; font-size: 1rem; cursor: pointer; width: 40px; height: 40px; }
 .like-snack a:focus-visible, .like-snack button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+/* Apadrinar desde la ficha / catálogo / test */
+.ficha-apad{margin:10px 0 2px}
+.ficha-apad a{display:flex;align-items:center;justify-content:center;min-height:46px;border-radius:999px;background:#E3F1EB;color:#1F5C50;font-weight:700;font-size:.9rem;text-decoration:none;padding:0 16px;text-align:center}
+.ficha-apad a:focus-visible,.apad-cta a:focus-visible{outline:3px solid #1C1A16;outline-offset:2px}
+.apad-cta{background:#E3F1EB;border-radius:22px;padding:20px 18px;margin:22px 0 6px}
+.apad-cta h3{margin:0 0 6px;font-size:1.3rem}
+.apad-cta p{margin:0 0 12px;line-height:1.5;color:#2c3a35;font-size:.95rem}
+.apad-cta a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:999px;background:#2F7A68;color:#fff;font-weight:700;text-decoration:none}
