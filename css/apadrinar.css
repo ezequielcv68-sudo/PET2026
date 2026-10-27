@@ -139,3 +139,36 @@
 .ap-rv.in{opacity:1;transform:none}
 html{scroll-behavior:smooth}
 @media(prefers-reduced-motion:reduce){.ap-rv{opacity:1;transform:none;transition:none}.ap-fa::before{animation:none}html{scroll-behavior:auto}.ap-s,.ap-pet{transition:none}}
+
+/* ===== v3: los animales son los protagonistas ===== */
+.ap-hero2 h1{font-size:clamp(2rem,7vw,3rem)}
+.ap-trust{margin:12px 0 0}
+.ap-pets{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:4px 20px 16px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.ap-pet{position:relative;flex:0 0 min(80%,320px);scroll-snap-align:center;aspect-ratio:4/5;border-radius:28px;overflow:hidden;background:#E4D6B8;box-shadow:0 14px 34px rgba(28,26,22,.2);display:block}
+.ap-pet-img{position:absolute;inset:0;background:#E4D6B8 center/cover no-repeat;transition:transform .5s}
+.ap-pet:hover .ap-pet-img{transform:scale(1.05)}
+.ap-pet-img.nofoto::after{content:"🐾";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:4rem;opacity:.5}
+.ap-pet-ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:14px;background:linear-gradient(to top,rgba(20,16,10,.86) 0%,rgba(20,16,10,.55) 38%,rgba(20,16,10,0) 62%);color:#fff}
+.ap-pet-top{display:flex;gap:6px;flex-wrap:wrap}
+.ap-chip-w{background:rgba(255,255,255,.92);color:#1C1A16;font-size:.72rem;font-weight:700;border-radius:999px;padding:5px 11px}
+.ap-pet-bot h3{margin:0;font-size:1.9rem;line-height:1;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.ap-pet-sub{font-size:.85rem;opacity:.9;margin:3px 0 8px}
+.ap-pet-need{font-size:.8rem;font-weight:600;margin-bottom:8px;}
+.ap-pet-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.3);overflow:hidden}
+.ap-pet-bar i{display:block;height:100%;background:#7FD1B9}
+.ap-pet-pct{font-size:.72rem;margin:4px 0 10px;opacity:.9}
+.ap-pet .ap-btn{width:100%;background:#fff;color:#1C1A16}
+.ap-pet .ap-btn:hover{background:#E3F1EB}
+@media(min-width:900px){.ap-pets{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));overflow:visible;margin:0;padding:4px 0 16px}.ap-pet{flex:none}}
+.ap-vacio{flex:1 0 100%}
+
+/* Calculadora: discreta y plegada */
+.ap-calc{margin:10px 0 0;background:#fff;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.ap-calc>summary{list-style:none;cursor:pointer;min-height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;font-size:.92rem}
+.ap-calc>summary::-webkit-details-marker{display:none}
+.ap-calc>summary em{font-style:normal;color:var(--ap);font-size:.82rem}
+.ap-calc>summary:focus-visible{outline:3px solid var(--ink);outline-offset:-3px;border-radius:20px}
+.ap-calc .ap-sim{box-shadow:none;border:0;border-radius:0 0 20px 20px;padding:0 16px 16px;max-width:none}
+.ap-calc .ap-sim-n input{font-size:2.2rem}.ap-calc .ap-sim-n span{font-size:1.5rem}
+.ap-calc .ap-sim-o b{font-size:1.15rem}
+.ap-calc{max-width:520px}
