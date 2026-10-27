@@ -8,6 +8,7 @@ import { fmt, FREC, barra, alCorriente, lineaDeVida, mensajeApadrinar } from "./
 
 const $ = (id) => document.getElementById(id);
 let user = null, userData = {}, pets = [];
+let montoSim = 200;
 
 onAuthStateChanged(auth, async (u) => {
   user = u;
@@ -25,8 +26,43 @@ async function cargar() {
     if (ref) pets = pets.filter((p) => p.shelterId === ref);
   } catch (e) { console.error(e); pets = []; }
   $("apPets").innerHTML = pets.length ? pets.map(cardPet).join("")
-    : `<p class="ap-empty">Todavía no hay animales abiertos a apadrinamiento. Pronto habrá; mientras tanto puedes <a href="catalogo.html">conocer a los que buscan hogar</a>.</p>`;
+    : `<div class="ap-vacio"><i aria-hidden="true">🐾</i><b>Pronto habrá a quién apadrinar</b><p>Los refugios están activando esta opción. ¿Eres refugio? Edita un animal en tu panel y activa “Recibir apadrinamientos”. Mientras tanto, conoce a quienes buscan hogar.</p><a class="ap-btn" href="catalogo.html">Ver animales en adopción</a></div>`;
+  simular();
 }
+
+/* ---------- simulador ---------- */
+function simular() {
+  const n = Math.max(0, Math.round(Number($("simNum").value) || 0));
+  montoSim = n || 200;
+  $("simAnio").textContent = fmt(n * 12);
+  const p = pets.find((x) => x.apadrinaMeta > 0);
+  $("simEq").hidden = !(p && n);
+  if (p && n) {
+    $("simPct").textContent = Math.min(100, Math.round(n * 100 / p.apadrinaMeta)) + "%";
+    $("simEqT").textContent = "de la meta mensual de " + p.nombre;
+  }
+}
+$("simRange").addEventListener("input", (e) => { $("simNum").value = e.target.value; simular(); });
+$("simNum").addEventListener("input", (e) => { const v = Number(e.target.value) || 0; if (v >= 50 && v <= 1500) $("simRange").value = v; simular(); });
+
+/* ---------- garantías (chips) ---------- */
+$("apChips").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  $("apChips").querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+  $("apChipP").textContent = b.dataset.t;
+});
+
+/* ---------- aparición al hacer scroll + botón flotante ---------- */
+(function () {
+  const els = document.querySelectorAll(".ap-rv");
+  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) { els.forEach((x) => x.classList.add("in")); }
+  else {
+    const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target); } }), { threshold: 0.12 });
+    els.forEach((x) => io.observe(x));
+  }
+  const fab = $("apFab"), sim = $("apSim");
+  if (fab && sim && "IntersectionObserver" in window) new IntersectionObserver((es) => { fab.hidden = es[0].isIntersecting; }, { threshold: 0 }).observe(sim);
+})();
 
 function cardPet(p) {
   return `<article class="ap-pet"><div class="ap-pet-img" style="background-image:url('${esc(safeUrl(p.photoURL))}')" role="img" aria-label="Foto de ${esc(p.nombre)}"></div>
@@ -82,7 +118,7 @@ function formulario(p) {
     <div class="ap-seg" id="apFrec"><button type="button" data-f="mensual" aria-pressed="true">Cada mes</button><button type="button" data-f="unica" aria-pressed="false">Una vez</button><button type="button" data-f="especie" aria-pressed="false">En especie</button></div>
     <div id="apMontoBox">
       <label for="apMonto">2 · Escribe cuánto quieres aportar (MXN)</label>
-      <div class="ap-money"><span>$</span><input id="apMonto" type="number" inputmode="numeric" min="1" step="1" placeholder="0" aria-describedby="apAyuda"></div>
+      <div class="ap-money"><span>$</span><input id="apMonto" type="number" inputmode="numeric" min="1" step="1" placeholder="0" value="${montoSim || ""}" aria-describedby="apAyuda"></div>
       <div class="ap-mut" id="apAyuda" style="margin-top:4px">Pon lo que puedas. No hay mínimo ni máximo y puedes cambiarlo cuando quieras.</div>
     </div>
     <div id="apMsg" role="status"></div>
