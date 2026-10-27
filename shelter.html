@@ -73,6 +73,7 @@
       <div class="sp-menu-wrap">
         <button class="sp-more" id="btnMore" title="Más opciones" aria-label="Más opciones">⋯</button>
         <div class="sp-menu" id="spMenu">
+          <button id="btnPadrinos">🤝 Apadrinamientos</button>
           <button id="btnConfigRefugio">⚙️ Redes sociales del refugio</button>
           <button id="btnExportarCSV">📊 Descargar datos (CSV)</button>
           <button id="btnLogout" class="danger">Salir</button>
@@ -163,6 +164,25 @@
     <select id="pEstado" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid rgba(28,26,22,.15);font:inherit;margin-bottom:8px;"></select>
     <input type="text" id="pCiudad" placeholder="Municipio o ciudad. Ej. Cuernavaca">
     <p style="font-size:.78rem;color:var(--ink-soft);margin:4px 0 0;">Solo se muestra el municipio y el estado, nunca la dirección exacta.</p>
+
+    <div style="background:#E3F1EB;border-radius:16px;padding:12px 14px;margin:14px 0 4px;">
+      <label style="display:flex;align-items:center;gap:10px;margin:0;font-weight:700;cursor:pointer;min-height:44px;">
+        <input type="checkbox" id="pApad" style="width:22px;height:22px;flex:none;margin:0;">
+        Recibir apadrinamientos para este animal
+      </label>
+      <div id="apadCampos" style="display:none;">
+        <p style="font-size:.8rem;color:var(--ink-soft);margin:2px 0 8px;line-height:1.4;">Quien no puede adoptar puede ayudar con su cuidado. El dinero va directo a ti. Te comprometes a subir recibos y una novedad con foto cada mes.</p>
+        <label for="pApadMeta">Meta mensual de ayuda (MXN)</label>
+        <input type="number" id="pApadMeta" inputmode="numeric" min="0" placeholder="Ej. 2000">
+        <label>¿Qué cubre la ayuda?</label>
+        <div id="pApadCubre" style="display:flex;flex-wrap:wrap;gap:6px 14px;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0;min-height:36px;"><input type="checkbox" value="Comida"> Comida</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0;min-height:36px;"><input type="checkbox" value="Vacunas"> Vacunas</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0;min-height:36px;"><input type="checkbox" value="Medicinas"> Medicinas</label>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0;min-height:36px;"><input type="checkbox" value="Cirugía o tratamiento"> Cirugía o tratamiento</label>
+        </div>
+      </div>
+    </div>
 
     <label>Foto</label>
     <div class="photo-drop" id="photoDrop">

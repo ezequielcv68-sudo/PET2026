@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apadrina a un perro o gato — PetMatch</title>
+<meta name="description" content="¿No puedes adoptar? Apadrina a un perrito o gatito de un refugio verificado: tú decides cuánto aportar y ves en qué se usó con recibos y fotos.">
+<meta property="og:title" content="Apadrina a un perro o gato — PetMatch">
+<meta property="og:description" content="Ayuda sin adoptar: aporta lo que puedas y ve en qué se usó, con recibos y fotos.">
+<meta property="og:image" content="https://hazpetmatch.com/img/logo.png">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" type="image/png" href="img/logo.png">
+<link rel="stylesheet" href="css/ux.css">
+<link rel="stylesheet" href="css/apadrinar.css">
+</head>
+<body>
+<div class="shell shell-wide">
+  <div class="topbar">
+    <a href="index.html" class="brand-mini"><span class="mark">🐾</span>PetMatch</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn-ghost" href="ahijados.html">Mis ahijados</a>
+      <a class="btn-ghost" href="catalogo.html">Adopción</a>
+    </div>
+  </div>
+
+  <div class="ap-hero">
+    <span class="ap-eyebrow">AYUDA SIN ADOPTAR</span>
+    <h1>Cuida a un animal sin tenerlo en casa</h1>
+    <p>Apadrinar es aportar —cada mes o una sola vez— para la comida, vacunas y medicinas de un animal que sigue en un refugio. Él sigue disponible para adopción: tú lo acompañas mientras llega su familia.</p>
+  </div>
+
+  <div class="ap-k">ASÍ FUNCIONA</div>
+  <div class="ap-grid">
+    <div class="ap-c ap-step"><div class="ap-n">1</div><div><b>Elige a tu ahijado</b>Ves qué necesita, su meta del mes y cuánta ayuda ya tiene.</div></div>
+    <div class="ap-c ap-step"><div class="ap-n">2</div><div><b>Escribe tu aportación</b>La cantidad que tú decidas. Sin mínimo ni máximo.</div></div>
+    <div class="ap-c ap-step"><div class="ap-n">3</div><div><b>El refugio te contacta</b>Por WhatsApp te da los datos para depositar directo a él.</div></div>
+    <div class="ap-c ap-step"><div class="ap-n">4</div><div><b>Confirman los dos</b>Tú confirmas que depositaste y el refugio confirma que lo recibió. Solo así queda registrado.</div></div>
+    <div class="ap-c ap-step"><div class="ap-n">5</div><div><b>Ves el resultado</b>Recibos y novedades con foto en “Mis ahijados”.</div></div>
+  </div>
+
+  <div class="ap-k">POR QUÉ ES SEGURO</div>
+  <div class="ap-grid">
+    <div class="ap-c hl"><b>Doble confirmación</b>Una aportación cuenta solo cuando padrino y refugio la confirman. Nada queda “a medias”.</div>
+    <div class="ap-c"><b>Refugios verificados</b>Revisamos a cada refugio. Se marca con ✓ y el sello “Refugio al corriente”.</div>
+    <div class="ap-c"><b>Sin intermediarios</b>El dinero va directo al refugio. PetMatch no lo toca ni cobra comisión.</div>
+    <div class="ap-c"><b>Comprobantes</b>El refugio sube recibos y novedades públicas. Si deja de hacerlo, pierde el sello.</div>
+    <div class="ap-c"><b>Si lo adoptan, tú eliges</b>Apadrinas a otro del mismo refugio o detienes tu ayuda.</div>
+    <div class="ap-c"><b>Cancelas cuando quieras</b>Sin permanencia ni penalización.</div>
+  </div>
+  <p class="ap-mut" style="margin-top:10px">PetMatch conecta a padrinos con refugios y publica la transparencia de cada apadrinamiento. Los depósitos se hacen directamente al refugio, por lo que PetMatch no administra ni reembolsa dinero.</p>
+
+  <div class="ap-k" id="necesitan">NECESITAN PADRINO</div>
+  <div id="apPets" class="ap-pets"><div class="center-loading">Cargando…</div></div>
+
+  <div class="ap-k">PREGUNTAS FRECUENTES</div>
+  <div class="ap-grid" style="margin-bottom:40px">
+    <div class="ap-c"><b>¿Cuánto debo aportar?</b>Lo que tú puedas. El refugio solo muestra una meta de referencia.</div>
+    <div class="ap-c"><b>¿Puedo adoptarlo después?</b>Sí. Un padrino puede pedir adoptar al mismo animal.</div>
+    <div class="ap-c"><b>¿Soy refugio, puedo recibir apadrinamientos?</b>Sí: activa “Recibir apadrinamientos” al editar un animal en tu panel.</div>
+  </div>
+</div>
+
+<div id="apOv" class="ap-ov" hidden>
+  <div class="ap-sheet" role="dialog" aria-modal="true" aria-labelledby="apTit">
+    <button class="ap-x" id="apX" type="button" aria-label="Cerrar">✕</button>
+    <div id="apBody"></div>
+  </div>
+</div>
+<script type="module" src="js/apadrinar.js"></script>
+<script type="module" src="js/ux.js"></script>
+</body>
+</html>
