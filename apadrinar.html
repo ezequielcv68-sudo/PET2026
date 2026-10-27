@@ -23,42 +23,72 @@
     </div>
   </div>
 
-  <div class="ap-hero">
+  <header class="ap-hero2 ap-rv">
     <span class="ap-eyebrow">AYUDA SIN ADOPTAR</span>
-    <h1>Cuida a un animal sin tenerlo en casa</h1>
-    <p>Apadrinar es aportar —cada mes o una sola vez— para la comida, vacunas y medicinas de un animal que sigue en un refugio. Él sigue disponible para adopción: tú lo acompañas mientras llega su familia.</p>
-  </div>
+    <h1>Apadrina.<br><span>Cuida sin tenerlo en casa.</span></h1>
+    <p class="ap-lead">Tú pones lo que puedas. El refugio lo cuida. Tú ves cada recibo.</p>
 
-  <div class="ap-k">ASÍ FUNCIONA</div>
-  <div class="ap-grid">
-    <div class="ap-c ap-step"><div class="ap-n">1</div><div><b>Elige a tu ahijado</b>Ves qué necesita, su meta del mes y cuánta ayuda ya tiene.</div></div>
-    <div class="ap-c ap-step"><div class="ap-n">2</div><div><b>Escribe tu aportación</b>La cantidad que tú decidas. Sin mínimo ni máximo.</div></div>
-    <div class="ap-c ap-step"><div class="ap-n">3</div><div><b>El refugio te contacta</b>Por WhatsApp te da los datos para depositar directo a él.</div></div>
-    <div class="ap-c ap-step"><div class="ap-n">4</div><div><b>Confirman los dos</b>Tú confirmas que depositaste y el refugio confirma que lo recibió. Solo así queda registrado.</div></div>
-    <div class="ap-c ap-step"><div class="ap-n">5</div><div><b>Ves el resultado</b>Recibos y novedades con foto en “Mis ahijados”.</div></div>
-  </div>
+    <div class="ap-sim" id="apSim">
+      <div class="ap-sim-t">Si aportaras al mes…</div>
+      <div class="ap-sim-n"><span>$</span><input id="simNum" type="number" inputmode="numeric" min="1" value="200" aria-label="Monto mensual en pesos"></div>
+      <input id="simRange" type="range" min="50" max="1500" step="50" value="200" aria-label="Elegir monto mensual">
+      <div class="ap-sim-r"><span>$50</span><span>$1,500</span></div>
+      <div class="ap-sim-o">
+        <div><b id="simAnio">$2,400</b><small>al año</small></div>
+        <div id="simEq" hidden><b id="simPct">0%</b><small id="simEqT">de la meta de un animal</small></div>
+      </div>
+      <a class="ap-btn" href="#necesitan" style="width:100%">Ver a quién puedo ayudar</a>
+    </div>
 
-  <div class="ap-k">POR QUÉ ES SEGURO</div>
-  <div class="ap-grid">
-    <div class="ap-c hl"><b>Doble confirmación</b>Una aportación cuenta solo cuando padrino y refugio la confirman. Nada queda “a medias”.</div>
-    <div class="ap-c"><b>Refugios verificados</b>Revisamos a cada refugio. Se marca con ✓ y el sello “Refugio al corriente”.</div>
-    <div class="ap-c"><b>Sin intermediarios</b>El dinero va directo al refugio. PetMatch no lo toca ni cobra comisión.</div>
-    <div class="ap-c"><b>Comprobantes</b>El refugio sube recibos y novedades públicas. Si deja de hacerlo, pierde el sello.</div>
-    <div class="ap-c"><b>Si lo adoptan, tú eliges</b>Apadrinas a otro del mismo refugio o detienes tu ayuda.</div>
-    <div class="ap-c"><b>Cancelas cuando quieras</b>Sin permanencia ni penalización.</div>
-  </div>
-  <p class="ap-mut" style="margin-top:10px">PetMatch conecta a padrinos con refugios y publica la transparencia de cada apadrinamiento. Los depósitos se hacen directamente al refugio, por lo que PetMatch no administra ni reembolsa dinero.</p>
+    <ul class="ap-trust" aria-label="Garantías">
+      <li><i aria-hidden="true">🛡️</i>Refugios verificados</li>
+      <li><i aria-hidden="true">🧾</i>Con recibos</li>
+      <li><i aria-hidden="true">💚</i>Sin comisión</li>
+    </ul>
+  </header>
 
-  <div class="ap-k" id="necesitan">NECESITAN PADRINO</div>
+  <h2 class="ap-h2 ap-rv" id="necesitan">Ellos necesitan padrino</h2>
   <div id="apPets" class="ap-pets"><div class="center-loading">Cargando…</div></div>
 
-  <div class="ap-k">PREGUNTAS FRECUENTES</div>
-  <div class="ap-grid" style="margin-bottom:40px">
-    <div class="ap-c"><b>¿Cuánto debo aportar?</b>Lo que tú puedas. El refugio solo muestra una meta de referencia.</div>
-    <div class="ap-c"><b>¿Puedo adoptarlo después?</b>Sí. Un padrino puede pedir adoptar al mismo animal.</div>
-    <div class="ap-c"><b>¿Soy refugio, puedo recibir apadrinamientos?</b>Sí: activa “Recibir apadrinamientos” al editar un animal en tu panel.</div>
+  <h2 class="ap-h2 ap-rv">Así funciona</h2>
+  <p class="ap-hint">Desliza para ver los 5 pasos →</p>
+  <div class="ap-steps ap-rv" tabindex="0" role="list" aria-label="Pasos para apadrinar">
+    <div class="ap-s" role="listitem"><div class="ap-s-i">🐶</div><b>1 · Elige</b><span>Un animal de un refugio verificado.</span></div>
+    <div class="ap-s" role="listitem"><div class="ap-s-i">✍️</div><b>2 · Escribe tu monto</b><span>Lo que tú puedas, sin mínimo.</span></div>
+    <div class="ap-s" role="listitem"><div class="ap-s-i">💬</div><b>3 · Habla con el refugio</b><span>Te da sus datos por WhatsApp.</span></div>
+    <div class="ap-s" role="listitem"><div class="ap-s-i">✅</div><b>4 · Confirman los dos</b><span>Tú depositas, él confirma.</span></div>
+    <div class="ap-s" role="listitem"><div class="ap-s-i">📸</div><b>5 · Mira el resultado</b><span>Recibos y fotos de tu ahijado.</span></div>
   </div>
+
+  <h2 class="ap-h2 ap-rv">¿Por qué es seguro?</h2>
+  <div class="ap-flow ap-rv" aria-label="Ruta de tu aportación">
+    <div class="ap-fn"><i aria-hidden="true">🙋</i><b>Tú</b></div>
+    <div class="ap-fa" aria-hidden="true"><em>directo</em></div>
+    <div class="ap-fn"><i aria-hidden="true">🏠</i><b>Refugio verificado</b></div>
+    <div class="ap-fa" aria-hidden="true"><em>recibo</em></div>
+    <div class="ap-fn"><i aria-hidden="true">🧾</i><b>Tu cuenta</b></div>
+  </div>
+  <p class="ap-mut" style="text-align:center;margin:8px 0 14px">El dinero nunca pasa por PetMatch.</p>
+  <div class="ap-chips ap-rv" id="apChips" role="tablist" aria-label="Garantías">
+    <button type="button" role="tab" aria-selected="true" data-t="Una aportación cuenta solo cuando padrino y refugio la confirman. Nada queda a medias.">🤝 Doble confirmación</button>
+    <button type="button" role="tab" aria-selected="false" data-t="Revisamos a cada refugio y lo marcamos con ✓. El sello “Al corriente” aparece si publica recibos cada mes.">🛡️ Refugios verificados</button>
+    <button type="button" role="tab" aria-selected="false" data-t="Cada compra tiene recibo y cada animal una línea de vida pública con fotos y novedades.">🧾 Comprobantes</button>
+    <button type="button" role="tab" aria-selected="false" data-t="Si tu ahijado es adoptado, apadrinas a otro del mismo refugio o detienes tu ayuda.">💛 Si lo adoptan</button>
+    <button type="button" role="tab" aria-selected="false" data-t="Cancelas o pausas cuando quieras. Sin permanencia ni penalización.">🔓 Cancelas cuando quieras</button>
+  </div>
+  <div class="ap-chip-p" id="apChipP" role="status">Una aportación cuenta solo cuando padrino y refugio la confirman. Nada queda a medias.</div>
+
+  <h2 class="ap-h2 ap-rv">Preguntas rápidas</h2>
+  <div class="ap-faq ap-rv">
+    <details><summary>¿Cuánto debo aportar?</summary><p>Lo que tú puedas. No hay mínimo ni máximo.</p></details>
+    <details><summary>¿Puedo adoptarlo después?</summary><p>Sí, un padrino puede pedir adoptar al mismo animal.</p></details>
+    <details><summary>¿Soy refugio, cómo recibo apadrinamientos?</summary><p>Edita un animal en tu panel y activa “Recibir apadrinamientos”.</p></details>
+    <details><summary>¿PetMatch maneja el dinero?</summary><p>No. Depositas directo al refugio; PetMatch solo muestra la transparencia. Por eso no administra ni reembolsa dinero.</p></details>
+  </div>
+  <div style="height:90px"></div>
 </div>
+
+<a class="ap-fab" href="#necesitan" id="apFab" hidden>🐾 Apadrinar</a>
 
 <div id="apOv" class="ap-ov" hidden>
   <div class="ap-sheet" role="dialog" aria-modal="true" aria-labelledby="apTit">
